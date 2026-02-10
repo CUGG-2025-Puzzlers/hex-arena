@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://dgloupwap6qns"]
+
+[ext_resource type="Script" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
+
+[sub_resource type="Curve2D" id="Curve2D_eejgt"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7y173"]
+
+[node name="Arena" type="Node2D"]
+
+[node name="Path2D" type="Path2D" parent="."]
+curve = SubResource("Curve2D_eejgt")
+script = ExtResource("1_gubwe")
+
+[node name="LazyFollow" type="Sprite2D" parent="Path2D"]
+scale = Vector2(36.5, 36.5)
+texture = SubResource("PlaceholderTexture2D_7y173")
+
+[node name="Camera2D" type="Camera2D" parent="."]
