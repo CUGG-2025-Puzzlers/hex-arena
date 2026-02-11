@@ -23,6 +23,10 @@ func create_game():
 # Connects to the local server using the specified port
 func join_local_game():
 	print("Joining game")
+	
+	var client_peer = ENetMultiplayerPeer.new()
+	client_peer.create_client(SERVER_IP, DEFAULT_PORT)
+	multiplayer.multiplayer_peer = client_peer
 
 #endregion
 
