@@ -2,6 +2,8 @@
 extends Path2D
 class_name HexCells
 
+
+@onready var text = get_node("Label")
 # Radius == side
 @export var r: float = 80.:
 	set(new_r):
@@ -98,18 +100,52 @@ func local_to_map(pos: Vector2):
 	var y = pos.y/r
 	
 	if fposmod(y+0.5,1.5)>1:
-		# More precise but still imperfect
-		y = roundi(sign(pos.y)*0.5*(abs(pos.x)+abs(pos.y)*sqrt(3))/hex_width)
-		x = floori(pos.x/hex_width+(0. if (abs(y)%2) else 0.5))
+		var x0 = floori(pos.x/(hex_width))
+		var x1 = roundi(pos.x/(hex_width))
+		
+		var y0 = 2*floori(floor((y+1.)/1.5)/2.)
+		var y1 = 2*floori((floor((y+1.)/1.5)-1.)/2.)+1
+		
+		if pos.x<0:
+			var temp = y0
+			y0 = y1
+			y1 = temp
+		
+		if floori(abs(pos.x)/(hex_width/2.)) % 2:
+			var temp = y0
+			y0 = y1
+			y1 = temp
+		
+		var point0 = Vector2i(x0,y0)
+		var point1 = Vector2i(x1,y1)
+		
+		if (pos-map_to_local(point0)).project((map_to_local(point1)-map_to_local(point0)).normalized()).length()<hex_width/2.:
+			y = y0
+			x = x0
+		else:
+			y=y1
+			x=x1
+		
+		# Glitchy version
+		#y = roundi(sign(pos.y)*0.5*(abs(pos.x)+abs(pos.y)*sqrt(3))/hex_width)
+		#x = floori(pos.x/hex_width+(0. if (abs(y)%2) else 0.5))
 		# Freer version
 		#y = int((y-0.5)/1.5)
 		#x = int(pos.x/hex_width+(0. if (abs(y)%2) else 0.5))
 	else:
+		
 		y = int(sign(pos.y)*(abs(y)+0.5)/1.5)
 		x = floori(pos.x/hex_width+(0. if (abs(y)%2) else 0.5))
-		get_node("LazyFollow").position = map_to_local(Vector2i(x,y))
 	
-	return Vector2i(x,y)
+	var result = Vector2i(x,y)
+	
+	if randf()>0.5 and cell_dict.has(result):
+		get_node("LazyFollow").position = map_to_local(result)
+	
+	text.text = str(result)
+	text.position = pos+Vector2(25,-5)
+	
+	return result
 
 func map_to_local(pos: Vector2i):
 	var i = pos.x
