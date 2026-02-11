@@ -74,8 +74,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		if curr_cell!=new_curr_cell:
 			curr_cell = new_curr_cell
+			Events.emit_signal("select_new_cell",curr_cell)
 			queue_redraw()
-
+	if Input.is_action_pressed("place_magic"):
+		if cell_dict.has(curr_cell) and \
+		not is_instance_valid(cell_dict[curr_cell]):
+			var magic_instance = preload("res://scenes/magic.tscn").instantiate()
+			magic_instance.position = map_to_local(curr_cell)
+			cell_dict[curr_cell]=magic_instance
+			add_child(magic_instance)
+			magic_instance.add_to_group('magic')
+			Magic.last_placed_cell=curr_cell
 
 func _draw() -> void:
 	if points.is_empty():
@@ -139,7 +148,7 @@ func local_to_map(pos: Vector2):
 	
 	var result = Vector2i(x,y)
 	
-	if randf()>0.5 and cell_dict.has(result):
+	if cell_dict.has(result):
 		get_node("LazyFollow").position = map_to_local(result)
 	
 	text.text = str(result)
