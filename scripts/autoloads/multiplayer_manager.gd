@@ -11,6 +11,13 @@ const SERVER_IP = "127.0.0.1"
 # The user who creates the server is considered the 'host'
 func create_game():
 	print("Creating new game as host")
+	
+	var server_peer = ENetMultiplayerPeer.new()
+	server_peer.create_server(DEFAULT_PORT)
+	multiplayer.multiplayer_peer = server_peer
+	
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
 # Joins a game on the local network
 # Connects to the local server using the specified port
