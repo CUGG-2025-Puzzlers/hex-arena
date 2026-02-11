@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbcvu40g30mk6"]
+
+[ext_resource type="Texture2D" uid="uid://ddpwk5yi3s8v0" path="res://assets/textures/icon.svg" id="1_bb3gb"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_w1s7e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0puml"]
+
+[node name="Pellet" type="PathFollow2D"]
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+amount = 20
+texture = ExtResource("1_bb3gb")
+emission_shape = 1
+emission_sphere_radius = 9.0
+gravity = Vector2(0, 39.2)
+scale_amount_min = 0.03
+scale_amount_max = 0.04
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 0.785398
+scale = Vector2(12, 12)
+texture = SubResource("PlaceholderTexture2D_w1s7e")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(-1.19209e-07, 1.3113e-06)
+scale = Vector2(0.9, 0.9)
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_0puml")

@@ -4,3 +4,5 @@ extends Node
 # It should provide functions to call emit those signals.
 # Other scripts should call these functions instead of directly emitting from
 # the signals themselves.
+
+signal select_new_cell
