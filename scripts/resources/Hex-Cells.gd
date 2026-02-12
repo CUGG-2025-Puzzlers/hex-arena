@@ -10,8 +10,8 @@ class_name HexCells
 		r = new_r
 		recalculate()
 
-var hex_height: float = 2*r
-var hex_width: float = sqrt(3)*r
+static var hex_height: float #= 2*r
+static var hex_width: float #= sqrt(3)*r
 
 @export var width: float = 2000: #5000.:
 	set(new_w):
@@ -81,6 +81,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		not is_instance_valid(cell_dict[curr_cell]):
 			var magic_instance = preload("res://scenes/magic.tscn").instantiate()
 			magic_instance.position = map_to_local(curr_cell)
+			magic_instance.self_cell = curr_cell
 			cell_dict[curr_cell]=magic_instance
 			add_child(magic_instance)
 			magic_instance.add_to_group('magic')
@@ -156,7 +157,7 @@ func local_to_map(pos: Vector2):
 	
 	return result
 
-func map_to_local(pos: Vector2i):
+static func map_to_local(pos: Vector2i):
 	var i = pos.x
 	var j = pos.y
 	var right_displacement : int = abs(j) % 2
