@@ -72,8 +72,13 @@ func _on_back() -> void:
 #endregion
 
 func _set_join_menu(open: bool) -> void:
+	_name_line_edit.text = ""
 	_ip_line_edit.text = ""
 	_port_line_edit.text = ""
+	
+	_name_error_label.hide()
+	_ip_error_label.hide()
+	_port_error_label.hide()
 	
 	_main_panel.visible = not open
 	_join_panel.visible = open
