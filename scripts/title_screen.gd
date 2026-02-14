@@ -1,9 +1,9 @@
 extends Node
 
 @onready var _host_game_button: Button = %HostGameButton
-@onready var _join_game_button: Button = %HostGameButton
-@onready var _join_button: Button = %HostGameButton
-@onready var _back_button: Button = %HostGameButton
+@onready var _join_game_button: Button = %JoinGameButton
+@onready var _connect_button: Button = %ConnectButton
+@onready var _back_button: Button = %BackButton
 
 @onready var _main_panel: Panel = %MainPanel
 @onready var _join_panel: Panel = %JoinPanel
@@ -16,7 +16,7 @@ extends Node
 func _ready() -> void:
 	_host_game_button.pressed.connect(_on_host_game)
 	_join_game_button.pressed.connect(_on_join_game)
-	_join_button.pressed.connect(_on_connect)
+	_connect_button.pressed.connect(_on_connect)
 	_back_button.pressed.connect(_on_back)
 	
 	_main_panel.visible = true
