@@ -16,6 +16,7 @@ config/icon="res://assets/textures/icon.svg"
 
 [autoload]
 
+SceneManager="*uid://bosapdapain4b"
 MultiplayerManager="*uid://dhwwc4t2mdyga"
 
 [display]
