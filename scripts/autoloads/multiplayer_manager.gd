@@ -34,13 +34,13 @@ func create_game():
 	players[1] = player_info
 	player_connected.emit(1, player_info)
 
-# Joins a game on the local network
-# Connects to the local server using the specified port
-func join_local_game():
+# Joins a game
+# Connects to the server using the specified ip and port
+func join_game(ip: String, port: int):
 	print("Joining game")
 	
 	var client_peer = ENetMultiplayerPeer.new()
-	client_peer.create_client(SERVER_IP, DEFAULT_PORT)
+	client_peer.create_client(ip, port)
 	multiplayer.multiplayer_peer = client_peer
 
 # Registers a player
