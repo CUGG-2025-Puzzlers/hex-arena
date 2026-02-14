@@ -8,8 +8,13 @@ extends Node
 @onready var _main_panel: Panel = %MainPanel
 @onready var _join_panel: Panel = %JoinPanel
 
+@onready var _name_line_edit: LineEdit = %NameLineEdit
 @onready var _ip_line_edit: LineEdit = %IPLineEdit
 @onready var _port_line_edit: LineEdit = %PortLineEdit
+
+@onready var _name_error_label: Label = %NameErrorLabel
+@onready var _ip_error_label: Label = %IPErrorLabel
+@onready var _port_error_label: Label = %PortErrorLabel
 
 #region Setup
 
