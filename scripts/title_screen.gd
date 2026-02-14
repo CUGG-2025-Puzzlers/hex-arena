@@ -99,6 +99,8 @@ func _on_back() -> void:
 
 #endregion
 
+# Toggles menu visibility
+# Clears text and errors
 func _set_join_menu(open: bool) -> void:
 	_name_line_edit.text = ""
 	_ip_line_edit.text = ""
@@ -111,6 +113,9 @@ func _set_join_menu(open: bool) -> void:
 	_main_panel.visible = not open
 	_join_panel.visible = open
 
+# Validates the given name
+# Length: 2 - 16 characters
+# Characters: Uppercase and Lowercase letters only
 func _is_valid_name(player_name: String) -> bool:
 	if player_name.length() < 2 || player_name.length() > 16:
 		print("Invalid Name Length: %d" % player_name.length())
@@ -123,8 +128,10 @@ func _is_valid_name(player_name: String) -> bool:
 	print("Invalid Name: %s does not match regex pattern %s" % [player_name, name_regex.get_pattern()])
 	return false
 
+# Validates the given port
+# Range: 1 - 65535 (inclusive)
 func _is_valid_port(port: int) -> bool:
-	if port > 0 and port < 65535:
+	if port > 0 and port <= 65535:
 		return true
 	
 	print("Invalid Port Number: %d" % port)
