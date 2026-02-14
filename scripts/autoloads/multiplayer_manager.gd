@@ -20,6 +20,8 @@ const SERVER_IP = "127.0.0.1"
 func _ready() -> void:
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	multiplayer.connection_failed.connect(_on_connection_failed)
 
 # Creates a game that other players can connect to
 # Creates a server with at the port specified in settings
@@ -35,13 +37,16 @@ func create_game():
 	player_connected.emit(1, player_info)
 
 # Joins a game
-# Connects to the server using the specified ip and port
-func join_game(ip: String, port: int):
-	print("Joining game")
-	
+# Attempts to connect to the server using the specified name, ip, and port
+func join_game(player_name: String, ip: String, port: int):
 	var client_peer = ENetMultiplayerPeer.new()
-	client_peer.create_client(ip, port)
+	var result = client_peer.create_client(ip, port)
+	if result != OK:
+		print("Failed to create client: %s" % result)
+		return
+	
 	multiplayer.multiplayer_peer = client_peer
+	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 
 # Registers a player
 # Adds a player to the players list
@@ -73,5 +78,11 @@ func _on_peer_disconnected(id: int):
 	print("Player %s left..." % id)
 	
 	_unregister_player(id)
+
+func _on_connected_to_server():
+	print("Successfully connected to server!")
+
+func _on_connection_failed():
+	print("Failed to connect to server: Double-check IP, Port, and Firewall settings")
 
 #endregion
