@@ -46,8 +46,9 @@ func join_game(player_name: String, ip: String, port: int):
 		print("Failed to create client: %s" % result)
 		return
 	
-	player_info["name"] = player_name
 	multiplayer.multiplayer_peer = client_peer
+	
+	player_info["name"] = player_name
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 
 # Registers a player
@@ -83,6 +84,7 @@ func _on_peer_disconnected(id: int):
 
 func _on_connected_to_server():
 	print("Successfully connected to server!")
+	players[multiplayer.get_unique_id()] = player_info
 
 func _on_connection_failed():
 	print("Failed to connect to server: Double-check IP, Port, and Firewall settings")
