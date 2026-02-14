@@ -7,47 +7,119 @@ script = ExtResource("1_fgkus")
 
 [node name="MainPanel" type="Panel" parent="." unique_id=2096537197]
 unique_name_in_owner = true
-offset_right = 187.0
-offset_bottom = 188.0
+offset_left = 226.0
+offset_top = 124.0
+offset_right = 421.0
+offset_bottom = 236.0
 
 [node name="HostGameButton" type="Button" parent="MainPanel" unique_id=75787454]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 49.0
-offset_top = 53.0
+offset_top = 21.0
 offset_right = 143.0
-offset_bottom = 84.0
+offset_bottom = 52.0
 text = "Host Game"
 
 [node name="JoinGameButton" type="Button" parent="MainPanel" unique_id=1984129057]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 51.0
-offset_top = 97.0
+offset_top = 65.0
 offset_right = 145.0
-offset_bottom = 128.0
+offset_bottom = 96.0
 text = "Join Game"
+
+[node name="NamePanel" type="Panel" parent="." unique_id=215951254]
+offset_left = 108.0
+offset_top = 50.0
+offset_right = 318.0
+offset_bottom = 108.0
+
+[node name="NameInfoPanel" type="Panel" parent="NamePanel" unique_id=282669142]
+layout_mode = 0
+offset_left = 215.0
+offset_right = 417.0
+offset_bottom = 58.0
+
+[node name="Title" type="Label" parent="NamePanel/NameInfoPanel" unique_id=1159234265]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 2.0
+offset_right = 182.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "Name Rules"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="NamePanel/NameInfoPanel" unique_id=1450701704]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 22.0
+offset_right = 195.0
+offset_bottom = 57.0
+theme_override_font_sizes/font_size = 10
+text = "Must be between 2-16 characters, lowercase and uppercase letters only"
+autowrap_mode = 2
+
+[node name="NameField" type="Control" parent="NamePanel" unique_id=1046245223]
+anchors_preset = 0
+offset_right = 209.0
+offset_bottom = 51.0
+
+[node name="NameErrorLabel" type="Label" parent="NamePanel/NameField" unique_id=1417586793]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 70.0
+offset_right = 200.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Invalid Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="NamePanel/NameField" unique_id=1519482048]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 17.0
+offset_right = 64.0
+offset_bottom = 48.0
+text = "Name: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="NameLineEdit" type="LineEdit" parent="NamePanel/NameField" unique_id=253069408]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 71.0
+offset_top = 17.0
+offset_right = 201.0
+offset_bottom = 48.0
 
 [node name="JoinPanel" type="Panel" parent="." unique_id=695321650]
 unique_name_in_owner = true
-offset_left = 87.0
-offset_top = 63.0
-offset_right = 387.0
-offset_bottom = 268.0
+offset_left = 101.0
+offset_top = 113.0
+offset_right = 401.0
+offset_bottom = 255.0
 
 [node name="InfoPanel" type="Panel" parent="JoinPanel" unique_id=1860023995]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 310.0
-offset_right = 495.0
-offset_bottom = 205.0
+offset_left = 312.0
+offset_top = 1.0
+offset_right = 497.0
+offset_bottom = 136.0
 
 [node name="Title" type="Label" parent="JoinPanel/InfoPanel" unique_id=1657139735]
 layout_mode = 0
-offset_left = 4.0
-offset_top = 3.0
-offset_right = 181.0
-offset_bottom = 21.0
+offset_left = 5.0
+offset_top = 6.0
+offset_right = 182.0
+offset_bottom = 24.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 10
 text = "How To Join A Game"
@@ -59,53 +131,17 @@ layout_mode = 0
 offset_left = 8.0
 offset_top = 30.0
 offset_right = 177.0
-offset_bottom = 200.0
+offset_bottom = 131.0
 theme_override_font_sizes/font_size = 10
-text = "- Your NAME must be between 2-16 characters and can only be made up of lowercase and uppercase letters.
-- Enter the IP ADDRESS of the user who's hosting the game. Leave empty for default.
+text = "- Enter the IP ADDRESS of the user who's hosting the game. Leave empty for default.
 - Enter the PORT the host is using, the value must be between 1 and 65535. Leave empty for default."
 autowrap_mode = 2
 
-[node name="NameField" type="Control" parent="JoinPanel" unique_id=1046245223]
-anchors_preset = 0
-offset_right = 300.0
-offset_bottom = 51.0
-
-[node name="NameErrorLabel" type="Label" parent="JoinPanel/NameField" unique_id=1417586793]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 124.0
-offset_right = 254.0
-offset_bottom = 20.0
-theme_override_colors/font_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 10
-text = "Invalid Name"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="NameLabel" type="Label" parent="JoinPanel/NameField" unique_id=1519482048]
-layout_mode = 0
-offset_left = 12.0
-offset_top = 17.0
-offset_right = 118.0
-offset_bottom = 48.0
-text = "Name: "
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="NameLineEdit" type="LineEdit" parent="JoinPanel/NameField" unique_id=253069408]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 125.0
-offset_top = 17.0
-offset_right = 255.0
-offset_bottom = 48.0
-
 [node name="IPField" type="Control" parent="JoinPanel" unique_id=913333004]
 anchors_preset = 0
-offset_top = 48.0
+offset_top = -1.0
 offset_right = 300.0
-offset_bottom = 99.0
+offset_bottom = 50.0
 
 [node name="IPErrorLabel" type="Label" parent="JoinPanel/IPField" unique_id=1581729105]
 unique_name_in_owner = true
@@ -141,9 +177,10 @@ placeholder_text = "127.0.0.1"
 
 [node name="PortField" type="Control" parent="JoinPanel" unique_id=1731529964]
 anchors_preset = 0
-offset_top = 98.0
-offset_right = 300.0
-offset_bottom = 147.0
+offset_left = -1.0
+offset_top = 50.0
+offset_right = 299.0
+offset_bottom = 99.0
 
 [node name="PortErrorLabel" type="Label" parent="JoinPanel/PortField" unique_id=1979254635]
 unique_name_in_owner = true
@@ -181,9 +218,9 @@ placeholder_text = "6967"
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 40.0
-offset_top = 163.0
+offset_top = 102.0
 offset_right = 134.0
-offset_bottom = 194.0
+offset_bottom = 133.0
 text = "Connect
 "
 
@@ -191,8 +228,8 @@ text = "Connect
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 160.0
-offset_top = 163.0
+offset_top = 102.0
 offset_right = 254.0
-offset_bottom = 194.0
+offset_bottom = 133.0
 text = "Back
 "
