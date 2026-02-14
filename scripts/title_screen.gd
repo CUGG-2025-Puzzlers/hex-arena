@@ -24,8 +24,7 @@ func _ready() -> void:
 	_connect_button.pressed.connect(_on_connect)
 	_back_button.pressed.connect(_on_back)
 	
-	_main_panel.visible = true
-	_join_panel.visible = false
+	_set_join_menu(false)
 	
 	_ip_line_edit.text = ""
 	_port_line_edit.text = ""
