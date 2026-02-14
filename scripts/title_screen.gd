@@ -25,6 +25,7 @@ func _ready() -> void:
 	_back_button.pressed.connect(_on_back)
 	
 	_set_join_menu(false)
+	_name_error_label.hide()
 	
 	_ip_line_edit.text = ""
 	_port_line_edit.text = ""
@@ -36,7 +37,14 @@ func _ready() -> void:
 # Creates a new game room
 # Switches to the character select screen
 func _on_host_game() -> void:
-	pass
+	var player_name: String = _name_line_edit.text.strip_edges()
+	if not _is_valid_name(player_name):
+		_name_error_label.show()
+		return
+	else:
+		_name_error_label.hide()
+	
+	MultiplayerManager.create_game(player_name)
 
 # Opens up the join menu
 func _on_join_game() -> void:
