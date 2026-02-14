@@ -45,21 +45,49 @@ func _on_join_game() -> void:
 # Joins an existing game room
 # Switches to the character select screen
 func _on_connect() -> void:
-	var ip: String = _ip_line_edit.text.strip_edges()
-	var port: int = _port_line_edit.text.strip_edges().to_int()
+	var errors: int = 0
 	
-	if (not ip):
+	# Get and validate player name
+	var player_name: String = _name_line_edit.text.strip_edges()
+	if not _is_valid_name(player_name):
+		errors += 1
+		_name_error_label.show()
+	else:
+		_name_error_label.hide()
+	
+	# Get and validate IP address
+	var ip: String = _ip_line_edit.text.strip_edges()
+	if not ip:
 		ip = MultiplayerManager.SERVER_IP
 	
-	if (not port):
+	if not ip.is_valid_ip_address():
+		errors += 1
+		_ip_error_label.show()
+		print("Invalid IP Address: %s" % ip)
+	else:
+		_ip_error_label.hide()
+	
+	# Get and validate port number
+	var port_string: String = _port_line_edit.text.strip_edges()
+	var port: int = -1
+	if not port_string:
 		port = MultiplayerManager.DEFAULT_PORT
+	elif not port_string.is_valid_int():
+		errors += 1
+		_port_error_label.show()
+		print("Invalid Port: %s is not an integer" % port_string)
+	else:
+		port = port_string.to_int()
 	
-	if (not ip.is_valid_ip_address()):
-		# show ip error
-		return
+	if not _is_valid_port(port):
+		errors += 1
+		_port_error_label.show()
+	else:
+		_port_error_label.hide()
 	
-	if (port < 1 or port > 65535):
-		# show port error
+	# Don't attempt connection is errors are present
+	if errors > 0:
+		print("Fix %d error(s) before connecting..." % errors)
 		return
 	
 	print("Attempting to connect to %s on port %s..." % [ip, port])
@@ -99,5 +127,5 @@ func _is_valid_port(port: int) -> bool:
 	if port > 0 and port < 65535:
 		return true
 	
-	print("Invalid port number: %d" % port)
+	print("Invalid Port Number: %d" % port)
 	return false
