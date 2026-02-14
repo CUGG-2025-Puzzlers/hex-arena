@@ -77,3 +77,22 @@ func _set_join_menu(open: bool) -> void:
 	
 	_main_panel.visible = not open
 	_join_panel.visible = open
+
+func _is_valid_name(player_name: String) -> bool:
+	if player_name.length() < 2 || player_name.length() > 16:
+		print("Invalid Name Length: %d" % player_name.length())
+		return false
+	
+	var name_regex = RegEx.create_from_string("^[a-zA-Z]{2,16}$")
+	if name_regex.search(player_name):
+		return true
+	
+	print("Invalid Name: %s does not match regex pattern %s" % [player_name, name_regex.get_pattern()])
+	return false
+
+func _is_valid_port(port: int) -> bool:
+	if port > 0 and port < 65535:
+		return true
+	
+	print("Invalid port number: %d" % port)
+	return false
