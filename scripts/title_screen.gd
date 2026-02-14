@@ -29,16 +29,29 @@ func _ready() -> void:
 
 #region Button Callbacks
 
-func _on_host_game():
+# Creates a new game room
+# Switches to the character select screen
+func _on_host_game() -> void:
 	pass
 
-func _on_join_game():
+# Opens up the join menu
+func _on_join_game() -> void:
+	_set_join_menu(true)
+
+# Joins an existing game room
+# Switches to the character select screen
+func _on_connect() -> void:
 	pass
 
-func _on_connect():
-	pass
-
-func _on_back():
-	pass
+# Closes the join menu
+func _on_back() -> void:
+	_set_join_menu(false)
 
 #endregion
+
+func _set_join_menu(open: bool) -> void:
+	_ip_line_edit.text = ""
+	_port_line_edit.text = ""
+	
+	_main_panel.visible = not open
+	_join_panel.visible = open
