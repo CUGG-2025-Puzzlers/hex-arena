@@ -30,70 +30,169 @@ text = "Join Game"
 
 [node name="JoinPanel" type="Panel" parent="." unique_id=695321650]
 unique_name_in_owner = true
-offset_left = 224.0
-offset_top = 1.0
-offset_right = 411.0
-offset_bottom = 271.0
+offset_left = 87.0
+offset_top = 63.0
+offset_right = 387.0
+offset_bottom = 268.0
+
+[node name="InfoPanel" type="Panel" parent="JoinPanel" unique_id=1860023995]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 310.0
+offset_right = 495.0
+offset_bottom = 205.0
+
+[node name="Title" type="Label" parent="JoinPanel/InfoPanel" unique_id=1657139735]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 3.0
+offset_right = 181.0
+offset_bottom = 21.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 10
+text = "How To Join A Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="JoinPanel/InfoPanel" unique_id=2068167460]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 30.0
+offset_right = 177.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 10
+text = "- Your NAME must be between 2-16 characters and can only be made up of lowercase and uppercase letters.
+- Enter the IP ADDRESS of the user who's hosting the game. Leave empty for default.
+- Enter the PORT the host is using, the value must be between 1 and 65535. Leave empty for default."
+autowrap_mode = 2
+
+[node name="NameField" type="Control" parent="JoinPanel" unique_id=1046245223]
+anchors_preset = 0
+offset_right = 300.0
+offset_bottom = 51.0
+
+[node name="NameErrorLabel" type="Label" parent="JoinPanel/NameField" unique_id=1417586793]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 124.0
+offset_right = 254.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Invalid Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="JoinPanel/NameField" unique_id=1519482048]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 17.0
+offset_right = 118.0
+offset_bottom = 48.0
+text = "Name: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="NameLineEdit" type="LineEdit" parent="JoinPanel/NameField" unique_id=253069408]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 125.0
+offset_top = 17.0
+offset_right = 255.0
+offset_bottom = 48.0
+
+[node name="IPField" type="Control" parent="JoinPanel" unique_id=913333004]
+anchors_preset = 0
+offset_top = 48.0
+offset_right = 300.0
+offset_bottom = 99.0
+
+[node name="IPErrorLabel" type="Label" parent="JoinPanel/IPField" unique_id=1581729105]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 125.0
+offset_top = -2.0
+offset_right = 255.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Invalid IP Address"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IPLabel" type="Label" parent="JoinPanel/IPField" unique_id=756439528]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 16.0
+offset_right = 118.0
+offset_bottom = 47.0
+text = "IP Address: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="IPLineEdit" type="LineEdit" parent="JoinPanel/IPField" unique_id=1418683015]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 125.0
+offset_top = 16.0
+offset_right = 255.0
+offset_bottom = 47.0
+placeholder_text = "127.0.0.1"
+
+[node name="PortField" type="Control" parent="JoinPanel" unique_id=1731529964]
+anchors_preset = 0
+offset_top = 98.0
+offset_right = 300.0
+offset_bottom = 147.0
+
+[node name="PortErrorLabel" type="Label" parent="JoinPanel/PortField" unique_id=1979254635]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 125.0
+offset_top = -4.0
+offset_right = 256.0
+offset_bottom = 16.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "Invalid Port"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PortLabel" type="Label" parent="JoinPanel/PortField" unique_id=484609462]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 118.0
+offset_bottom = 45.0
+text = "Port: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PortLineEdit" type="LineEdit" parent="JoinPanel/PortField" unique_id=958010255]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 125.0
+offset_top = 14.0
+offset_right = 255.0
+offset_bottom = 45.0
+placeholder_text = "6967"
 
 [node name="ConnectButton" type="Button" parent="JoinPanel" unique_id=1759602935]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 47.0
-offset_top = 185.0
-offset_right = 141.0
-offset_bottom = 216.0
-text = "Join
+offset_left = 40.0
+offset_top = 163.0
+offset_right = 134.0
+offset_bottom = 194.0
+text = "Connect
 "
 
 [node name="BackButton" type="Button" parent="JoinPanel" unique_id=644963433]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 47.0
-offset_top = 225.0
-offset_right = 141.0
-offset_bottom = 256.0
+offset_left = 160.0
+offset_top = 163.0
+offset_right = 254.0
+offset_bottom = 194.0
 text = "Back
 "
-
-[node name="IPLineEdit" type="LineEdit" parent="JoinPanel" unique_id=821240118]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 29.0
-offset_top = 47.0
-offset_right = 159.0
-offset_bottom = 78.0
-placeholder_text = "127.0.0.1"
-
-[node name="PortLineEdit" type="LineEdit" parent="JoinPanel" unique_id=1411946905]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 29.0
-offset_top = 126.0
-offset_right = 159.0
-offset_bottom = 157.0
-placeholder_text = "6967"
-
-[node name="IPLabel" type="Label" parent="JoinPanel" unique_id=1847340233]
-layout_mode = 0
-offset_left = 33.0
-offset_top = 23.0
-offset_right = 158.0
-offset_bottom = 46.0
-text = "IP Address:"
-
-[node name="ToolTipLabel" type="Label" parent="JoinPanel" unique_id=544092920]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 5.0
-offset_right = 165.0
-offset_bottom = 25.0
-theme_override_font_sizes/font_size = 10
-text = "Leave blank for default values"
-
-[node name="PortLabel" type="Label" parent="JoinPanel" unique_id=1524361010]
-layout_mode = 0
-offset_left = 31.0
-offset_top = 99.0
-offset_right = 156.0
-offset_bottom = 122.0
-text = "Port:"
