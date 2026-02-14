@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://bxue7p844nv7d"]
+
+[ext_resource type="Script" uid="uid://ce3s23apcqhow" path="res://scripts/title_screen.gd" id="1_fgkus"]
+
+[node name="TitleScreen" type="Node2D" unique_id=1287481627]
+script = ExtResource("1_fgkus")
+
+[node name="MainPanel" type="Panel" parent="." unique_id=2096537197]
+offset_right = 187.0
+offset_bottom = 188.0
+
+[node name="HostGameButton" type="Button" parent="MainPanel" unique_id=75787454]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 49.0
+offset_top = 53.0
+offset_right = 143.0
+offset_bottom = 84.0
+text = "Host Game"
+
+[node name="JoinGameButton" type="Button" parent="MainPanel" unique_id=1984129057]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 51.0
+offset_top = 97.0
+offset_right = 145.0
+offset_bottom = 128.0
+text = "Join Game"
+
+[node name="JoinPanel" type="Panel" parent="." unique_id=695321650]
+offset_left = 224.0
+offset_top = 1.0
+offset_right = 411.0
+offset_bottom = 271.0
+
+[node name="ConnectButton" type="Button" parent="JoinPanel" unique_id=1759602935]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 47.0
+offset_top = 190.0
+offset_right = 141.0
+offset_bottom = 221.0
+text = "Join
+"
+
+[node name="BackButton" type="Button" parent="JoinPanel" unique_id=644963433]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 47.0
+offset_top = 230.0
+offset_right = 141.0
+offset_bottom = 261.0
+text = "Back
+"
+
+[node name="IPLineEdit" type="LineEdit" parent="JoinPanel" unique_id=821240118]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 86.0
+offset_right = 159.0
+offset_bottom = 117.0
+placeholder_text = "127.0.0.1"
+
+[node name="PortLineEdit2" type="LineEdit" parent="JoinPanel" unique_id=1411946905]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 147.0
+offset_right = 159.0
+offset_bottom = 178.0
+placeholder_text = "6967"
+
+[node name="IPLabel" type="Label" parent="JoinPanel" unique_id=1847340233]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 59.0
+offset_right = 158.0
+offset_bottom = 82.0
+text = "IP Address:"
+
+[node name="IPLabel3" type="Label" parent="JoinPanel" unique_id=544092920]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 26.0
+offset_right = 165.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 10
+text = "Leave blank for default values"
+
+[node name="IPLabel2" type="Label" parent="JoinPanel" unique_id=1524361010]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 120.0
+offset_right = 156.0
+offset_bottom = 143.0
+text = "Port:"
