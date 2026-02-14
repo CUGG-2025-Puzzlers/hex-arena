@@ -90,8 +90,7 @@ func _on_connect() -> void:
 		print("Fix %d error(s) before connecting..." % errors)
 		return
 	
-	print("Attempting to connect to %s on port %s..." % [ip, port])
-	MultiplayerManager.join_game(ip, port)
+	MultiplayerManager.join_game(player_name, ip, port)
 
 # Closes the join menu
 func _on_back() -> void:
