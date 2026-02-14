@@ -41,7 +41,25 @@ func _on_join_game() -> void:
 # Joins an existing game room
 # Switches to the character select screen
 func _on_connect() -> void:
-	pass
+	var ip: String = _ip_line_edit.text.strip_edges()
+	var port: int = _port_line_edit.text.strip_edges().to_int()
+	
+	if (not ip):
+		ip = MultiplayerManager.SERVER_IP
+	
+	if (not port):
+		port = MultiplayerManager.DEFAULT_PORT
+	
+	if (not ip.is_valid_ip_address()):
+		# show ip error
+		return
+	
+	if (port < 1 or port > 65535):
+		# show port error
+		return
+	
+	print("Attempting to connect to %s on port %s..." % [ip, port])
+	MultiplayerManager.join_game(ip, port)
 
 # Closes the join menu
 func _on_back() -> void:
