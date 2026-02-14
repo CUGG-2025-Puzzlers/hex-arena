@@ -26,13 +26,14 @@ func _ready() -> void:
 # Creates a game that other players can connect to
 # Creates a server with at the port specified in settings
 # The user who creates the server is considered the 'host'
-func create_game():
+func create_game(player_name: String):
 	print("Creating new game as host")
 	
 	var server_peer = ENetMultiplayerPeer.new()
 	server_peer.create_server(DEFAULT_PORT, 2)
 	multiplayer.multiplayer_peer = server_peer
 	
+	player_info["name"] = player_name
 	players[1] = player_info
 	player_connected.emit(1, player_info)
 
@@ -45,6 +46,7 @@ func join_game(player_name: String, ip: String, port: int):
 		print("Failed to create client: %s" % result)
 		return
 	
+	player_info["name"] = player_name
 	multiplayer.multiplayer_peer = client_peer
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 
