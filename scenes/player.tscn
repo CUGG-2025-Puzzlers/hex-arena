@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://dfgnxywsww0d5" path="res://icon.svg" id="2_qhqgy"]
+[ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(10, 30)
@@ -18,3 +19,7 @@ shape = SubResource("RectangleShape2D_g2els")
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
 scale = Vector2(0.086, 0.25)
 texture = ExtResource("2_qhqgy")
+
+[node name="StatsComponent" type="Node" parent="." unique_id=20242128]
+script = ExtResource("3_qhqgy")
+metadata/_custom_type_script = "uid://c1fx17yoxje1h"

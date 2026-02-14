@@ -2,12 +2,13 @@ extends CharacterBody2D
 
 @export var base_speed : float = 150.0
 
+@onready var stats: StatsComponent = $StatsComponent
+
 var input : Vector2
 var canMove : bool
 
-func _ready():
-	canMove = true
-	
+func get_stats() -> StatsComponent:
+	return stats
 
 func _physics_process(delta: float) -> void:
 		
