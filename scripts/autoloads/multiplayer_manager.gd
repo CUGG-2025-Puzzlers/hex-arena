@@ -30,7 +30,7 @@ func create_game():
 	print("Creating new game as host")
 	
 	var server_peer = ENetMultiplayerPeer.new()
-	server_peer.create_server(DEFAULT_PORT)
+	server_peer.create_server(DEFAULT_PORT, 2)
 	multiplayer.multiplayer_peer = server_peer
 	
 	players[1] = player_info
