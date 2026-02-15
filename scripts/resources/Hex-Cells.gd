@@ -29,7 +29,8 @@ static var cell_dict: Dictionary = {}
 static var curr_cell: Vector2i = Vector2i()
 
 var points = []
-var hex_shape = []
+static var hex_shape = []
+static var hex_polygon_shape : ConvexPolygonShape2D
 
 
 func recalculate() -> void:
@@ -39,6 +40,10 @@ func recalculate() -> void:
 	hex_shape = []
 	for i in range(6):
 		hex_shape.append(r*Vector2.UP.rotated(i*PI/3.))
+	
+	hex_polygon_shape = ConvexPolygonShape2D.new()
+	hex_polygon_shape.points=hex_shape.duplicate()
+	
 	hex_shape.append(hex_shape.front())
 	
 	vertical_n = max(int(height/(hex_height))-1,0)+1
@@ -74,8 +79,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		if curr_cell!=new_curr_cell:
 			curr_cell = new_curr_cell
+			
+			text.text = str(curr_cell)
+			if cell_dict.has(curr_cell):
+				get_node("LazyFollow").position = map_to_local(curr_cell)
+			
 			Events.emit_signal("select_new_cell",curr_cell)
 			queue_redraw()
+		
+		text.position = get_global_mouse_position()+Vector2(25,-5)
+		
 	if Input.is_action_pressed("place_magic"):
 		if cell_dict.has(curr_cell) and \
 		not is_instance_valid(cell_dict[curr_cell]):
@@ -148,12 +161,6 @@ func local_to_map(pos: Vector2):
 		x = floori(pos.x/hex_width+(0. if (abs(y)%2) else 0.5))
 	
 	var result = Vector2i(x,y)
-	
-	if cell_dict.has(result):
-		get_node("LazyFollow").position = map_to_local(result)
-	
-	text.text = str(result)
-	text.position = pos+Vector2(25,-5)
 	
 	return result
 

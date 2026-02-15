@@ -69,10 +69,14 @@ func change_state():
 			health = 200
 			damage = 100
 		MagicType.SHIELD:
-			modulate=Color.GOLD
+			modulate=Color.WEB_PURPLE
 			health = 100
 			damage = 100
-		
+			
+			visualize_shield()
+			scale = 0.9*Vector2.ONE
+			var coll_shape :CollisionShape2D = get_node("CollisionShape2D")
+			coll_shape.shape =	HexCells.hex_polygon_shape
 
 func _process(delta: float) -> void:
 	if rolling:
@@ -172,3 +176,21 @@ func fizzle():
 			else:
 				rolling_pathfollow.queue_free()
 	queue_free()
+
+func visualize_shield():
+	var polygon : Polygon2D = get_node("Shield Texture")
+	polygon.polygon = HexCells.hex_shape.duplicate()
+	
+	var bounding_box: Rect2 = Rect2()
+	bounding_box.position = Vector2(polygon.polygon[5].x,polygon.polygon[0].y)
+	bounding_box.size = abs(bounding_box.position)*2
+	
+	var scale_vec : Vector2 = polygon.texture.get_size()/bounding_box.size
+	polygon.texture_scale = Vector2.ONE*min(scale_vec.x,scale_vec.y)
+	#polygon.texture_offset = -bounding_box.position
+	#polygon.texture_offset = position-bounding_box.position
+	#polygon.texture_rotation = randfn(0, PI*0.01)
+	polygon.texture_rotation=randfn(PI*randi_range(0,5)/3,PI*0.05)
+	
+	polygon.visible=true
+	get_node("Sprite2D").visible = false
