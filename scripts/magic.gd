@@ -19,6 +19,11 @@ var self_cell: Vector2i
 var health: float = 25
 var damage: float = 0
 
+var animation_timer : float = 0.
+@onready var animated_sprite : Sprite2D = get_node("Sprite2D")
+
+var points =[]
+
 func _unhandled_key_input(_event: InputEvent) -> void:
 	if rolling:
 		return
@@ -68,6 +73,10 @@ func change_state():
 			modulate=Color.CRIMSON
 			health = 200
 			damage = 100
+			
+			animated_sprite.texture=animated_sprite.texture.duplicate()
+			animation_timer = randf()
+			
 		MagicType.SHIELD:
 			modulate=Color.WEB_PURPLE
 			health = 100
@@ -79,14 +88,29 @@ func change_state():
 			coll_shape.shape =	HexCells.hex_polygon_shape
 
 func _process(delta: float) -> void:
+	animation_timer+=randfn(delta/3.,delta/10)#+randfn(0,animation_timer/3.)
+	if animation_timer>=1 or animation_timer<0:
+		animation_timer=fposmod(animation_timer, 1)
+	if state==MagicType.HEAVY:
+		animated_sprite.texture.seamless_blend_skirt = lerpf(0.6,1,0.5*cos(2*PI*animation_timer)+0.5)
+	
 	if rolling:
 		if not is_instance_valid(rolling_pathfollow):
 			var trajectory : Path2D = Path2D.new()
-			trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE)
-			add_child(trajectory)
+			match state:
+				MagicType.HEAVY:
+					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(1,2))
+				MagicType.LIGHT:
+					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
+			
+			#smooth_path(trajectory.curve)
+			#points = trajectory.curve.get_baked_points()
+			#queue_redraw()
+			
 			rolling_pathfollow = PathFollow2D.new()
 			rolling_pathfollow.loop = false
-			trajectory.reparent(get_tree().current_scene)
+			trajectory.global_position=global_position
+			get_tree().current_scene.add_child(trajectory)
 			trajectory.add_child(rolling_pathfollow)
 			reparent(rolling_pathfollow)
 		else:
@@ -150,7 +174,7 @@ func create_wiggly_path(dir: Vector2, dist: float) -> Curve2D:
 		path.add_point(next_point)
 		last_point = next_point
 	
-	path.add_point(dir*BULLET_DISTANCE)
+	path.add_point(dir*dist)
 	return path
 
 
@@ -194,3 +218,21 @@ func visualize_shield():
 	
 	polygon.visible=true
 	get_node("Sprite2D").visible = false
+
+func smooth_path(curve: Curve2D):
+	"""
+	for i in range(curve.get_point_count()):
+		curve.set_point_left_tangent(i,Curve.TangentMode.TANGENT_LINEAR)
+		curve.set_point_right_tangent(i,Curve.TangentMode.TANGENT_LINEAR)
+	return
+	"""
+	for i in range(1,curve.get_point_count()-2):
+		var prev = curve.get_point_position(i-1)
+		var next = curve.get_point_position(i+1)
+		var spline: Vector2 = (next-prev).normalized()*5
+		curve.set_point_in(i,-spline)
+		curve.set_point_out(i,spline)
+
+func _draw() -> void:
+	if len(points)>1:
+		draw_polyline(points,Color.WHITE)
