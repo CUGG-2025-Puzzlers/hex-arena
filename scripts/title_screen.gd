@@ -6,7 +6,7 @@ extends Node
 @onready var _back_button: Button = %BackButton
 
 @onready var _main_panel: Panel = %MainPanel
-@onready var _join_panel: Panel = %JoinPanel
+@onready var _join_container: Container = %JoinContainer
 
 @onready var _name_line_edit: LineEdit = %NameLineEdit
 @onready var _ip_line_edit: LineEdit = %IPLineEdit
@@ -116,7 +116,7 @@ func _set_join_menu(open: bool) -> void:
 	_port_error_label.hide()
 	
 	_main_panel.visible = not open
-	_join_panel.visible = open
+	_join_container.visible = open
 
 # Validates the given name
 # Length: 2 - 16 characters
