@@ -34,3 +34,56 @@ offset_bottom = 90.0
 theme_override_font_sizes/font_size = 50
 text = "Waiting for player..."
 horizontal_alignment = 2
+
+[node name="CharacterList" type="CenterContainer" parent="." unique_id=1696245211]
+offset_top = 730.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CharacterList" unique_id=2080266635]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/separation = 20
+
+[node name="CharacterPanel" type="Panel" parent="CharacterList/HBoxContainer" unique_id=1991876662]
+custom_minimum_size = Vector2(200, 250)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="CharacterPortrait" type="TextureRect" parent="CharacterList/HBoxContainer/CharacterPanel" unique_id=142918293]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+
+[node name="CharacterName" type="Label" parent="CharacterList/HBoxContainer/CharacterPanel" unique_id=715577369]
+layout_mode = 0
+offset_top = 200.0
+offset_right = 200.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 35
+text = "Char 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CharacterPanel2" type="Panel" parent="CharacterList/HBoxContainer" unique_id=567378931]
+custom_minimum_size = Vector2(200, 250)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="CharacterPortrait" type="TextureRect" parent="CharacterList/HBoxContainer/CharacterPanel2" unique_id=1381679696]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 200.0
+
+[node name="CharacterName" type="Label" parent="CharacterList/HBoxContainer/CharacterPanel2" unique_id=888583893]
+layout_mode = 0
+offset_top = 200.0
+offset_right = 200.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 35
+text = "Char 2"
+horizontal_alignment = 1
+vertical_alignment = 1
