@@ -5,7 +5,9 @@
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
-size = Vector2(10, 30)
+size = Vector2(22, 11)
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_qhqgy"]
 
 [sub_resource type="Animation" id="Animation_qhqgy"]
 length = 0.001
@@ -24,6 +26,8 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_fjrip"]
 resource_name = "down"
+length = 1.2500125
+loop_mode = 1
 step = 0.125
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -32,10 +36,10 @@ tracks/0/path = NodePath("Sprite2D:frame_coords")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.63321745, 0.75, 0.88321745, 1, 1.125),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [Vector2i(1, 2)]
+"values": [Vector2i(1, 3), Vector2i(2, 3), Vector2i(3, 3), Vector2i(2, 3), Vector2i(1, 3), Vector2i(0, 3), Vector2i(5, 2), Vector2i(4, 2), Vector2i(5, 2), Vector2i(0, 3)]
 }
 
 [sub_resource type="Animation" id="Animation_smehm"]
@@ -72,6 +76,24 @@ tracks/0/keys = {
 "values": [Vector2i(1, 1), Vector2i(0, 1), Vector2i(5, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(3, 1), Vector2i(2, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_dqkch"]
+resource_name = "up"
+length = 1.0000125
+loop_mode = 1
+step = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 0), Vector2i(6, 2), Vector2i(6, 1), Vector2i(6, 2), Vector2i(0, 0), Vector2i(5, 3), Vector2i(4, 3), Vector2i(5, 3)]
+}
+
 [sub_resource type="Animation" id="Animation_qlg0r"]
 resource_name = "up_left"
 length = 1.0000125
@@ -89,32 +111,14 @@ tracks/0/keys = {
 "values": [Vector2i(1, 0), Vector2i(2, 0), Vector2i(3, 0), Vector2i(2, 0), Vector2i(1, 0), Vector2i(6, 3), Vector2i(0, 4), Vector2i(6, 3)]
 }
 
-[sub_resource type="Animation" id="Animation_dqkch"]
-resource_name = "walk_up"
-length = 1.0000125
-loop_mode = 1
-step = 0.125
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame_coords")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [Vector2i(0, 0), Vector2i(6, 2), Vector2i(6, 1), Vector2i(6, 2), Vector2i(0, 0), Vector2i(5, 3), Vector2i(4, 3), Vector2i(5, 3)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_qlg0r"]
 _data = {
 &"RESET": SubResource("Animation_qhqgy"),
 &"down": SubResource("Animation_fjrip"),
 &"down_left": SubResource("Animation_smehm"),
 &"left": SubResource("Animation_tuyoq"),
-&"up_left": SubResource("Animation_qlg0r"),
-&"walk_up": SubResource("Animation_dqkch")
+&"up": SubResource("Animation_dqkch"),
+&"up_left": SubResource("Animation_qlg0r")
 }
 
 [node name="Player" type="CharacterBody2D" unique_id=398475662]
@@ -124,12 +128,12 @@ script = ExtResource("1_g2els")
 base_speed = 250.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
-visible = false
+position = Vector2(0, -2)
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
-position = Vector2(81, 106)
-scale = Vector2(0.1, 0.1)
+position = Vector2(-4.7683716e-07, -34)
+scale = Vector2(0.05, 0.05)
 texture = ExtResource("2_qhqgy")
 hframes = 7
 vframes = 5
@@ -139,6 +143,11 @@ region_rect = Rect2(0, 640, 11210, 10640)
 [node name="StatsComponent" type="Node" parent="." unique_id=20242128]
 script = ExtResource("3_qhqgy")
 metadata/_custom_type_script = "uid://c1fx17yoxje1h"
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1235461056]
+tree_root = SubResource("AnimationNodeBlendSpace2D_qhqgy")
+anim_player = NodePath("../AnimationPlayer")
+parameters/blend_position = Vector2(0, 0)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1925996960]
 libraries/ = SubResource("AnimationLibrary_qlg0r")
