@@ -5,7 +5,7 @@ class_name HexCells
 
 @onready var text = get_node("Label")
 # Radius == side
-@export var r: float = 80.:
+@export var r: float = 60.:
 	set(new_r):
 		r = new_r
 		recalculate()

@@ -19,10 +19,17 @@ var self_cell: Vector2i
 var health: float = 25
 var damage: float = 0
 
-var animation_timer : float = 0.
+var animation_timers : Array[float] = [0., 0.]
+var animation_total_times : Array[float] = [3., PI]
+
 @onready var animated_sprite : Sprite2D = get_node("Sprite2D")
+@onready var animated_children : Array
+var shield_animated_texture : GradientTexture2D
 
 var points =[]
+
+func _ready() -> void:
+	animated_children = find_children("ChildLight*", "Sprite2D")
 
 func _unhandled_key_input(_event: InputEvent) -> void:
 	if rolling:
@@ -75,24 +82,36 @@ func change_state():
 			damage = 100
 			
 			animated_sprite.texture=animated_sprite.texture.duplicate()
-			animation_timer = randf()
+			animation_timers[0] = randf()
 			
 		MagicType.SHIELD:
-			modulate=Color.WEB_PURPLE
+			#modulate=Color.WEB_PURPLE
 			health = 100
 			damage = 100
 			
+			animation_total_times[0] = 5
+			shield_animated_texture = find_child("Shield Glow").texture.duplicate()
+			find_child("Shield Glow").texture = shield_animated_texture
 			visualize_shield()
 			scale = 0.9*Vector2.ONE
 			var coll_shape :CollisionShape2D = get_node("CollisionShape2D")
 			coll_shape.shape =	HexCells.hex_polygon_shape
 
 func _process(delta: float) -> void:
-	animation_timer+=randfn(delta/3.,delta/10)#+randfn(0,animation_timer/3.)
-	if animation_timer>=1 or animation_timer<0:
-		animation_timer=fposmod(animation_timer, 1)
-	if state==MagicType.HEAVY:
-		animated_sprite.texture.seamless_blend_skirt = lerpf(0.6,1,0.5*cos(2*PI*animation_timer)+0.5)
+	for i in range(len(animation_timers)):
+		animation_timers[i]+=randfn(delta/animation_total_times[i],delta/animation_total_times[i]*0.3)#+randfn(0,animation_timers[i]/3.)
+		if animation_timers[i]>=1 or animation_timers[i]<0:
+			animation_timers[i]=fposmod(animation_timers[i], 1)
+	match state:
+		MagicType.HEAVY:
+			#animated_sprite.texture.seamless_blend_skirt = lerpf(0.6,1,0.5*cos(2*PI*animation_timer)+0.5)
+			pass
+		MagicType.SHIELD:
+			shield_animated_texture.fill_to = Vector2.ONE*lerpf(0.6,0.8,0.5*(cos(2*PI*animation_timers[0])+1))*sqrt(2)
+		MagicType.NEUTRAL:
+			animated_children[0].position = Vector2.RIGHT.rotated(2*PI*animation_timers[0])*20
+			animated_sprite.position = Vector2.UP*sin(animation_timers[1]*2*PI)*6
+			#animated_children[1].position = Vector2.RIGHT.rotated(-2*PI*animation_timer*3)*150
 	
 	if rolling:
 		if not is_instance_valid(rolling_pathfollow):
@@ -202,21 +221,25 @@ func fizzle():
 	queue_free()
 
 func visualize_shield():
-	var polygon : Polygon2D = get_node("Shield Texture")
-	polygon.polygon = HexCells.hex_shape.duplicate()
-	
 	var bounding_box: Rect2 = Rect2()
-	bounding_box.position = Vector2(polygon.polygon[5].x,polygon.polygon[0].y)
+	bounding_box.position = Vector2(HexCells.hex_shape[5].x,HexCells.hex_shape[0].y)
 	bounding_box.size = abs(bounding_box.position)*2
 	
-	var scale_vec : Vector2 = polygon.texture.get_size()/bounding_box.size
-	polygon.texture_scale = Vector2.ONE*min(scale_vec.x,scale_vec.y)
-	#polygon.texture_offset = -bounding_box.position
-	#polygon.texture_offset = position-bounding_box.position
-	#polygon.texture_rotation = randfn(0, PI*0.01)
-	polygon.texture_rotation=randfn(PI*randi_range(0,5)/3,PI*0.05)
+	for polygon in find_children("Shield*", "Polygon2D"):
+		polygon.polygon = HexCells.hex_shape
+		
+		var scale_vec : Vector2 = polygon.texture.get_size()/bounding_box.size
+		#polygon.texture_scale = Vector2.ONE*min(scale_vec.x,scale_vec.y)
+		#polygon.texture_scale = scale_vec
+		polygon.texture_scale = Vector2.ONE*max(scale_vec.x,scale_vec.y)
+		polygon.texture_scale*=2
 	
-	polygon.visible=true
+		#polygon.texture_offset = -bounding_box.position
+		#polygon.texture_offset = position-bounding_box.position
+		#polygon.texture_rotation = randfn(0, PI*0.01)
+		#polygon.texture_rotation=randfn(PI*randi_range(0,5)/3,PI*0.05)
+	
+		polygon.visible=true
 	get_node("Sprite2D").visible = false
 
 func smooth_path(curve: Curve2D):
