@@ -1,11 +1,50 @@
 [gd_scene format=3 uid="uid://2gnmcjcwoy5e"]
 
 [ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_g2els"]
-[ext_resource type="Texture2D" uid="uid://dfgnxywsww0d5" path="res://icon.svg" id="2_qhqgy"]
+[ext_resource type="Texture2D" uid="uid://b846lw5gl8daw" path="res://assets/textures/Aztec_walk_draft.png" id="2_qhqgy"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(10, 30)
+
+[sub_resource type="Animation" id="Animation_qhqgy"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2i(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_dqkch"]
+resource_name = "walk_up"
+length = 1.0000125
+loop_mode = 1
+step = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 0), Vector2i(6, 2), Vector2i(6, 1), Vector2i(6, 2), Vector2i(0, 0), Vector2i(5, 3), Vector2i(4, 3), Vector2i(5, 3)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qlg0r"]
+_data = {
+&"RESET": SubResource("Animation_qhqgy"),
+&"walk_up": SubResource("Animation_dqkch")
+}
 
 [node name="Player" type="CharacterBody2D" unique_id=398475662]
 collision_layer = 2
@@ -14,12 +53,21 @@ script = ExtResource("1_g2els")
 base_speed = 250.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
+visible = false
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
-scale = Vector2(0.086, 0.25)
+position = Vector2(81, 106)
+scale = Vector2(0.1, 0.1)
 texture = ExtResource("2_qhqgy")
+hframes = 7
+vframes = 5
+region_enabled = true
+region_rect = Rect2(0, 640, 11210, 10640)
 
 [node name="StatsComponent" type="Node" parent="." unique_id=20242128]
 script = ExtResource("3_qhqgy")
 metadata/_custom_type_script = "uid://c1fx17yoxje1h"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1925996960]
+libraries/ = SubResource("AnimationLibrary_qlg0r")
