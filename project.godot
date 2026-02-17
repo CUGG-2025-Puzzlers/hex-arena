@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Hex Arena"
 run/main_scene="res://scenes/arena.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://assets/textures/icon.svg"
 
 [autoload]
@@ -20,7 +20,7 @@ config/icon="res://assets/textures/icon.svg"
 SceneManager="*uid://bosapdapain4b"
 MultiplayerManager="*uid://dhwwc4t2mdyga"
 GameManager="*uid://cvimhpwolfbnu"
-Events="*res://scripts/autoloads/events.gd"
+Events="*uid://brxpdvd1ijwfd"
 
 [display]
 
