@@ -26,6 +26,9 @@ func _physics_process(delta: float) -> void:
 	#_face_mouse()
 
 func select_animation():
+	if input_direction == Vector2.ZERO:
+		playback.travel("Stop")
+	else:
 		playback.travel("Walk")
 
 func update_animation_parameters():
@@ -33,6 +36,7 @@ func update_animation_parameters():
 		return
 		
 	animation_tree["parameters/Walk/blend_position"] = input_direction
+	animation_tree["parameters/Stop/blend_position"] = input_direction
 
 func _handle_movement(_delta: float) -> void:
 	input_direction = Input.get_vector("left", "right", "up", "down")
