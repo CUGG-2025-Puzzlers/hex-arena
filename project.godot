@@ -17,6 +17,7 @@ config/icon="res://assets/textures/icon.svg"
 
 [autoload]
 
+Util="*uid://bu4y4hlan006c"
 SceneManager="*uid://bosapdapain4b"
 MultiplayerManager="*uid://dhwwc4t2mdyga"
 GameManager="*uid://cvimhpwolfbnu"
