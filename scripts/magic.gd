@@ -77,12 +77,26 @@ func change_state():
 			health = 50
 			damage = 50
 		MagicType.HEAVY:
-			modulate=Color.CRIMSON
+			#modulate=Color.CRIMSON
 			health = 200
 			damage = 100
 			
-			animated_sprite.texture=animated_sprite.texture.duplicate()
-			animation_timers[0] = randf()
+			animated_sprite.visible = false
+			animated_sprite =	get_node("EyeSprite")
+			animated_sprite.visible = true
+			animated_sprite.scale = Vector2.ONE*randf_range(0.2,0.3)
+			animated_sprite.rotation=randf()*2*PI
+			animated_sprite.flip_h = randf()<0.5
+			animated_sprite.flip_v = randf()<0.5
+			
+			animation_timers = [0.]
+			animation_total_times = [3.]
+			points = []
+			for i in range(randi_range(5,23)):
+				points.append(Vector2.ONE.rotated(randf()*2*PI)*randf_range(5,15))
+				animation_timers.append(0.)
+				animation_total_times.append(randf_range(2,8))
+			queue_redraw()
 			
 		MagicType.SHIELD:
 			#modulate=Color.WEB_PURPLE
@@ -105,7 +119,10 @@ func _process(delta: float) -> void:
 	match state:
 		MagicType.HEAVY:
 			#animated_sprite.texture.seamless_blend_skirt = lerpf(0.6,1,0.5*cos(2*PI*animation_timer)+0.5)
-			pass
+			queue_redraw()
+			animated_sprite.scale.y=0.5*(cos(2*PI*animation_timers[0])+1)*animated_sprite.scale.x
+			animated_sprite.scale.y = clampf(animated_sprite.scale.y, 0.07, animated_sprite.scale.x)
+			animated_sprite.position = Vector2.UP.rotated(animated_sprite.rotation)*cos(2*PI*(animation_timers[0]+0.2))*4
 		MagicType.SHIELD:
 			shield_animated_texture.fill_to = Vector2.ONE*lerpf(0.6,0.8,0.5*(cos(2*PI*animation_timers[0])+1))*sqrt(2)
 		MagicType.NEUTRAL:
@@ -122,18 +139,17 @@ func _process(delta: float) -> void:
 				MagicType.LIGHT:
 					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
 			
-			#smooth_path(trajectory.curve)
-			#points = trajectory.curve.get_baked_points()
-			#queue_redraw()
 			
 			rolling_pathfollow = PathFollow2D.new()
 			rolling_pathfollow.loop = false
+			rolling_pathfollow.rotates = false
 			trajectory.global_position=global_position
 			get_tree().current_scene.add_child(trajectory)
 			trajectory.add_child(rolling_pathfollow)
 			reparent(rolling_pathfollow)
 		else:
 			rolling_pathfollow.progress+=roll_speed*delta
+			rotation = 2*PI*rolling_pathfollow.progress_ratio
 			if rolling_pathfollow.progress_ratio>=1:
 				var trajectory = rolling_pathfollow.get_parent()
 				reparent(trajectory.get_parent())
@@ -242,20 +258,25 @@ func visualize_shield():
 		polygon.visible=true
 	get_node("Sprite2D").visible = false
 
-func smooth_path(curve: Curve2D):
-	"""
-	for i in range(curve.get_point_count()):
-		curve.set_point_left_tangent(i,Curve.TangentMode.TANGENT_LINEAR)
-		curve.set_point_right_tangent(i,Curve.TangentMode.TANGENT_LINEAR)
-	return
-	"""
-	for i in range(1,curve.get_point_count()-2):
-		var prev = curve.get_point_position(i-1)
-		var next = curve.get_point_position(i+1)
-		var spline: Vector2 = (next-prev).normalized()*5
-		curve.set_point_in(i,-spline)
-		curve.set_point_out(i,spline)
 
 func _draw() -> void:
-	if len(points)>1:
-		draw_polyline(points,Color.WHITE)
+	if not points.is_empty():
+		var fill_prog = 0.5*(cos(2*PI*animation_timers[0])+1)
+		
+		draw_circle(Vector2.ZERO, lerpf(15.5,17,fill_prog), Color.RED)
+		for i in range(len(points)):
+			var point = points[i]*0.5*(cos(2*PI*animation_timers[i+1])+1)
+			var tri = [point*2.5]
+			tri.append(point-point.rotated(PI/12))
+			tri.append(point-point.rotated(-PI/12))
+			tri.append(point*2.5)
+			draw_polygon(tri,[Color.RED])
+		
+		draw_circle(Vector2.ZERO, lerpf(12,15,fill_prog), Color.WHITE)
+		for i in range(len(points)):
+			var point = points[i]*0.5*(cos(2*PI*animation_timers[i+1])+1)
+			var tri = [point*lerpf(1.5,2,fill_prog)]
+			tri.append(point-point.rotated(PI/lerpf(12,20,fill_prog)))
+			tri.append(point-point.rotated(-PI/lerpf(12,20,fill_prog)))
+			tri.append(point*lerpf(1.5,2,fill_prog))
+			draw_polygon(tri,[Color.WHITE])
