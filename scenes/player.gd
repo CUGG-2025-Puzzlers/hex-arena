@@ -2,16 +2,22 @@ extends CharacterBody2D
 
 @export var base_speed : float = 150.0
 
-@onready var stats: StatsComponent = $StatsComponent
+@onready var stats : StatsComponent = $StatsComponent
+@onready var flash_ability : FlashAbility = $FlashAbility
 
 var input : Vector2
 var canMove : bool
+
+func _ready() -> void:
+	#player gets reference of ability
+	for child in get_children():
+		if child is AbilityBase:
+			child.player = self
 
 func get_stats() -> StatsComponent:
 	return stats
 
 func _physics_process(delta: float) -> void:
-		
 	_handle_movement(delta)
 	#_face_mouse()
 	
@@ -21,14 +27,10 @@ func _handle_movement(_delta: float) -> void:
 	velocity = input_direction * base_speed
 	move_and_slide()
 	
-#func _face_mouse() -> void:
-	##rotate to face mouse
-	#var mouse_pos = get_global_mouse_position()
-	#var angle = (mouse_pos - global_position).angle()
-	#
-	#if Sprite2D:
-		#Sprite2D.rotation = angle
-	#
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("flash_ability"):
+		flash_ability.try_activate()
+	
 
 	
 
