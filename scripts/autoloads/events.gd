@@ -6,3 +6,12 @@ extends Node
 # the signals themselves.
 
 signal select_new_cell
+
+signal character_selected(character: Util.Character)
+signal character_deselected()
+
+func select_character(character: Util.Character):
+	character_selected.emit()
+
+func deselect_character():
+	character_deselected.emit()
