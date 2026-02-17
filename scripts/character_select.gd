@@ -5,12 +5,19 @@ const WAITING_FOR_PLAYER = "Waiting for player..."
 @onready var _local_player_name: Label = %LocalPlayerName
 @onready var _remote_player_name: Label = %RemotePlayerName
 
+@onready var _character_list_container: HBoxContainer = %CharacterList
+
+var _selection: int = 0
+var _num_characters: int = 0
+
 func _ready() -> void:
 	MultiplayerManager.player_connected.connect(_on_player_connected)
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 	
 	_local_player_name.text = MultiplayerManager.player_info.name
 	_remote_player_name.text = WAITING_FOR_PLAYER
+	
+	_num_characters = _character_list_container.get_child_count()
 
 #region Event Listeners
 
