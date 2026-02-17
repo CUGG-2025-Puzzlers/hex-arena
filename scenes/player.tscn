@@ -100,7 +100,7 @@ states/Stop/node = SubResource("AnimationNodeBlendSpace2D_qhqgy")
 states/Stop/position = Vector2(463.0502, 120.72751)
 states/Walk/node = SubResource("AnimationNodeBlendSpace2D_d2wvv")
 states/Walk/position = Vector2(265.75024, 1.2775116)
-graph_offset = Vector2(-81.44979, -3.7724898)
+graph_offset = Vector2(-252.26987, -79.22246)
 
 [sub_resource type="Animation" id="Animation_qhqgy"]
 length = 0.001

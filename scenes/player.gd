@@ -14,9 +14,6 @@ var input_direction: Vector2
 
 func _ready() -> void:
 	playback = animation_tree["parameters/playback"]
-
-
-func _ready() -> void:
 	#player gets reference of ability
 	for child in get_children():
 		if child is AbilityBase:
