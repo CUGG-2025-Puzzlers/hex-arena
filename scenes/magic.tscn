@@ -1,11 +1,61 @@
-[gd_scene load_steps=3 format=3 uid="uid://bymw2mj6hkty5"]
+[gd_scene format=3 uid="uid://bymw2mj6hkty5"]
 
-[ext_resource type="Script" path="res://scripts/magic.gd" id="1_1u1wh"]
-[ext_resource type="Texture2D" uid="uid://ddpwk5yi3s8v0" path="res://assets/textures/icon.svg" id="2_8w3nk"]
+[ext_resource type="Script" uid="uid://cgy3ov1hdhyys" path="res://scripts/magic.gd" id="1_1u1wh"]
+[ext_resource type="Texture2D" uid="uid://dcm8pb6gd3088" path="res://assets/textures/neutral_magic.tres" id="2_0f2g5"]
+[ext_resource type="Texture2D" uid="uid://bgkrluc4yfisl" path="res://assets/textures/shield-pattern1.png" id="3_0f2g5"]
+[ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="3_fggut"]
+[ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="5_87hvv"]
 
-[node name="Magic" type="Node2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
+radius = 18.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mgv3p"]
+blend_mode = 3
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_87hvv"]
+blend_mode = 1
+
+[node name="Magic" type="Area2D" unique_id=627565832]
 script = ExtResource("1_1u1wh")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=415175278]
+texture_repeat = 3
 scale = Vector2(0.7, 0.7)
-texture = ExtResource("2_8w3nk")
+texture = ExtResource("2_0f2g5")
+
+[node name="ChildLight1" type="Sprite2D" parent="Sprite2D" unique_id=141704045]
+texture_repeat = 3
+position = Vector2(20, 0)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("2_0f2g5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=29718005]
+shape = SubResource("CircleShape2D_fggut")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1483890363]
+position = Vector2(-0.499998, -0.499998)
+scale = Vector2(4.55, 4.55)
+rect = Rect2(-6, -6, 12, 12)
+
+[node name="Shield Pattern" type="Polygon2D" parent="." unique_id=201908227]
+visible = false
+clip_children = 2
+texture_repeat = 3
+material = SubResource("CanvasItemMaterial_mgv3p")
+texture = ExtResource("3_0f2g5")
+texture_scale = Vector2(15, 15)
+polygon = PackedVector2Array(-7, -88, 97, -25, 85, 78, -33, 104, -101, -30)
+
+[node name="Shield Glow" type="Polygon2D" parent="Shield Pattern" unique_id=784304187]
+texture_repeat = 3
+material = SubResource("CanvasItemMaterial_87hvv")
+texture = ExtResource("3_fggut")
+polygon = PackedVector2Array(-7, -88, 97, -25, 85, 78, -33, 104, -101, -30)
+
+[node name="EyeSprite" type="Sprite2D" parent="." unique_id=491687938]
+visible = false
+position = Vector2(2.5629997e-06, 1.4901161e-07)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("5_87hvv")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
