@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bgkrluc4yfisl" path="res://assets/textures/shield-pattern1.png" id="3_0f2g5"]
 [ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="3_fggut"]
 [ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="5_87hvv"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="6_mgv3p"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
 radius = 18.0
@@ -14,6 +15,22 @@ blend_mode = 3
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_87hvv"]
 blend_mode = 1
+
+[sub_resource type="Curve" id="Curve_hug0r"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.48612148), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.7469652, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_87hvv"]
+offsets = PackedFloat32Array(0.4392971, 0.71565497, 0.8769968, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.5999999, 0, 1, 1, 0.39069343, 0.98, 0.11760001, 1, 0.39069343, 0.98, 0.11760001, 0)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_hug0r"]
+
+[sub_resource type="Curve" id="Curve_mgv3p"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.4925651), 0.0, 0.7901357, 0, 0, Vector2(0.26764706, 0.5115242), 0.0, 0.0, 0, 0, Vector2(0.6220588, 0.62750936), 0.25944108, 0.25944108, 0, 0, Vector2(1, 0.430979), 0.45105314, 0.0, 0, 0]
+point_count = 4
 
 [node name="Magic" type="Area2D" unique_id=627565832]
 script = ExtResource("1_1u1wh")
@@ -57,5 +74,54 @@ visible = false
 position = Vector2(2.5629997e-06, 1.4901161e-07)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("5_87hvv")
+
+[node name="ArrowParticles" type="Node2D" parent="." unique_id=458787119]
+visible = false
+
+[node name="ArrowL" type="CPUParticles2D" parent="ArrowParticles" unique_id=543708223]
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 30
+texture = ExtResource("6_mgv3p")
+direction = Vector2(-0.94, -0.342)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 150.0
+scale_amount_max = 2.0
+scale_amount_curve = SubResource("Curve_hug0r")
+color_ramp = SubResource("Gradient_87hvv")
+
+[node name="ArrowR" type="CPUParticles2D" parent="ArrowParticles" unique_id=2128713303]
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 30
+texture = ExtResource("6_mgv3p")
+direction = Vector2(-0.94, 0.342)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 150.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_max = 2.0
+scale_amount_curve = SubResource("Curve_hug0r")
+color_ramp = SubResource("Gradient_87hvv")
+
+[node name="ArrowH" type="CPUParticles2D" parent="ArrowParticles" unique_id=1011908754]
+material = SubResource("CanvasItemMaterial_hug0r")
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 40
+texture = ExtResource("6_mgv3p")
+direction = Vector2(-1, 0)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 300.0
+angle_max = 180.0
+scale_amount_max = 2.0
+scale_amount_curve = SubResource("Curve_mgv3p")
+color_ramp = SubResource("Gradient_87hvv")
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
