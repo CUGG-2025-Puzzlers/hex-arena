@@ -8,6 +8,7 @@ extends CharacterBody2D
 @onready var flash_ability : FlashAbility = $FlashAbility
 @onready var dash_ability: DashAbility = $DashAbility
 @onready var ghost_ability : GhostAbility = $GhostAbility
+@onready var teleport_ability : TeleportAbility = $TeleportAbility
 
 var input : Vector2
 var canMove : bool
@@ -28,11 +29,11 @@ func _physics_process(delta: float) -> void:
 	#no movement if dashing
 	if dash_ability.is_controlling_movement():
 		return
+	
 		
 	_handle_movement(delta)
 	select_animation()
 	update_animation_parameters()
-	#_face_mouse()
 
 func select_animation():
 	if input_direction == Vector2.ZERO:
@@ -63,8 +64,12 @@ func _unhandled_input(event : InputEvent) -> void:
 		dash_ability.try_activate()
 	elif event.is_action_pressed("ghost_ability"):
 		ghost_ability.try_activate()
+	elif event.is_action_pressed("teleport_ability"):
+		teleport_ability.try_activate()
 		
-#testng
+func is_channeling() -> bool:
+	return teleport_ability.is_channeling
+	
 func is_dashing() -> bool:
 	return dash_ability.is_dashing
 

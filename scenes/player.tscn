@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://btpjo0pne2vdu" path="res://scripts/abilities/flash_ability.gd" id="4_dqkch"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="6_tuyoq"]
+[ext_resource type="Script" uid="uid://er414tfvhsml" path="res://scripts/abilities/teleport_ability.gd" id="7_fjrip"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(38, 11)
@@ -625,3 +626,7 @@ metadata/_custom_type_script = "uid://cty0adueu5syp"
 [node name="GhostAbility" type="Node" parent="." unique_id=679062097]
 script = ExtResource("6_tuyoq")
 metadata/_custom_type_script = "uid://cciheadly5brc"
+
+[node name="TeleportAbility" type="Node" parent="." unique_id=1604331524]
+script = ExtResource("7_fjrip")
+metadata/_custom_type_script = "uid://er414tfvhsml"
