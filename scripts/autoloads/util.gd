@@ -4,6 +4,7 @@ extends Node
 # from any script at any time.
 
 enum Character {
+	None,
 	Zilo,
 	Vesta,
 	Hekaset,
