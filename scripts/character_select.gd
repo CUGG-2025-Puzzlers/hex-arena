@@ -1,9 +1,15 @@
 extends Node
 
 const WAITING_FOR_PLAYER = "Waiting for player..."
+const SELECT_CHARACTER = "Select Character"
 
 @onready var _local_player_name: Label = %LocalPlayerName
+@onready var _local_character_art: TextureRect = %LocalCharacterArt
+@onready var _local_character_name: Label = %LocalCharacterName
+
 @onready var _remote_player_name: Label = %RemotePlayerName
+@onready var _remote_character_art: TextureRect = %RemoteCharacterArt
+@onready var _remote_character_name: Label = %RemoteCharacterName
 
 @onready var _character_list_container: HBoxContainer = %CharacterList
 
@@ -29,6 +35,9 @@ func _on_player_disconnected(id):
 func _on_character_selected(character: Util.Character):
 	MultiplayerManager.set_player_character(multiplayer.get_unique_id(), character)
 	_set_character.rpc(character)
+	
+	_local_character_name.text = _get_character_name(character)
+	# TODO: Set local character art here
 
 #endregion
 
@@ -38,3 +47,14 @@ func _set_character(character: Util.Character):
 	var sender_id = multiplayer.get_remote_sender_id()
 	print("%s selected %s" % [MultiplayerManager.players[sender_id].name, Util.Character.keys()[character]])
 	MultiplayerManager.set_player_character(sender_id, character)
+	
+	_remote_character_name.text = _get_character_name(character)
+	# TODO: Set remote character art here
+
+# Returns the name associated with the given character enum
+# If the given enum is None, returns a default string
+func _get_character_name(character: Util.Character):
+	if character == Util.Character.None:
+		return SELECT_CHARACTER
+	
+	return Util.Character.keys()[character]

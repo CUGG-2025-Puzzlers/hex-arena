@@ -6,11 +6,19 @@
 [node name="CharacterSelect" type="Node2D" unique_id=1709553184]
 script = ExtResource("1_x8mhf")
 
-[node name="PlayerInfoPanel" type="Panel" parent="." unique_id=503751340]
+[node name="LocalPlayerInfo" type="Control" parent="." unique_id=1961302266]
+custom_minimum_size = Vector2(950, 1080)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NamePanel" type="Panel" parent="LocalPlayerInfo" unique_id=503751340]
+layout_mode = 0
 offset_right = 950.0
 offset_bottom = 100.0
 
-[node name="LocalPlayerName" type="Label" parent="PlayerInfoPanel" unique_id=1331055825]
+[node name="LocalPlayerName" type="Label" parent="LocalPlayerInfo/NamePanel" unique_id=1331055825]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 20.0
@@ -20,12 +28,40 @@ offset_bottom = 90.0
 theme_override_font_sizes/font_size = 50
 text = "Waiting for player..."
 
-[node name="PlayerInfoPanel2" type="Panel" parent="." unique_id=1987327392]
+[node name="LocalCharacterArt" type="TextureRect" parent="LocalPlayerInfo" unique_id=23506429]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(950, 950)
+layout_mode = 0
+offset_top = 130.0
+offset_right = 950.0
+offset_bottom = 1080.0
+
+[node name="LocalCharacterName" type="Label" parent="LocalPlayerInfo" unique_id=115677487]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(950, 100)
+layout_mode = 0
+offset_top = 100.0
+offset_right = 950.0
+offset_bottom = 123.0
+theme_override_font_sizes/font_size = 40
+text = "Character Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RemotePlayerInfo" type="Control" parent="." unique_id=1393824492]
+custom_minimum_size = Vector2(950, 1080)
+layout_mode = 3
+anchors_preset = 0
 offset_left = 970.0
-offset_right = 1920.0
+offset_right = 1010.0
+offset_bottom = 40.0
+
+[node name="NamePanel" type="Panel" parent="RemotePlayerInfo" unique_id=600625399]
+layout_mode = 0
+offset_right = 950.0
 offset_bottom = 100.0
 
-[node name="RemotePlayerName" type="Label" parent="PlayerInfoPanel2" unique_id=1738674220]
+[node name="RemotePlayerName" type="Label" parent="RemotePlayerInfo/NamePanel" unique_id=1112659897]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 20.0
@@ -34,24 +70,43 @@ offset_right = 930.0
 offset_bottom = 90.0
 theme_override_font_sizes/font_size = 50
 text = "Waiting for player..."
-horizontal_alignment = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1696245211]
+[node name="RemoteCharacterArt" type="TextureRect" parent="RemotePlayerInfo" unique_id=891245071]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(950, 950)
+layout_mode = 0
+offset_top = 130.0
+offset_right = 950.0
+offset_bottom = 1080.0
+
+[node name="RemoteCharacterName" type="Label" parent="RemotePlayerInfo" unique_id=1567604212]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(950, 100)
+layout_mode = 0
+offset_top = 100.0
+offset_right = 950.0
+offset_bottom = 123.0
+theme_override_font_sizes/font_size = 40
+text = "Character Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CharacterContainer" type="CenterContainer" parent="." unique_id=1696245211]
 offset_top = 730.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 
-[node name="CharacterList" type="HBoxContainer" parent="CenterContainer" unique_id=2080266635]
+[node name="CharacterList" type="HBoxContainer" parent="CharacterContainer" unique_id=2080266635]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 20
 
-[node name="SelectableCharacter" parent="CenterContainer/CharacterList" unique_id=20013062 instance=ExtResource("2_jgus3")]
+[node name="SelectableCharacter" parent="CharacterContainer/CharacterList" unique_id=20013062 instance=ExtResource("2_jgus3")]
 layout_mode = 2
 character = 1
 
-[node name="SelectableCharacter2" parent="CenterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
+[node name="SelectableCharacter2" parent="CharacterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
 layout_mode = 2
 character = 2
