@@ -2,8 +2,10 @@ extends AbilityBase
 
 class_name DashAbility
 
-@export var dash_distance : float = 120.0
-@export var dash_duration : float = 0.12
+# these values need to be better adjusted
+@export var dash_distance : float = 200.0
+@export var dash_duration : float = 0.35 
+@export var dash_speed_curve : float = 2.0  # decelerate
 
 var is_dashing : bool = false
 var dash_elapsed : float = 0.0
@@ -23,8 +25,10 @@ func _physics_process(delta: float) -> void:
 		if progress >= 1.0:
 			_end_dash()
 			return
-
-		var speed = (dash_distance / dash_duration) * 2.0
+		
+		# fast start then decelerate
+		var speed_factor = pow(1.0 - progress, dash_speed_curve)
+		var speed = (dash_distance / dash_duration) * speed_factor * 2.0
 		player.velocity = dash_direction * speed
 		player.move_and_slide()
 
