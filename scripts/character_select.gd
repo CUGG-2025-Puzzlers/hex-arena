@@ -11,13 +11,15 @@ const SELECT_CHARACTER = "Select Character"
 @onready var _remote_character_art: TextureRect = %RemoteCharacterArt
 @onready var _remote_character_name: Label = %RemoteCharacterName
 
-@onready var _character_list_container: HBoxContainer = %CharacterList
+@onready var _start_button: Button = %StartButton
 
 func _ready() -> void:
 	MultiplayerManager.player_connected.connect(_on_player_connected)
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 	Events.character_selected.connect(_on_character_selected)
+	_start_button.pressed.connect(_on_start_pressed)
 	
+	_start_button.hide()
 	_local_player_name.text = MultiplayerManager.player_info.name
 	_remote_player_name.text = WAITING_FOR_PLAYER
 	
@@ -40,6 +42,9 @@ func _on_player_disconnected(id):
 func _on_character_selected(character: Util.Character):
 	_set_character.rpc(character)
 
+func _on_start_pressed():
+	_start_game.rpc()
+
 #endregion
 
 # Sets the sending client's selected character on this client
@@ -50,6 +55,12 @@ func _set_character(character: Util.Character):
 	print("%s selected %s" % [MultiplayerManager.players[sender_id].name, Util.Character.keys()[character]])
 	MultiplayerManager.set_player_character(sender_id, character)
 	_set_character_info(character, sender_is_local_client)
+	_check_players_ready()
+
+# Starts the game for all clients
+@rpc("call_local", "any_peer", "reliable")
+func _start_game():
+	SceneManager.load_arena()
 
 # Sets the character info for the local or remote player
 func _set_character_info(character: Util.Character, is_local_client: bool):
@@ -69,3 +80,16 @@ func _get_character_name(character: Util.Character):
 		return SELECT_CHARACTER
 	
 	return Util.Character.keys()[character]
+
+# Checks if the players have both selected their characters, indicating readiness
+func _check_players_ready():
+	if MultiplayerManager.players.size() < 2:
+		_start_button.hide()
+		return
+	
+	for player_id in MultiplayerManager.players:
+		if MultiplayerManager.players[player_id].character == Util.Character.None:
+			_start_button.hide()
+			return
+	
+	_start_button.show()
