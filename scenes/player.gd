@@ -22,14 +22,15 @@ func _ready() -> void:
 		if child is AbilityBase:
 			child.player = self
 
-func get_stats() -> StatsComponent:
-	return stats
-
 func _physics_process(delta: float) -> void:
 	#no movement if dashing
 	if dash_ability.is_controlling_movement():
 		return
-	
+		
+	if teleport_ability.is_channeling:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
 		
 	_handle_movement(delta)
 	select_animation()
@@ -67,6 +68,10 @@ func _unhandled_input(event : InputEvent) -> void:
 	elif event.is_action_pressed("teleport_ability"):
 		teleport_ability.try_activate()
 		
+
+func get_stats() -> StatsComponent:
+	return stats
+	
 func is_channeling() -> bool:
 	return teleport_ability.is_channeling
 	

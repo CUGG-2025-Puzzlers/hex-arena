@@ -27,7 +27,8 @@ func _execute() -> void:
 	var result = world_state.intersect_ray(raycast_query)
 	
 	if result:
-		player.global_position = result.position - direction * 8.0
+		var dir = (target_pos - player.global_position).normalized()
+		player.global_position = result.position - dir * 8.0
 	else:
 		player.global_position = target_pos
 	
