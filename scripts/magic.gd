@@ -137,11 +137,13 @@ func _process(delta: float) -> void:
 			animated_sprite.position = Vector2.UP*sin(animation_timers[1]*2*PI)*6
 			#animated_children[1].position = Vector2.RIGHT.rotated(-2*PI*animation_timer*3)*150
 		MagicType.LIGHT:
-			#var dir = (get_global_mouse_position()-global_position).normalized()
-			var dir :Vector2 = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(last_placed_cell)
-			dir = dir.normalized()
-			if dir == Vector2.ZERO:
-				dir = Vector2.UP
+			var dir : Vector2 = rolling_dir
+			if not rolling:
+				#dir = (get_global_mouse_position()-global_position).normalized()
+				dir = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(last_placed_cell)
+				dir = dir.normalized()
+				if dir == Vector2.ZERO:
+					dir = Vector2.UP
 			get_node("ArrowParticles").rotation = dir.angle()
 	
 	if rolling:
