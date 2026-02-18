@@ -20,16 +20,21 @@ func _ready() -> void:
 	
 	_local_player_name.text = MultiplayerManager.player_info.name
 	_remote_player_name.text = WAITING_FOR_PLAYER
+	
+	_set_character_info(Util.Character.None, true)
+	_set_character_info(Util.Character.None, false)
 
 #region Event Listeners
 
 # Sets the other player's label to their name
 func _on_player_connected(id, info):
 	_remote_player_name.text = info.name
+	_set_character_info(info.character, false)
 
 # Sets the other player's label to the default text
 func _on_player_disconnected(id):
 	_remote_player_name.text = WAITING_FOR_PLAYER
+	_set_character_info(Util.Character.None, false)
 
 # Sets this client's selected character on all clients
 func _on_character_selected(character: Util.Character):
@@ -46,8 +51,9 @@ func _set_character(character: Util.Character):
 	MultiplayerManager.set_player_character(sender_id, character)
 	_set_character_info(character, sender_is_local_client)
 
+# Sets the character info for the local or remote player
 func _set_character_info(character: Util.Character, is_local_client: bool):
-	var character_name = Util.Character.keys()[character]
+	var character_name = Util.Character.keys()[character] if character != Util.Character.None else SELECT_CHARACTER
 	
 	if is_local_client:
 		_local_character_name.text = character_name
