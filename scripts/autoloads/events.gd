@@ -11,7 +11,7 @@ signal character_selected(character: Util.Character)
 signal character_deselected()
 
 func select_character(character: Util.Character):
-	character_selected.emit()
+	character_selected.emit(character)
 
 func deselect_character():
 	character_deselected.emit()
