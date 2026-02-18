@@ -5,13 +5,13 @@ class_name HexCells
 
 @onready var text = get_node("Label")
 # Radius == side
-@export var r: float = 80.:
+@export var r: float = 60.:
 	set(new_r):
 		r = new_r
 		recalculate()
 
-var hex_height: float = 2*r
-var hex_width: float = sqrt(3)*r
+static var hex_height: float #= 2*r
+static var hex_width: float #= sqrt(3)*r
 
 @export var width: float = 2000: #5000.:
 	set(new_w):
@@ -29,7 +29,8 @@ static var cell_dict: Dictionary = {}
 static var curr_cell: Vector2i = Vector2i()
 
 var points = []
-var hex_shape = []
+static var hex_shape = []
+static var hex_polygon_shape : ConvexPolygonShape2D
 
 
 func recalculate() -> void:
@@ -39,6 +40,10 @@ func recalculate() -> void:
 	hex_shape = []
 	for i in range(6):
 		hex_shape.append(r*Vector2.UP.rotated(i*PI/3.))
+	
+	hex_polygon_shape = ConvexPolygonShape2D.new()
+	hex_polygon_shape.points=hex_shape.duplicate()
+	
 	hex_shape.append(hex_shape.front())
 	
 	vertical_n = max(int(height/(hex_height))-1,0)+1
@@ -74,13 +79,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		if curr_cell!=new_curr_cell:
 			curr_cell = new_curr_cell
+			
+			text.text = str(curr_cell)
+			if cell_dict.has(curr_cell):
+				get_node("LazyFollow").position = map_to_local(curr_cell)
+			
 			Events.emit_signal("select_new_cell",curr_cell)
 			queue_redraw()
+		
+		text.position = get_global_mouse_position()+Vector2(25,-5)
+		
 	if Input.is_action_pressed("place_magic"):
 		if cell_dict.has(curr_cell) and \
 		not is_instance_valid(cell_dict[curr_cell]):
 			var magic_instance = preload("res://scenes/magic.tscn").instantiate()
 			magic_instance.position = map_to_local(curr_cell)
+			magic_instance.self_cell = curr_cell
 			cell_dict[curr_cell]=magic_instance
 			add_child(magic_instance)
 			magic_instance.add_to_group('magic')
@@ -148,15 +162,9 @@ func local_to_map(pos: Vector2):
 	
 	var result = Vector2i(x,y)
 	
-	if cell_dict.has(result):
-		get_node("LazyFollow").position = map_to_local(result)
-	
-	text.text = str(result)
-	text.position = pos+Vector2(25,-5)
-	
 	return result
 
-func map_to_local(pos: Vector2i):
+static func map_to_local(pos: Vector2i):
 	var i = pos.x
 	var j = pos.y
 	var right_displacement : int = abs(j) % 2
