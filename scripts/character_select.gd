@@ -32,7 +32,7 @@ func _on_character_selected(character: Util.Character):
 
 #endregion
 
-# Sets this client's selected character on all other clients 
+# Sets the sending client's selected character on this client
 @rpc("any_peer", "reliable")
 func _set_character(character: Util.Character):
 	var sender_id = multiplayer.get_remote_sender_id()
