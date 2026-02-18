@@ -581,6 +581,16 @@ _data = {
 &"up_right": SubResource("Animation_ur7pv")
 }
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fjrip"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 80.0
+initial_velocity_max = 150.0
+gravity = Vector3(0, 0, 0)
+scale_min = 2.0
+scale_max = 4.0
+color = Color(0.959805, 0.99, 0.3861, 1)
+
 [node name="Player" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
 collision_layer = 2
 collision_mask = 7
@@ -630,3 +640,12 @@ metadata/_custom_type_script = "uid://cciheadly5brc"
 [node name="TeleportAbility" type="Node" parent="." unique_id=1604331524]
 script = ExtResource("7_fjrip")
 metadata/_custom_type_script = "uid://er414tfvhsml"
+
+[node name="FlashAnimation" type="GPUParticles2D" parent="." unique_id=409151462]
+position = Vector2(-2.842171e-14, -3.8146973e-06)
+scale = Vector2(0.99999994, 0.99999994)
+emitting = false
+amount = 13
+lifetime = 0.3
+one_shot = true
+process_material = SubResource("ParticleProcessMaterial_fjrip")

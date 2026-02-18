@@ -27,9 +27,17 @@ func _execute() -> void:
 	var result = world_state.intersect_ray(raycast_query)
 	
 	if result:
-		var dir = (target_pos - player.global_position).normalized()
+		var dir = (target_pos - player_pos).normalized()
 		player.global_position = result.position - dir * 8.0
 	else:
 		player.global_position = target_pos
+		
+	_spawn_flash_effect()
 	
+func _spawn_flash_effect() -> void:
+	var particles = player.find_child("FlashAnimation")
+	if particles:
+		particles.restart()
+	else:
+		print("FlashAnimation node not found")
 	
