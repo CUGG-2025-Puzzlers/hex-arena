@@ -9,7 +9,10 @@ var players = {}
 
 # Local player info
 # Set these fields using some UI before creating/joining a game
-var player_info = { "name" : "Local Player" }
+var player_info = { 
+	"name" : "Local Player",
+	"character" : Util.Character.None, 
+}
 
 #region Setup
 
@@ -93,3 +96,18 @@ func _on_connection_failed():
 	print("Failed to connect to server: Double-check IP, Port, and Firewall settings")
 
 #endregion
+
+# Sets a player's selected character
+func set_player_character(player_id: int, character: Util.Character):
+	if not player_id in players:
+		return
+	
+	players[player_id].character = character
+	_print_players()
+
+# Prints out the players for debugging purposes
+func _print_players():
+	for player in players:
+		if player == multiplayer.get_unique_id():
+			print("*Local Client*")
+		print("Name: %s\nSelected Character: %s\n" % [players[player].name, Util.Character.keys()[players[player].character]])

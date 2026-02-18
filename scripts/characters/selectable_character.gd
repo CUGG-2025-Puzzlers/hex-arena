@@ -34,7 +34,7 @@ func _on_mouse_exited():
 	scale /= 1.1
 
 func _on_mouse_pressed():
-	pass
+	Events.select_character(character)
 
 #endregion
 
