@@ -7,6 +7,7 @@ extends CharacterBody2D
 @onready var stats : StatsComponent = $StatsComponent
 @onready var flash_ability : FlashAbility = $FlashAbility
 @onready var dash_ability: DashAbility = $DashAbility
+@onready var ghost_ability : GhostAbility = $GhostAbility
 
 var input : Vector2
 var canMove : bool
@@ -49,14 +50,19 @@ func update_animation_parameters():
 func _handle_movement(_delta: float) -> void:
 	input_direction = Input.get_vector("left", "right", "up", "down")
 	
-	velocity = input_direction * base_speed
+	# ghost speed multiplier when active
+	var speed = base_speed * ghost_ability.get_speed_multiplier()
+	
+	velocity = input_direction * speed
 	move_and_slide()
 	
-func _unhandled_input(event: InputEvent) -> void:
+func _unhandled_input(event : InputEvent) -> void:
 	if event.is_action_pressed("flash_ability"):
 		flash_ability.try_activate()
 	elif event.is_action_pressed("dash_ability"):
 		dash_ability.try_activate()
+	elif event.is_action_pressed("ghost_ability"):
+		ghost_ability.try_activate()
 		
 #testng
 func is_dashing() -> bool:

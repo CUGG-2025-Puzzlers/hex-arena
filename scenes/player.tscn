@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://btpjo0pne2vdu" path="res://scripts/abilities/flash_ability.gd" id="4_dqkch"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
+[ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="6_tuyoq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(38, 11)
@@ -620,3 +621,7 @@ metadata/_custom_type_script = "uid://btpjo0pne2vdu"
 [node name="DashAbility" type="Node" parent="." unique_id=1460347397]
 script = ExtResource("5_qlg0r")
 metadata/_custom_type_script = "uid://cty0adueu5syp"
+
+[node name="GhostAbility" type="Node" parent="." unique_id=679062097]
+script = ExtResource("6_tuyoq")
+metadata/_custom_type_script = "uid://cciheadly5brc"
