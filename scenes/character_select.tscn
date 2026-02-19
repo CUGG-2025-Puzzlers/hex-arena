@@ -105,10 +105,12 @@ theme_override_constants/separation = 20
 [node name="SelectableCharacter" parent="CharacterContainer/CharacterList" unique_id=20013062 instance=ExtResource("2_jgus3")]
 layout_mode = 2
 character = 1
+locked = false
 
 [node name="SelectableCharacter2" parent="CharacterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
 layout_mode = 2
 character = 2
+locked = true
 
 [node name="StartButton" type="Button" parent="." unique_id=2091587044]
 unique_name_in_owner = true

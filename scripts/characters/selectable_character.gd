@@ -11,6 +11,10 @@ extends Panel
 		character = value
 		_set_display_name()
 
+@export var locked: bool = false:
+	set(value):
+		locked = value
+
 var hovered: bool = false
 
 func _ready() -> void:
@@ -34,6 +38,9 @@ func _on_mouse_exited():
 	scale /= 1.1
 
 func _on_mouse_pressed():
+	if locked:
+		return
+	
 	Events.select_character(character)
 
 #endregion
