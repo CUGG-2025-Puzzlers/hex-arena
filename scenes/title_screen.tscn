@@ -211,7 +211,7 @@ offset_top = 35.0
 offset_right = 475.0
 offset_bottom = 92.0
 theme_override_font_sizes/font_size = 35
-placeholder_text = "6967"
+placeholder_text = "6769"
 max_length = 5
 
 [node name="Buttons" type="HBoxContainer" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer" unique_id=1481893487]
