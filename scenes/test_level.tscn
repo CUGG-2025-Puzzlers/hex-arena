@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://dofh848afuuml"]
+
+[ext_resource type="Script" uid="uid://hngqxqbobcvi" path="res://scenes/test_level.gd" id="1_j6w7d"]
+[ext_resource type="PackedScene" uid="uid://2gnmcjcwoy5e" path="res://scenes/player.tscn" id="1_paw1w"]
+[ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="2_j6w7d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j6w7d"]
+
+[node name="TestLevel" type="Node2D" unique_id=1524694689]
+script = ExtResource("1_j6w7d")
+
+[node name="Player" parent="." unique_id=398475662 instance=ExtResource("1_paw1w")]
+
+[node name="HUD" parent="." unique_id=1928650332 instance=ExtResource("2_j6w7d")]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=405552243]
+visible = false
+z_index = -10
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.12156863, 0.12156863, 0.14901961, 1)
+
+[node name="Wall" type="StaticBody2D" parent="." unique_id=16875151]
+position = Vector2(640, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=1695929823]
+shape = SubResource("RectangleShape2D_j6w7d")
+
+[node name="ColorRect" type="ColorRect" parent="Wall" unique_id=233594366]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(0.5019608, 0.34901962, 0.34901962, 1)

@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://dkis3bnrh1b7d"]
+
+[ext_resource type="Script" uid="uid://bscgkyr277i63" path="res://scripts/hud.gd" id="1_ahhtf"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1928650332]
+script = ExtResource("1_ahhtf")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1978879548]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -120.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1594959854]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer" unique_id=1552030233]
+custom_minimum_size = Vector2(300, 24)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HPBar" unique_id=1542006894]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ManaBar" type="ProgressBar" parent="MarginContainer/VBoxContainer" unique_id=775309612]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ManaBar" unique_id=1261899035]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AbilityContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=758315931]
+layout_mode = 2
+theme_override_constants/separation = 8
