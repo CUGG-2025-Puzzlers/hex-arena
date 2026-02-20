@@ -28,6 +28,9 @@ func _ready() -> void:
 	for child in get_children():
 		if child is AbilityBase:
 			child.player = self
+	# collision with environment is layer 1 and ignore other players
+	set_collision_layer_value(2, true)   # player on layer 2
+	set_collision_mask_value(2, false)   # player cant collide with layer 2
 
 func _physics_process(delta: float) -> void:
 	#no movement if dashing
