@@ -3,10 +3,17 @@
 [ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://b846lw5gl8daw" path="res://assets/textures/Aztec_walk_draft.png" id="2_qhqgy"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
+[ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_smehm"]
+[ext_resource type="Script" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://btpjo0pne2vdu" path="res://scripts/abilities/flash_ability.gd" id="4_dqkch"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="6_tuyoq"]
 [ext_resource type="Script" uid="uid://er414tfvhsml" path="res://scripts/abilities/teleport_ability.gd" id="7_fjrip"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ur7pv"]
+properties/0/path = NodePath("InputSynchronizer:direction")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(38, 11)
@@ -598,6 +605,11 @@ script = ExtResource("1_g2els")
 base_speed = 250.0
 animation_tree = NodePath("AnimationTree")
 animation_player = NodePath("AnimationPlayer")
+
+[node name="InputSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=638878176]
+unique_name_in_owner = true
+replication_config = SubResource("SceneReplicationConfig_ur7pv")
+script = ExtResource("2_smehm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
 shape = SubResource("RectangleShape2D_g2els")
