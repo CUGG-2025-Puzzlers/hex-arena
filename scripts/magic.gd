@@ -73,16 +73,23 @@ func change_state():
 			health = 25
 			damage = 0
 		MagicType.LIGHT:
-			modulate=Color.BLUE
+			#modulate=Color.BLUE
 			health = 50
 			damage = 50
+			
+			animated_sprite.visible = false
+			
+			var arrow_particles : Node2D = get_node("ArrowParticles")
+			arrow_particles.visible = true
+			arrow_particles.rotation = rolling_dir.angle()
+			#arrow_particles.scale *= 4
 		MagicType.HEAVY:
 			#modulate=Color.CRIMSON
 			health = 200
 			damage = 100
 			
 			animated_sprite.visible = false
-			animated_sprite =	get_node("EyeSprite")
+			animated_sprite = get_node("EyeSprite")
 			animated_sprite.visible = true
 			animated_sprite.scale = Vector2.ONE*randf_range(0.2,0.3)
 			animated_sprite.rotation=randf()*2*PI
@@ -129,9 +136,34 @@ func _process(delta: float) -> void:
 			animated_children[0].position = Vector2.RIGHT.rotated(2*PI*animation_timers[0])*20
 			animated_sprite.position = Vector2.UP*sin(animation_timers[1]*2*PI)*6
 			#animated_children[1].position = Vector2.RIGHT.rotated(-2*PI*animation_timer*3)*150
+		MagicType.LIGHT:
+			var dir : Vector2 = rolling_dir
+			if not rolling:
+				#dir = (get_global_mouse_position()-global_position).normalized()
+				dir = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(last_placed_cell)
+				dir = dir.normalized()
+				if dir == Vector2.ZERO:
+					dir = Vector2.UP
+			get_node("ArrowParticles").rotation = dir.angle()
 	
 	if rolling:
-		if not is_instance_valid(rolling_pathfollow):
+		if is_instance_valid(rolling_pathfollow):
+			rolling_pathfollow.progress+=roll_speed*delta
+			if state == MagicType.HEAVY:
+				rotation = 2*PI*rolling_pathfollow.progress_ratio
+			if rolling_pathfollow.progress_ratio>=1:
+				
+				var trajectory = rolling_pathfollow.get_parent()
+				trajectory.global_position=global_position
+				rolling_pathfollow.progress_ratio = 0
+				"""
+				match state:
+					MagicType.HEAVY:
+						trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(1,2))
+					MagicType.LIGHT:
+						trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
+				"""
+		else:
 			var trajectory : Path2D = Path2D.new()
 			match state:
 				MagicType.HEAVY:
@@ -147,14 +179,7 @@ func _process(delta: float) -> void:
 			get_tree().current_scene.add_child(trajectory)
 			trajectory.add_child(rolling_pathfollow)
 			reparent(rolling_pathfollow)
-		else:
-			rolling_pathfollow.progress+=roll_speed*delta
-			rotation = 2*PI*rolling_pathfollow.progress_ratio
-			if rolling_pathfollow.progress_ratio>=1:
-				var trajectory = rolling_pathfollow.get_parent()
-				reparent(trajectory.get_parent())
-				rolling_pathfollow.queue_free()
-				trajectory.queue_free()
+			
 	#advance_child_pellets(delta)
 
 func instantiate_pellet(dir: Vector2) -> void:
@@ -264,6 +289,8 @@ func _draw() -> void:
 		var fill_prog = 0.5*(cos(2*PI*animation_timers[0])+1)
 		
 		draw_circle(Vector2.ZERO, lerpf(15.5,17,fill_prog), Color.RED)
+		draw_circle(Vector2.ZERO, lerpf(12,15,fill_prog), Color.WHITE)
+		
 		for i in range(len(points)):
 			var point = points[i]*0.5*(cos(2*PI*animation_timers[i+1])+1)
 			var tri = [point*2.5]
@@ -272,7 +299,7 @@ func _draw() -> void:
 			tri.append(point*2.5)
 			draw_polygon(tri,[Color.RED])
 		
-		draw_circle(Vector2.ZERO, lerpf(12,15,fill_prog), Color.WHITE)
+		
 		for i in range(len(points)):
 			var point = points[i]*0.5*(cos(2*PI*animation_timers[i+1])+1)
 			var tri = [point*lerpf(1.5,2,fill_prog)]
