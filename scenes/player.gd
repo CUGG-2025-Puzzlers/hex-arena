@@ -4,6 +4,8 @@ extends CharacterBody2D
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
 
+@onready var _input: MultiplayerInput = %InputSynchronizer
+
 @onready var stats : StatsComponent = $StatsComponent
 @onready var flash_ability : FlashAbility = $FlashAbility
 @onready var dash_ability: DashAbility = $DashAbility
@@ -13,7 +15,6 @@ extends CharacterBody2D
 var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
-var input_direction: Vector2
 
 func _ready() -> void:
 	playback = animation_tree["parameters/playback"]
@@ -37,25 +38,23 @@ func _physics_process(delta: float) -> void:
 	update_animation_parameters()
 
 func select_animation():
-	if input_direction == Vector2.ZERO:
+	if _input.direction == Vector2.ZERO:
 		playback.travel("Stop")
 	else:
 		playback.travel("Walk")
 
 func update_animation_parameters():
-	if input_direction == Vector2.ZERO:
+	if _input.direction == Vector2.ZERO:
 		return
 		
-	animation_tree["parameters/Walk/blend_position"] = input_direction
-	animation_tree["parameters/Stop/blend_position"] = input_direction
+	animation_tree["parameters/Walk/blend_position"] = _input.direction
+	animation_tree["parameters/Stop/blend_position"] = _input.direction
 
-func _handle_movement(_delta: float) -> void:
-	input_direction = Input.get_vector("left", "right", "up", "down")
-	
+func _handle_movement(_delta: float) -> void:	
 	# ghost speed multiplier when active
 	var speed = base_speed * ghost_ability.get_speed_multiplier()
 	
-	velocity = input_direction * speed
+	velocity = _input.direction * speed
 	move_and_slide()
 	
 func _unhandled_input(event : InputEvent) -> void:
