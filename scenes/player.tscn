@@ -11,6 +11,9 @@
 [ext_resource type="Script" uid="uid://er414tfvhsml" path="res://scripts/abilities/teleport_ability.gd" id="7_fjrip"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ur7pv"]
+properties/0/path = NodePath("InputSynchronizer:direction")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(38, 11)
