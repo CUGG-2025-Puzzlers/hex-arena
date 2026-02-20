@@ -2,9 +2,7 @@ class_name MultiplayerInput
 extends Node
 
 var direction: Vector2
-var ability_pressed: bool
-
-@onready var player = $".."
+var ability: Util.Ability
 
 func _ready() -> void:
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
@@ -18,16 +16,12 @@ func _physics_process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("flash_ability"):
-		use_mobility_skill.rpc("flash_ability")
+		ability = Util.Ability.Flash
 	elif event.is_action_pressed("dash_ability"):
-		use_mobility_skill.rpc("dash_ability")
+		ability = Util.Ability.Dash
 	elif event.is_action_pressed("ghost_ability"):
-		use_mobility_skill.rpc("ghost_ability")
+		ability = Util.Ability.Ghost
 	elif event.is_action_pressed("teleport_ability"):
-		use_mobility_skill.rpc("teleport_ability")
-		
-
-@rpc("call_local")
-func use_mobility_skill(skill):
-	if multiplayer.is_server():
-		player.do_ability = skill
+		ability = Util.Ability.Teleport
+	else:
+		ability = Util.Ability.None

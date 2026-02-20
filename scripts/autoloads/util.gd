@@ -9,3 +9,11 @@ enum Character {
 	Vesta,
 	Hekaset,
 }
+
+enum Ability {
+	None,
+	Flash,
+	Dash,
+	Ghost,
+	Teleport,
+}

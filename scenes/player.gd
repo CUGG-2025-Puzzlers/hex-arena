@@ -4,8 +4,6 @@ extends CharacterBody2D
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
 
-@export var do_ability : String
-
 @onready var _input: MultiplayerInput = %InputSynchronizer
 
 @onready var stats : StatsComponent = $StatsComponent
@@ -61,17 +59,15 @@ func _handle_movement(_delta: float) -> void:
 	# ghost speed multiplier when active
 	var speed = base_speed * ghost_ability.get_speed_multiplier()
 	
-	if do_ability != "":
-		match do_ability:
-			"flash_ability":
-				flash_ability.try_activate()
-			"dash_ability":
-				dash_ability.try_activate()
-			"ghost_ability":
-				ghost_ability.try_activate()
-			"teleport_ability":
-				teleport_ability.try_activate()
-		do_ability = ""
+	match _input.ability:
+		Util.Ability.Flash:
+			flash_ability.try_activate()
+		Util.Ability.Dash:
+			dash_ability.try_activate()
+		Util.Ability.Ghost:
+			ghost_ability.try_activate()
+		Util.Ability.Teleport:
+			teleport_ability.try_activate()
 
 	velocity = _input.direction * speed
 	move_and_slide()
@@ -84,15 +80,3 @@ func is_channeling() -> bool:
 	
 func is_dashing() -> bool:
 	return dash_ability.is_dashing
-
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
