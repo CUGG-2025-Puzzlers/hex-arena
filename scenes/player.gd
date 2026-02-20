@@ -18,7 +18,7 @@ var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
 
-@export var player_id := 1:
+var player_id: int:
 	set(value):
 		player_id = value
 		%InputSynchronizer.set_multiplayer_authority(value)
