@@ -43,7 +43,7 @@ func _unhandled_key_input(_event: InputEvent) -> void:
 			rolling_dir = dir
 			match state:
 				MagicType.LIGHT:
-					roll_speed = BULLET_SPEED*1.2
+					roll_speed = BULLET_SPEED*1.4
 				MagicType.HEAVY:
 					roll_speed = BULLET_SPEED*0.6
 
@@ -170,6 +170,7 @@ func _process(delta: float) -> void:
 					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(1,2))
 				MagicType.LIGHT:
 					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
+					#trajectory.curve = smooth_curve(trajectory.curve)
 			
 			
 			rolling_pathfollow = PathFollow2D.new()
@@ -283,6 +284,16 @@ func visualize_shield():
 		polygon.visible=true
 	get_node("Sprite2D").visible = false
 
+"""
+func smooth_curve(curve: Curve2D):
+	for i in range(1, curve.get_point_count()-2):
+		var prev : Vector2 = curve.get_point_position(i-1)
+		var next : Vector2 = curve.get_point_position(i+1)
+		var spline = (next-prev).normalized()
+		curve.set_point_in(i,-spline*10)
+		curve.set_point_out(i,spline*10)
+	return curve
+"""
 
 func _draw() -> void:
 	if not points.is_empty():

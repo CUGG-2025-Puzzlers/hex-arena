@@ -1,0 +1,23 @@
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://y8eip55psmp4"]
+
+[sub_resource type="Gradient" id="Gradient_b175n"]
+interpolation_mode = 2
+interpolation_color_space = 2
+offsets = PackedFloat32Array(0, 0.25692308, 0.2830769, 0.31846154, 0.40461537, 0.46307692, 0.4923077, 0.63384616, 0.74, 0.84307694, 0.8553846)
+colors = PackedColorArray(0.24199164, 0.15985787, 0.043992653, 1, 0.93, 0.768025, 0.4185, 1, 0.35, 0.24266666, 0.06999999, 1, 0.9161613, 0.5891589, 0.5735995, 1, 0.9210018, 0.77711403, 0.42575946, 1, 0, 0, 0, 1, 0.69, 0.58374, 0.11040002, 1, 0.71, 0.70124334, 0.18459998, 1, 0.94, 0.8279833, 0.42299998, 1, 0.52, 0.51246, 0.36920002, 1, 0.36, 0.2544, 0.043200005, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_khgdq"]
+noise_type = 5
+frequency = 0.2621
+fractal_type = 2
+fractal_octaves = 10
+fractal_lacunarity = 4.0
+fractal_weighted_strength = 0.46
+cellular_distance_function = 2
+cellular_jitter = 1.5
+cellular_return_type = 6
+
+[resource]
+noise = SubResource("FastNoiseLite_khgdq")
+color_ramp = SubResource("Gradient_b175n")
+seamless_blend_skirt = 0.82

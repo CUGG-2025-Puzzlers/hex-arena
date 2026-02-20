@@ -6,7 +6,7 @@ colors = PackedColorArray(0.19215687, 0.5882353, 0.81960785, 1, 0.02745098, 0.17
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0f2g5"]
 noise_type = 3
-frequency = 0.3701
+frequency = 0.7402
 
 [resource]
 width = 400
