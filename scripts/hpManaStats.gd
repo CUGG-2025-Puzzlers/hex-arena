@@ -9,7 +9,7 @@ signal deadgeLol
 
 @export var max_health: float = 100.0
 @export var max_mana: float = 100.0
-@export var mana_regen_rate: float = 5.0  # /second
+@export var mana_regen_rate: float = 0.8  # /second
 
 var current_health : float
 var current_mana : float
