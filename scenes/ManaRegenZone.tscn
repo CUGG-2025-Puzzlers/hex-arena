@@ -1,3 +1,18 @@
 [gd_scene format=3 uid="uid://bvyoun1n6erc6"]
 
+[ext_resource type="Script" uid="uid://kxff0ooa0ehv" path="res://scenes/mana_regen_zone.gd" id="1_lunh6"]
+[ext_resource type="Texture2D" uid="uid://dfgnxywsww0d5" path="res://icon.svg" id="2_wgop7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wgop7"]
+radius = 20.0
+
 [node name="ManaRegenZone" type="Area2D" unique_id=1630663991]
+script = ExtResource("1_lunh6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=789701483]
+light_mask = 3
+visibility_layer = 3
+shape = SubResource("CircleShape2D_wgop7")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2078308174]
+texture = ExtResource("2_wgop7")
