@@ -125,8 +125,9 @@ func _start_game():
 			player_node.position.x += 200
 			player_node.position.y += 200
 		else:
-			player_node.position.x -=200
-			player_node.position.y -=200
+			player_node.position.x -= 200
+			player_node.position.y -= 200
+			
 		player_node.player_id = player
 		player_node.name = str(player)
 		_players_spawn_node.add_child(player_node, true)

@@ -4,6 +4,8 @@ extends CharacterBody2D
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
 
+@export var do_ability : String
+
 @onready var _input: MultiplayerInput = %InputSynchronizer
 
 @onready var stats : StatsComponent = $StatsComponent
@@ -16,7 +18,7 @@ var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
 
-var player_id: int:
+@export var player_id := 1:
 	set(value):
 		player_id = value
 		%InputSynchronizer.set_multiplayer_authority(value)
@@ -59,19 +61,17 @@ func _handle_movement(_delta: float) -> void:
 	# ghost speed multiplier when active
 	var speed = base_speed * ghost_ability.get_speed_multiplier()
 	
+	if do_ability == "flash_ability":
+		flash_ability.try_activate()
+	elif do_ability == "dash_ability":
+		dash_ability.try_activate()
+	elif do_ability == "ghost_ability":
+		ghost_ability.try_activate()
+	elif do_ability == "teleport_ability":
+		teleport_ability.try_activate()
+
 	velocity = _input.direction * speed
 	move_and_slide()
-	
-func _unhandled_input(event : InputEvent) -> void:
-	if event.is_action_pressed("flash_ability"):
-		flash_ability.try_activate()
-	elif event.is_action_pressed("dash_ability"):
-		dash_ability.try_activate()
-	elif event.is_action_pressed("ghost_ability"):
-		ghost_ability.try_activate()
-	elif event.is_action_pressed("teleport_ability"):
-		teleport_ability.try_activate()
-		
 
 func get_stats() -> StatsComponent:
 	return stats
