@@ -119,7 +119,14 @@ func _print_players():
 func _start_game():
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 	for player in players:
+	
 		var player_node = player_scene.instantiate()
+		if player == 1:
+			player_node.position.x += 200
+			player_node.position.y += 200
+		else:
+			player_node.position.x -=200
+			player_node.position.y -=200
 		player_node.player_id = player
-		player_node.name = str(players[player].name)
+		player_node.name = str(player)
 		_players_spawn_node.add_child(player_node, true)
