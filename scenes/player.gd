@@ -61,14 +61,17 @@ func _handle_movement(_delta: float) -> void:
 	# ghost speed multiplier when active
 	var speed = base_speed * ghost_ability.get_speed_multiplier()
 	
-	if do_ability == "flash_ability":
-		flash_ability.try_activate()
-	elif do_ability == "dash_ability":
-		dash_ability.try_activate()
-	elif do_ability == "ghost_ability":
-		ghost_ability.try_activate()
-	elif do_ability == "teleport_ability":
-		teleport_ability.try_activate()
+	if do_ability != "":
+		match do_ability:
+			"flash_ability":
+				flash_ability.try_activate()
+			"dash_ability":
+				dash_ability.try_activate()
+			"ghost_ability":
+				ghost_ability.try_activate()
+			"teleport_ability":
+				teleport_ability.try_activate()
+		do_ability = ""
 
 	velocity = _input.direction * speed
 	move_and_slide()
