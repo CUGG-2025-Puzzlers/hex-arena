@@ -16,7 +16,10 @@ var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
 
-var player_id
+var player_id: int:
+	set(value):
+		player_id = value
+		%InputSynchronizer.set_multiplayer_authority(value)
 
 func _ready() -> void:
 	playback = animation_tree["parameters/playback"]
