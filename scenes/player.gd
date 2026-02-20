@@ -4,8 +4,6 @@ extends CharacterBody2D
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
 
-@export var do_ability : String
-
 @onready var _input: MultiplayerInput = %InputSynchronizer
 
 @onready var stats : StatsComponent = $StatsComponent
@@ -14,6 +12,7 @@ extends CharacterBody2D
 @onready var ghost_ability : GhostAbility = $GhostAbility
 @onready var teleport_ability : TeleportAbility = $TeleportAbility
 
+var do_ability : String
 var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
