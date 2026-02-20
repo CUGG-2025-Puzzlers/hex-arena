@@ -7,6 +7,8 @@ signal server_disconnected
 # Dictionary of players using IDs as keys
 var players = {}
 
+var _players_spawn_node
+
 # Local player info
 # Set these fields using some UI before creating/joining a game
 var player_info = { 
@@ -111,3 +113,7 @@ func _print_players():
 		if player == multiplayer.get_unique_id():
 			print("*Local Client*")
 		print("Name: %s\nSelected Character: %s\n" % [players[player].name, Util.Character.keys()[players[player].character]])
+		
+func _start_game():
+	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
+	
