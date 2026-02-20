@@ -16,6 +16,8 @@ var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
 
+var player_id
+
 func _ready() -> void:
 	playback = animation_tree["parameters/playback"]
 	#player gets reference of ability
