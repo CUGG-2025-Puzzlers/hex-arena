@@ -17,6 +17,10 @@ var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
 
+var radius : int = 1
+var radius_cells : Array
+var cell : Vector2i
+
 var player_id: int:
 	set(value):
 		player_id = value
@@ -28,6 +32,9 @@ func _ready() -> void:
 	# collision with environment is layer 1 and ignore other players
 	set_collision_layer_value(2, true)   # player on layer 2
 	set_collision_mask_value(2, false)   # player cant collide with layer 2
+	
+	radius_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, radius)
+	get_node("Drawing range").draw_range(radius_cells)
 
 func _physics_process(delta: float) -> void:
 	#no movement if dashing
@@ -42,6 +49,8 @@ func _physics_process(delta: float) -> void:
 	_handle_movement(delta)
 	select_animation()
 	update_animation_parameters()
+	
+	cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
 
 func select_animation():
 	if _input.direction == Vector2.ZERO:

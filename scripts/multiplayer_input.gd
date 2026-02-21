@@ -56,5 +56,5 @@ func _unhandled_input(event: InputEvent) -> void:
 		possible_states.append(Magic.MagicType.SHIELD)
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
-		var pos = get_parent().global_position
-		HexCells.player_unique_instance.rpc("change_magic", pos,state, player_id)
+		var pos = get_parent().get_node("CollisionShape2D").global_position
+		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius, state,player_id)

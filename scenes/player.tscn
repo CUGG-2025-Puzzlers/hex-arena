@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="6_tuyoq"]
 [ext_resource type="Script" uid="uid://er414tfvhsml" path="res://scripts/abilities/teleport_ability.gd" id="7_fjrip"]
+[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_ur7pv"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
 properties/0/path = NodePath(".:player_id")
@@ -687,3 +688,7 @@ amount = 13
 lifetime = 0.3
 one_shot = true
 process_material = SubResource("ParticleProcessMaterial_fjrip")
+
+[node name="Drawing range" type="Node2D" parent="." unique_id=771124319]
+show_behind_parent = true
+script = ExtResource("9_ur7pv")

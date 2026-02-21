@@ -89,22 +89,32 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_node("LazyFollow").position = map_to_local(curr_cell)
 			
 			Events.emit_signal("select_new_cell",curr_cell)
-			queue_redraw()
 		
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
-@rpc("call_local", "any_peer", "reliable")
-func change_magic(pos: Vector2, new_state: Magic.MagicType, player_id: int):
+@rpc("call_local","any_peer","reliable") func change_magic(pos: Vector2, radius : int, new_state: Magic.MagicType, player_id: int):
 	var change_around_cell = local_to_map(pos)
 	
-	for j in range(-player_cell_range_radius,player_cell_range_radius*2+1):
-		for i in range(-player_cell_range_radius,player_cell_range_radius*2+1):
-			var cell_to_check = change_around_cell+Vector2i(i,j)
-			if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]):
-				var magic_instance : Magic = cell_dict[cell_to_check]
-				if magic_instance.state == Magic.MagicType.NEUTRAL and magic_instance.player_id == player_id:
-					magic_instance.change_state(new_state)
-				#if magic_instance.state == MagicType.NEUT
+	var player_cells = []
+	for player in get_tree().current_scene.find_child("Players").get_children():
+		player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
+	
+	var surrounding_cells = get_surrounding_cells_in_radius(change_around_cell, radius)
+	
+	surrounding_cells.erase(change_around_cell)
+	surrounding_cells.shuffle()
+	surrounding_cells.append(change_around_cell)
+	
+	
+	while not surrounding_cells.is_empty():
+		var cell_to_check = surrounding_cells.pop_back()
+		if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]):
+			var magic_instance : Magic = cell_dict[cell_to_check]
+			
+			if magic_instance.state == Magic.MagicType.NEUTRAL \
+			and magic_instance.player_id == player_id \
+			and not (cell_to_check == change_around_cell and change_around_cell in player_cells and new_state==Magic.MagicType.SHIELD):
+				magic_instance.change_state(new_state)
 
 @rpc("call_local", "any_peer", "reliable")
 func place_magic_in_cell(mouse_pos: Vector2, player_id: int):
@@ -132,8 +142,14 @@ func _draw() -> void:
 	for hex_points in points:
 		draw_polyline(hex_points,Color.CYAN)
 	
+	"""
 	var hex_points = get_hex_points_around(curr_cell)
 	draw_polyline(hex_points,Color.MAGENTA)
+	
+	for cell in get_surrounding_cells_in_radius(curr_cell,2):
+		hex_points = get_hex_points_around(cell)
+		draw_polyline(hex_points, Color.MAGENTA)
+	"""
 
 func get_hex_points_around(pos: Vector2i):
 	var hex_points = hex_shape.duplicate()
@@ -196,3 +212,27 @@ static func map_to_local(pos: Vector2i):
 	var center : Vector2 = Vector2(i*hex_width
 		+ (hex_width/2)*right_displacement, hex_height*0.75*j)
 	return center
+
+static func get_surrounding_cells(cell: Vector2i) -> Array:
+	var cells = [Vector2i(0,-1), Vector2i(1,0), Vector2i(0,1), Vector2i(-1,1), Vector2i(-1,0), Vector2i(-1,-1)]
+	if fposmod(cell.y,2):
+		for i in [0,2,3,5]:
+			cells[i]+=Vector2i(1,0)
+	for i in range(len(cells)):
+		cells[i]+=cell
+	return cells
+
+static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Array:
+	var surrounding_cells = [cell]
+	var extend_past_index = 0
+	for i in range(radius):
+		var ind = extend_past_index
+		var limit = len(surrounding_cells)
+		while ind < limit:
+			var new_surround_cells = get_surrounding_cells(surrounding_cells[ind])
+			ind+=1
+			for surrond_cell in new_surround_cells:
+				if surrond_cell not in surrounding_cells:
+					surrounding_cells.append(surrond_cell)
+			extend_past_index+=1
+	return surrounding_cells
