@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cp0acrvwc8fd3"]
+
+[ext_resource type="Script" uid="uid://dod0axqlalpdv" path="res://scenes/end_scene.gd" id="1_cv086"]
+
+[node name="EndScene" type="Control" unique_id=2014117180]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_cv086")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1998518321]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+alignment = 1
+
+[node name="WinnerLabel" type="Label" parent="VBoxContainer" unique_id=1981317496]
+layout_mode = 2
+
+[node name="PlayAgainBtn" type="Button" parent="VBoxContainer" unique_id=1865388114]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Play Again"
