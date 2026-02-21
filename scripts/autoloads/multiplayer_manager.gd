@@ -116,6 +116,19 @@ func _print_players():
 			print("*Local Client*")
 		print("Name: %s\nSelected Character: %s\n" % [players[player].name, Util.Character.keys()[players[player].character]])
 
+func _on_player_died(dead_player_id : int) -> void:
+	var winner_name = ""
+	
+	for id in players:
+		if id != dead_player_id:
+			winner_name = players[id].name
+			break
+	_end_game.rpc(winner_name)
+	
+@rpc("any_peer", "call_local", "reliable")
+func _end_game(winner_name: String):
+	SceneManager.load_end_scene(winner_name)
+
 func _start_game():
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 	for player in players:
@@ -127,7 +140,7 @@ func _start_game():
 		else:
 			player_node.position.x -= 200
 			player_node.position.y -= 200
-			
+		
 		player_node.player_id = player
 		player_node.name = str(player)
 		_players_spawn_node.add_child(player_node, true)
@@ -135,4 +148,9 @@ func _start_game():
 		# connecting HUD to local player only
 		if player == multiplayer.get_unique_id():
 			var hud = get_tree().get_current_scene().get_node("HUD")
-			hud.connect_to_player.call_deferred(player_node)
+			if not hud.is_node_ready():
+				await hud.ready
+			hud.connect_to_player(player_node)
+			#hud.connect_to_player.call_deferred(player_node)
+		
+		player_node.get_node("StatsComponent").deadgeLol.connect(_on_player_died.bind(player))
