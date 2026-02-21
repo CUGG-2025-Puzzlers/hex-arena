@@ -13,6 +13,7 @@ func _ready() -> void:
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
 		set_process(false)
 		set_physics_process(false)
+		set_process_unhandled_input(false)
 	else:
 		player_id = multiplayer.get_unique_id()
 	
@@ -20,18 +21,14 @@ func _ready() -> void:
 	camera_offset = camera.position - camera.get_viewport_rect().size / 2
 	
 	direction = Input.get_vector("left", "right", "up", "down")
-	mouse_pos = get_viewport().get_mouse_position() + camera_offset
+	mouse_pos = get_parent().get_global_mouse_position()
 
 func _physics_process(_delta: float) -> void:
 	direction = Input.get_vector("left", "right", "up", "down")
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion:
-		mouse_pos = event.global_position + camera_offset
+	mouse_pos = get_parent().get_global_mouse_position()
 	
-	if get_multiplayer_authority() != player_id:
-		return
-		
 	if event.is_action_pressed("flash_ability"):
 		ability = Util.Ability.Flash
 	elif event.is_action_pressed("dash_ability"):
@@ -62,8 +59,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					HexCells.player_unique_instance.rpc("launch_magic_in_cell", magic_cell, points, player_id)
 	
 	if Input.is_action_pressed("place_magic"):
-		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
-		HexCells.player_unique_instance.rpc("place_magic_in_cell", global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
+		HexCells.player_unique_instance.rpc("place_magic_in_cell", mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
 		#HexCells.player_unique_instance.place_magic_in_cell(global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
 	
 	var possible_states = []
