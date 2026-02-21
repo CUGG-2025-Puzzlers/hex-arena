@@ -29,12 +29,12 @@ func _ready() -> void:
 #region Event Listeners
 
 # Sets the other player's label to their name
-func _on_player_connected(id, info):
+func _on_player_connected(_id, info):
 	_remote_player_name.text = info.name
 	_set_character_info(info.character, false)
 
 # Sets the other player's label to the default text
-func _on_player_disconnected(id):
+func _on_player_disconnected(_id):
 	_remote_player_name.text = WAITING_FOR_PLAYER
 	_set_character_info(Util.Character.None, false)
 

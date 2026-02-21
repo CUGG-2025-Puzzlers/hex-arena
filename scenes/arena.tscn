@@ -37,6 +37,7 @@ tile_set = SubResource("TileSet_wl4x5")
 [node name="Path2D" type="Path2D" parent="." unique_id=513764908]
 curve = SubResource("Curve2D_eejgt")
 script = ExtResource("1_gubwe")
+player_cell_range_radius = null
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
 scale = Vector2(36.5, 36.5)

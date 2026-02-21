@@ -34,6 +34,8 @@ static var hex_polygon_shape : ConvexPolygonShape2D
 
 static var player_unique_instance : HexCells
 
+@export var player_cell_range_radius: int = 4
+
 func recalculate() -> void:
 	hex_height = 2*r
 	hex_width = sqrt(3)*r
@@ -91,16 +93,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
+@rpc("any_peer") func change_magic(pos: Vector2, new_state: Magic.MagicType, player_id: int):
+	var change_around_cell = local_to_map(pos)
+	
+	for j in range(-player_cell_range_radius,player_cell_range_radius*2+1):
+		for i in range(-player_cell_range_radius,player_cell_range_radius*2+1):
+			var cell_to_check = change_around_cell+Vector2i(i,j)
+			if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]):
+				var magic_instance : Magic = cell_dict[cell_to_check]
+				if magic_instance.state == Magic.MagicType.NEUTRAL and magic_instance.player_id == player_id:
+					magic_instance.change_state(new_state)
+				#if magic_instance.state == MagicType.NEUT
+
 @rpc("any_peer") func place_magic_in_cell(mouse_pos: Vector2, player_id: int):
 	var cell_to_place = local_to_map(mouse_pos)
 	
 	if cell_dict.has(cell_to_place) and not is_instance_valid(cell_dict[cell_to_place]):
-		var magic_instance = preload("res://scenes/magic.tscn").instantiate()
+		var magic_instance : Magic = preload("res://scenes/magic.tscn").instantiate()
 		magic_instance.position = map_to_local(cell_to_place)
 		magic_instance.self_cell = cell_to_place
 		cell_dict[cell_to_place]=magic_instance
 		add_child(magic_instance)
 		magic_instance.add_to_group('magic')
+		
+		if player_id!=multiplayer.get_unique_id():
+			magic_instance.modulate = Color.WEB_GRAY
+		
+		magic_instance.player_id = player_id
+		
 		Magic.last_placed_cell=cell_to_place
 
 func _draw() -> void:

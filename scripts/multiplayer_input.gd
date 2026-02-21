@@ -7,10 +7,14 @@ var mouse_pos: Vector2
 
 var camera_offset: Vector2
 
+var player_id: int
+
 func _ready() -> void:
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
 		set_process(false)
 		set_physics_process(false)
+	else:
+		player_id = multiplayer.get_unique_id()
 	
 	var camera = get_viewport().get_camera_2d()
 	camera_offset = camera.position - camera.get_viewport_rect().size / 2
@@ -18,14 +22,14 @@ func _ready() -> void:
 	direction = Input.get_vector("left", "right", "up", "down")
 	mouse_pos = get_viewport().get_mouse_position() + camera_offset
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	direction = Input.get_vector("left", "right", "up", "down")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		mouse_pos = event.global_position + camera_offset
 	
-	if get_multiplayer_authority() != multiplayer.get_unique_id():
+	if get_multiplayer_authority() != player_id:
 		return
 		
 	if event.is_action_pressed("flash_ability"):
@@ -38,9 +42,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		ability = Util.Ability.Teleport
 	else:
 		ability = Util.Ability.None
-		
+	
 	if Input.is_action_pressed("place_magic"):
 		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
-		var unique_id : int = multiplayer.get_unique_id()
-		HexCells.player_unique_instance.place_magic_in_cell(global_mouse_pos,unique_id)
-		HexCells.player_unique_instance.rpc("place_magic_in_cell",global_mouse_pos,unique_id)
+		HexCells.player_unique_instance.place_magic_in_cell(global_mouse_pos,player_id)
+		HexCells.player_unique_instance.rpc("place_magic_in_cell",global_mouse_pos,player_id)
+	
+	var possible_states = []
+	if Input.is_action_just_pressed("turn_pure_to_heavy"):
+		possible_states.append(Magic.MagicType.HEAVY)
+	if Input.is_action_just_pressed("turn_pure_to_light"):
+		possible_states.append(Magic.MagicType.LIGHT)
+	if Input.is_action_just_pressed("turn_pure_to_shield"):
+		possible_states.append(Magic.MagicType.SHIELD)
+	if not possible_states.is_empty():
+		var state = possible_states.pick_random()
+		var pos = get_parent().global_position
+		HexCells.player_unique_instance.change_magic(pos,state,player_id)
+		HexCells.player_unique_instance.rpc("change_magic",pos,state,player_id)
