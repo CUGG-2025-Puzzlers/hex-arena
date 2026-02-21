@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://2gnmcjcwoy5e"]
 
 [ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_g2els"]
-[ext_resource type="Texture2D" uid="uid://b846lw5gl8daw" path="res://assets/textures/Aztec_walk_draft.png" id="2_qhqgy"]
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_smehm"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://btpjo0pne2vdu" path="res://scripts/abilities/flash_ability.gd" id="4_dqkch"]
@@ -31,6 +30,9 @@ properties/2/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(38, 11)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_smehm"]
+load_path = "res://.godot/imported/Aztec_walk_draft.png-ca31bbd12d930f750257669e38fcd888.ctex"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_d2wvv"]
 animation = &"stop_up"
@@ -123,8 +125,8 @@ sync = true
 states/Stop/node = SubResource("AnimationNodeBlendSpace2D_qhqgy")
 states/Stop/position = Vector2(463.0502, 120.72751)
 states/Walk/node = SubResource("AnimationNodeBlendSpace2D_d2wvv")
-states/Walk/position = Vector2(265.75024, 1.2775116)
-graph_offset = Vector2(-252.26987, -79.22246)
+states/Walk/position = Vector2(314.12512, 120.216415)
+graph_offset = Vector2(8.167633, -52.81495)
 
 [sub_resource type="Animation" id="Animation_qhqgy"]
 length = 0.001
@@ -642,9 +644,10 @@ vertical_alignment = 1
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
+unique_name_in_owner = true
 position = Vector2(-4.7683716e-07, -34)
 scale = Vector2(0.05, 0.05)
-texture = ExtResource("2_qhqgy")
+texture = SubResource("CompressedTexture2D_smehm")
 hframes = 7
 vframes = 5
 region_enabled = true

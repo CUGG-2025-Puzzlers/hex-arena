@@ -82,7 +82,7 @@ position_smoothing_speed = 0.8
 [node name="Players" type="Node2D" parent="." unique_id=355591495]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=842747712]
-_spawnable_scenes = PackedStringArray("uid://2gnmcjcwoy5e")
+_spawnable_scenes = PackedStringArray("uid://2gnmcjcwoy5e", "uid://bvdkuf6c1gdxs")
 spawn_path = NodePath("../Players")
 spawn_limit = 2
 

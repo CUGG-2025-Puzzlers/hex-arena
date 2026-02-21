@@ -17,7 +17,7 @@ var input : Vector2
 var canMove : bool
 var playback : AnimationNodeStateMachinePlayback
 
-var radius : int = 1
+@export var radius : int = 1
 var radius_cells : Array
 var cell : Vector2i
 
@@ -35,6 +35,8 @@ func _ready() -> void:
 	
 	radius_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, radius)
 	get_node("Drawing range").draw_range(radius_cells)
+	
+	
 
 func _physics_process(delta: float) -> void:
 	#no movement if dashing

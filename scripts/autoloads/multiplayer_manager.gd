@@ -8,6 +8,7 @@ signal server_disconnected
 var players = {}
 
 var player_scene = preload("res://scenes/player.tscn")
+var hekaset = preload("res://scenes/hekaset.tscn")
 
 var _players_spawn_node
 
@@ -146,18 +147,25 @@ func _end_game(winner_name: String):
 func _start_game():
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 	for player in players:
-	
-		var player_node = player_scene.instantiate()
+		var player_node
+		
+		if Util.Character.keys()[players[player].character] == "Hekaset":
+			player_node = hekaset.instantiate()
+		else: 
+			player_node = player_scene.instantiate()
+		
+		# change spawn positions of each player
 		if player == 1:
 			player_node.position.x += 200
 			player_node.position.y += 200
 		else:
 			player_node.position.x -= 200
 			player_node.position.y -= 200
-		
+
 		player_node.player_id = player
 		player_node.name = str(player)
 		player_node.set_player_name(players[player].name)
+		
 		_players_spawn_node.add_child(player_node, true)
 		
 		# connecting HUD to local player only
