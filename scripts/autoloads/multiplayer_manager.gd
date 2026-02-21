@@ -131,3 +131,8 @@ func _start_game():
 		player_node.player_id = player
 		player_node.name = str(player)
 		_players_spawn_node.add_child(player_node, true)
+		
+		# connecting HUD to local player only
+		if player == multiplayer.get_unique_id():
+			var hud = get_tree().get_current_scene().get_node("HUD")
+			hud.connect_to_player.call_deferred(player_node)
