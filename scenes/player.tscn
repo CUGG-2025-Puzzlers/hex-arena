@@ -627,6 +627,16 @@ unique_name_in_owner = true
 replication_config = SubResource("SceneReplicationConfig_ur7pv")
 script = ExtResource("2_smehm")
 
+[node name="NameLabel" type="Label" parent="." unique_id=123225415]
+unique_name_in_owner = true
+offset_left = -75.0
+offset_top = -115.0
+offset_right = 75.0
+offset_bottom = -92.0
+pivot_offset_ratio = Vector2(0.5, 0.5)
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
 shape = SubResource("RectangleShape2D_g2els")
 

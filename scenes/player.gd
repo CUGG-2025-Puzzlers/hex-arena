@@ -73,6 +73,9 @@ func _handle_movement(_delta: float) -> void:
 	velocity = _input.direction * speed
 	move_and_slide()
 
+func set_player_name(player_name: String):
+	%NameLabel.text = player_name
+
 func get_stats() -> StatsComponent:
 	return stats
 	

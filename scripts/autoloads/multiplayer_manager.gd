@@ -157,6 +157,7 @@ func _start_game():
 		
 		player_node.player_id = player
 		player_node.name = str(player)
+		player_node.set_player_name(players[player].name)
 		_players_spawn_node.add_child(player_node, true)
 		
 		# connecting HUD to local player only
