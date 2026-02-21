@@ -108,6 +108,11 @@ character = 1
 
 [node name="SelectableCharacter2" parent="CharacterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
 layout_mode = 2
+character = 2
+locked = true
+
+[node name="SelectableCharacter3" parent="CharacterContainer/CharacterList" unique_id=840476462 instance=ExtResource("2_jgus3")]
+layout_mode = 2
 character = 3
 
 [node name="StartButton" type="Button" parent="." unique_id=2091587044]
