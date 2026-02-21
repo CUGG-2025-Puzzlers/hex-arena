@@ -93,7 +93,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
-@rpc("any_peer") func change_magic(pos: Vector2, new_state: Magic.MagicType, player_id: int):
+@rpc("call_local", "any_peer", "reliable")
+func change_magic(pos: Vector2, new_state: Magic.MagicType, player_id: int):
 	var change_around_cell = local_to_map(pos)
 	
 	for j in range(-player_cell_range_radius,player_cell_range_radius*2+1):
@@ -105,7 +106,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					magic_instance.change_state(new_state)
 				#if magic_instance.state == MagicType.NEUT
 
-@rpc("any_peer") func place_magic_in_cell(mouse_pos: Vector2, player_id: int):
+@rpc("call_local", "any_peer", "reliable")
+func place_magic_in_cell(mouse_pos: Vector2, player_id: int):
 	var cell_to_place = local_to_map(mouse_pos)
 	
 	if cell_dict.has(cell_to_place) and not is_instance_valid(cell_dict[cell_to_place]):
