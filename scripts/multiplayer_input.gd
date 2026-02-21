@@ -38,3 +38,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		ability = Util.Ability.Teleport
 	else:
 		ability = Util.Ability.None
+		
+	if Input.is_action_pressed("place_magic"):
+		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
+		var unique_id : int = multiplayer.get_unique_id()
+		HexCells.player_unique_instance.place_magic_in_cell(global_mouse_pos,unique_id)
+		HexCells.player_unique_instance.rpc("place_magic_in_cell",global_mouse_pos,unique_id)
