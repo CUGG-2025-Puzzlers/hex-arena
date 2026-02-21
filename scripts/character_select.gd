@@ -21,7 +21,11 @@ func _ready() -> void:
 	
 	_start_button.hide()
 	_local_player_name.text = MultiplayerManager.player_info.name
-	_remote_player_name.text = WAITING_FOR_PLAYER
+	
+	if MultiplayerManager.players.size() > 1:
+		_remote_player_name.text = MultiplayerManager.get_other_player_info().name
+	else:
+		_remote_player_name.text = WAITING_FOR_PLAYER
 	
 	_set_character_info(Util.Character.None, true)
 	_set_character_info(Util.Character.None, false)

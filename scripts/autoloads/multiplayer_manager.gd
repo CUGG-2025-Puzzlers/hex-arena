@@ -114,6 +114,15 @@ func reset_character_selections():
 	for player_id in players:
 		players[player_id].character = Util.Character.None
 
+# Returns the other player's info from the player dictionary
+# Returns null if no other player is found
+func get_other_player_info():
+	for player_id in players:
+		if player_id != multiplayer.get_unique_id():
+			return players[player_id]
+	
+	return null
+
 # Prints out the players for debugging purposes
 func _print_players():
 	for player in players:
