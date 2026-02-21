@@ -91,7 +91,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
 @rpc("call_local","any_peer","reliable") 
-func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int):
+func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int, player_stats, how_many:int, rng_seed: int):
 	var change_around_cell = local_to_map(pos)
 	
 	var player_cells = []
@@ -103,9 +103,19 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 		surrounding_cells[i]=local_to_map(map_to_local(change_around_cell)+map_to_local(surrounding_cells[i]))
 
 	surrounding_cells.erase(change_around_cell)
-	surrounding_cells.shuffle()
+	var rng : RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = rng_seed
+	rng.state = 0
+	for i in range(len(surrounding_cells)):
+		var ind2 = len(surrounding_cells)-i-1
+		var ind1 = rng.randi()%(ind2+1)
+		var temp = surrounding_cells[ind2]
+		surrounding_cells[ind2]=surrounding_cells[ind1]
+		surrounding_cells[ind1]=temp
 	surrounding_cells.append(change_around_cell)
 	
+	var counter = 0
+	var owned = player_id == multiplayer.get_unique_id()
 	
 	while not surrounding_cells.is_empty():
 		var cell_to_check = surrounding_cells.pop_back()
@@ -115,10 +125,16 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 			if magic_instance.state == Magic.MagicType.NEUTRAL \
 			and magic_instance.player_id == player_id \
 			and not (cell_to_check in player_cells and new_state==Magic.MagicType.SHIELD):
-				magic_instance.change_state(new_state)
+				if counter<how_many:
+					magic_instance.change_state(new_state)
+					counter+=1
+					if owned:
+						player_stats.use_mana(Magic.cost[new_state])
+				else:
+					break
 
 @rpc("call_local", "any_peer", "reliable")
-func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells: Array, player_id: int):
+func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells: Array, player_id: int, player_stats):
 	var player_pos = map_to_local(player_cell)
 	var cell_to_place = local_to_map(mouse_pos)
 	var in_radius = false
@@ -131,6 +147,8 @@ func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells:
 		
 	if cell_dict.has(cell_to_place) and not is_instance_valid(cell_dict[cell_to_place]):
 		var magic_instance : Magic = preload("res://scenes/magic.tscn").instantiate()
+		
+		
 		magic_instance.position = map_to_local(cell_to_place)
 		magic_instance.self_cell = cell_to_place
 		cell_dict[cell_to_place]=magic_instance
@@ -144,6 +162,7 @@ func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells:
 			Magic.last_placed_cell=cell_to_place
 			get_node("LastMagic").global_position=map_to_local(cell_to_place)
 			get_node("LastMagic").visible = true
+			player_stats.use_mana(Magic.cost[Magic.MagicType.NEUTRAL])
 		
 		magic_instance.player_id = player_id
 
