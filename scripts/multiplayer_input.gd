@@ -44,21 +44,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		ability = Util.Ability.None
 	
 	if Input.is_action_just_pressed("fire_magic"):
-		for magic_instance in get_tree().get_nodes_in_group("magic"):
-			if magic_instance.player_id==player_id and magic_instance.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY]:
-				var magic_cell : Vector2i = magic_instance.self_cell
-				
-				var rolling_dir : Vector2 = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(Magic.last_placed_cell)
-				rolling_dir = rolling_dir.normalized()
+		var rolling_dir : Vector2 = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(Magic.last_placed_cell)
+		if rolling_dir!=Vector2.ZERO:
+			rolling_dir = rolling_dir.normalized()
 			
-				var points : PackedVector2Array = []
-				match magic_instance.state:
-					Magic.MagicType.HEAVY:
-						points.append_array(Magic.create_wiggly_path(rolling_dir, Magic.BULLET_DISTANCE*randf_range(1,2)))
-					Magic.MagicType.LIGHT:
-						points.append_array(Magic.create_wiggly_path(rolling_dir, Magic.BULLET_DISTANCE*randf_range(0.5,1)))
+			for magic_instance in get_tree().get_nodes_in_group("magic"):
+				if magic_instance.player_id==player_id and magic_instance.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY]:
+					var magic_cell : Vector2i = magic_instance.self_cell
 				
-				HexCells.player_unique_instance.rpc("launch_magic_in_cell", magic_cell, points)
+					var points : PackedVector2Array = []
+					match magic_instance.state:
+						Magic.MagicType.HEAVY:
+							points.append_array(Magic.create_wiggly_path(rolling_dir, Magic.BULLET_DISTANCE*randf_range(1,2)))
+						Magic.MagicType.LIGHT:
+							points.append_array(Magic.create_wiggly_path(rolling_dir, Magic.BULLET_DISTANCE*randf_range(0.5,1)))
+					
+					HexCells.player_unique_instance.rpc("launch_magic_in_cell", magic_cell, points, player_id)
 	
 	if Input.is_action_pressed("place_magic"):
 		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()

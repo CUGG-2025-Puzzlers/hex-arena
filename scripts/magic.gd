@@ -6,6 +6,12 @@ var state = MagicType.NEUTRAL
 
 static var last_placed_cell : Vector2i
 
+static var cost = {
+	MagicType.NEUTRAL: 5, 
+	MagicType.LIGHT: 14,
+	MagicType.HEAVY: 27,
+	MagicType.SHIELD: 18, }
+
 const BULLET_SPEED : float = 450
 const BULLET_DISTANCE : float = 800
 
@@ -28,21 +34,32 @@ var shield_animated_texture : GradientTexture2D
 
 var points =[]
 
-var player_id : int
+@onready var player_id : int = multiplayer.get_unique_id()
 
 func _ready() -> void:
+	var cell_dict : Dictionary = HexCells.player_unique_instance.cell_dict
+	
+	if cell_dict.has(self_cell) and is_instance_valid(cell_dict[self_cell]) and cell_dict[self_cell]!=self:
+		cell_dict[self_cell].queue_free()
+	else:
+		HexCells.player_unique_instance.cell_dict[self_cell]=self
 	animated_children = find_children("ChildLight*", "Sprite2D")
 
 
 func start_rolling(wiggly_path: PackedVector2Array):
-	if rolling:
-		return
-	
 	match state:
 		MagicType.LIGHT:
 			roll_speed = BULLET_SPEED*1.2
 		MagicType.HEAVY:
 			roll_speed = BULLET_SPEED*0.6
+		_:
+			return
+	
+	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
+		HexCells.cell_dict[self_cell] = null
+	
+	if rolling:
+		return
 	
 	var trajectory: Path2D = Path2D.new()
 	trajectory.curve = Curve2D.new()
@@ -58,9 +75,6 @@ func start_rolling(wiggly_path: PackedVector2Array):
 	get_tree().current_scene.add_child(trajectory)
 	trajectory.add_child(rolling_pathfollow)
 	reparent(rolling_pathfollow)
-	
-	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
-		HexCells.cell_dict[self_cell] = null
 	
 	if state==MagicType.LIGHT:
 		rotation = (wiggly_path[len(wiggly_path)-1]-wiggly_path[0]).angle()

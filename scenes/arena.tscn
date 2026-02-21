@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_wl4x5"]
+[ext_resource type="Texture2D" uid="uid://bnv70x432w8c1" path="res://assets/textures/select_bubble_texture.tres" id="3_7ft05"]
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
+[ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_wl4x5")
@@ -24,8 +26,6 @@ tile_size = Vector2i(104, 120)
 sources/0 = SubResource("TileSetAtlasSource_wl4x5")
 
 [sub_resource type="Curve2D" id="Curve2D_eejgt"]
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7y173"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
 distance = -650.0
@@ -55,8 +55,14 @@ curve = SubResource("Curve2D_eejgt")
 script = ExtResource("1_gubwe")
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
-scale = Vector2(36.5, 36.5)
-texture = SubResource("PlaceholderTexture2D_7y173")
+texture = ExtResource("3_7ft05")
+
+[node name="LastMagic" type="Sprite2D" parent="Path2D" unique_id=1268473399]
+visible = false
+modulate = Color(0.5019608, 0.5019608, 0.5019608, 1)
+show_behind_parent = true
+scale = Vector2(1.6406251, 1.6406251)
+texture = ExtResource("4_4ag8t")
 
 [node name="Label" type="Label" parent="Path2D" unique_id=1072220071]
 z_index = 10

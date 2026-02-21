@@ -34,8 +34,6 @@ static var hex_polygon_shape : ConvexPolygonShape2D
 
 static var player_unique_instance : HexCells
 
-@export var player_cell_range_radius: int = 4
-
 func recalculate() -> void:
 	hex_height = 2*r
 	hex_width = sqrt(3)*r
@@ -136,22 +134,24 @@ func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells:
 		magic_instance.position = map_to_local(cell_to_place)
 		magic_instance.self_cell = cell_to_place
 		cell_dict[cell_to_place]=magic_instance
-		add_child(magic_instance)
+		add_child(magic_instance, true)
+		magic_instance.name = "Magic"
 		magic_instance.add_to_group('magic')
 		
 		if player_id!=multiplayer.get_unique_id():
 			magic_instance.modulate = Color.WEB_MAROON
 		else:
 			Magic.last_placed_cell=cell_to_place
+			get_node("LastMagic").global_position=map_to_local(cell_to_place)
+			get_node("LastMagic").visible = true
 		
 		magic_instance.player_id = player_id
 
 @rpc("call_local","any_peer","reliable")
-func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array):
-	if cell_dict.has(cell) and is_instance_valid(cell_dict[cell]):
-		var magic_instance: Magic = cell_dict[cell]
-		magic_instance.start_rolling(wiggly_path_points)
-		cell_dict[cell]=null
+func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array, player_id: int):
+	for magic_instance in get_tree().get_nodes_in_group('magic'):
+		if is_instance_valid(magic_instance) and magic_instance.player_id==player_id and magic_instance.self_cell == cell:
+			magic_instance.start_rolling(wiggly_path_points)
 
 func _draw() -> void:
 	if points.is_empty():
