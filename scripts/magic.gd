@@ -7,10 +7,10 @@ var state = MagicType.NEUTRAL
 static var last_placed_cell : Vector2i
 
 static var cost = {
-	MagicType.NEUTRAL: 5, 
-	MagicType.LIGHT: 14,
-	MagicType.HEAVY: 27,
-	MagicType.SHIELD: 18, }
+	MagicType.NEUTRAL: 5,
+	MagicType.LIGHT: 10,
+	MagicType.HEAVY: 20,
+	MagicType.SHIELD: 15, }
 
 const BULLET_SPEED : float = 450
 const BULLET_DISTANCE : float = 800
@@ -38,7 +38,7 @@ var points =[]
 
 func _ready() -> void:
 	var cell_dict : Dictionary = HexCells.player_unique_instance.cell_dict
-	
+
 	if cell_dict.has(self_cell) and is_instance_valid(cell_dict[self_cell]) and cell_dict[self_cell]!=self:
 		cell_dict[self_cell].queue_free()
 	else:
