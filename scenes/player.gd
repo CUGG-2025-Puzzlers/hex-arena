@@ -24,10 +24,7 @@ var player_id: int:
 
 func _ready() -> void:
 	playback = animation_tree["parameters/playback"]
-	#player gets reference of ability
-	for child in get_children():
-		if child is AbilityBase:
-			child.player = self
+	
 	# collision with environment is layer 1 and ignore other players
 	set_collision_layer_value(2, true)   # player on layer 2
 	set_collision_mask_value(2, false)   # player cant collide with layer 2

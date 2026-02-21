@@ -19,6 +19,9 @@ var is_active: bool = false
 # player reference
 var player: CharacterBody2D
 
+func _ready() -> void:
+	player = get_parent()
+
 func _process(delta: float) -> void:
 	if is_on_cooldown:
 		cooldown_remaining -= delta
