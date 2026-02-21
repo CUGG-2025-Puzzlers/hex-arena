@@ -27,6 +27,21 @@ sources/0 = SubResource("TileSetAtlasSource_wl4x5")
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7y173"]
 
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
+distance = -650.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_xdvfk"]
+normal = Vector2(1, 0)
+distance = -930.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_7ft05"]
+normal = Vector2(-1, 0)
+distance = -880.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_olpmc"]
+normal = Vector2(0, 1)
+distance = -730.0
+
 [node name="Arena" type="Node2D" unique_id=669064917]
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1388945420]
@@ -51,6 +66,12 @@ theme_override_font_sizes/font_size = 32
 text = "(1,2)"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=794670418]
+limit_left = -1000
+limit_top = -800
+limit_right = 950
+limit_bottom = 700
+position_smoothing_enabled = true
+position_smoothing_speed = 0.8
 
 [node name="Players" type="Node2D" parent="." unique_id=355591495]
 
@@ -60,3 +81,17 @@ spawn_path = NodePath("../Players")
 spawn_limit = 2
 
 [node name="HUD" parent="." unique_id=1928650332 instance=ExtResource("3_olpmc")]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=976022257]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=828635459]
+shape = SubResource("WorldBoundaryShape2D_4ag8t")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=1335702283]
+shape = SubResource("WorldBoundaryShape2D_xdvfk")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=994577793]
+shape = SubResource("WorldBoundaryShape2D_7ft05")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=220051452]
+shape = SubResource("WorldBoundaryShape2D_olpmc")

@@ -92,7 +92,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
-@rpc("call_local","any_peer","reliable") func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int):
+@rpc("call_local","any_peer","reliable") 
+func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int):
 	var change_around_cell = local_to_map(pos)
 	
 	var player_cells = []
@@ -150,7 +151,7 @@ func _draw() -> void:
 		return
 	
 	for hex_points in points:
-		draw_polyline(hex_points,Color.CYAN)
+		draw_polyline(hex_points,Color.CYAN) #1.01, true
 	
 	"""
 	var hex_points = get_hex_points_around(curr_cell)

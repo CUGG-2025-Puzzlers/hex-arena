@@ -162,6 +162,10 @@ func _start_game():
 		
 		# connecting HUD to local player only
 		if player == multiplayer.get_unique_id():
+			player_node.z_index = 1
+			var camera : Camera2D = get_tree().get_current_scene().get_node("Camera2D")
+			camera.reparent(player_node)
+			camera.position=Vector2.ZERO
 			var hud = get_tree().get_current_scene().get_node("HUD")
 			if not hud.is_node_ready():
 				await hud.ready
