@@ -109,6 +109,11 @@ func set_player_character(player_id: int, character: Util.Character):
 	players[player_id].character = character
 	_print_players()
 
+# Resets all players' selected character
+func reset_character_selections():
+	for player_id in players:
+		players[player_id].character = Util.Character.None
+
 # Prints out the players for debugging purposes
 func _print_players():
 	for player in players:
