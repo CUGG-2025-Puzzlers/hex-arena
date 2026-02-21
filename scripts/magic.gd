@@ -28,6 +28,8 @@ var shield_animated_texture : GradientTexture2D
 
 var points =[]
 
+var player_id : int
+
 func _ready() -> void:
 	animated_children = find_children("ChildLight*", "Sprite2D")
 
@@ -54,19 +56,9 @@ func _unhandled_key_input(_event: InputEvent) -> void:
 			rolling = true
 			#instantiate_pellet(dir)
 	
-	if state==MagicType.NEUTRAL:
-		var possible_states = []
-		if Input.is_action_just_pressed("turn_pure_to_heavy"):
-			possible_states.append(MagicType.HEAVY)
-		if Input.is_action_just_pressed("turn_pure_to_light"):
-			possible_states.append(MagicType.LIGHT)
-		if Input.is_action_just_pressed("turn_pure_to_shield"):
-			possible_states.append(MagicType.SHIELD)
-		if not possible_states.is_empty():
-			state = possible_states.pick_random()
-			change_state()
 
-func change_state():
+func change_state(new_state: MagicType):
+	state = new_state
 	match state:
 		MagicType.NEUTRAL:
 			modulate=Color.WHITE

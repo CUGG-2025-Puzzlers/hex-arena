@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://cei521iq1xrb2"]
 
-[ext_resource type="Script" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
+[ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_wl4x5"]
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 
@@ -37,6 +37,7 @@ tile_set = SubResource("TileSet_wl4x5")
 [node name="Path2D" type="Path2D" parent="." unique_id=513764908]
 curve = SubResource("Curve2D_eejgt")
 script = ExtResource("1_gubwe")
+player_cell_range_radius = null
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
 scale = Vector2(36.5, 36.5)
