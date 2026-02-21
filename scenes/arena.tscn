@@ -1,7 +1,8 @@
-[gd_scene format=4 uid="uid://dgloupwap6qns"]
+[gd_scene format=4 uid="uid://cei521iq1xrb2"]
 
-[ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
+[ext_resource type="Script" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_wl4x5"]
+[ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_wl4x5")
@@ -56,3 +57,5 @@ text = "(1,2)"
 _spawnable_scenes = PackedStringArray("uid://2gnmcjcwoy5e")
 spawn_path = NodePath("../Players")
 spawn_limit = 2
+
+[node name="HUD" parent="." unique_id=1928650332 instance=ExtResource("3_olpmc")]
