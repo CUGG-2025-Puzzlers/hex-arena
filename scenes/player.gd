@@ -95,7 +95,7 @@ func is_dashing() -> bool:
 	return dash_ability.is_dashing
 	
 func _unhandled_input(event: InputEvent) -> void:
-	if %InputSynchronizer.get_multiplayer_authority() != multiplayer.get_unique_id():
+	if %InputSynchronizer.get_multiplayer_authority() != player_id:
 		return
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_K:

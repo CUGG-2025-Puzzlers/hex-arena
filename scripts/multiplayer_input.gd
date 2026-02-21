@@ -45,7 +45,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	if Input.is_action_pressed("place_magic"):
 		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
-		HexCells.player_unique_instance.rpc("place_magic_in_cell", global_mouse_pos, player_id)
+		HexCells.player_unique_instance.rpc("place_magic_in_cell", global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
 	
 	var possible_states = []
 	if Input.is_action_just_pressed("turn_pure_to_heavy"):
@@ -57,4 +57,4 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
 		var pos = get_parent().get_node("CollisionShape2D").global_position
-		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius, state,player_id)
+		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius_cells, state,player_id)

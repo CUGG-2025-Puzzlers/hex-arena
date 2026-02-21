@@ -92,15 +92,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
-@rpc("call_local","any_peer","reliable") func change_magic(pos: Vector2, radius : int, new_state: Magic.MagicType, player_id: int):
+@rpc("call_local","any_peer","reliable") func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int):
 	var change_around_cell = local_to_map(pos)
 	
 	var player_cells = []
 	for player in get_tree().current_scene.find_child("Players").get_children():
 		player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
 	
-	var surrounding_cells = get_surrounding_cells_in_radius(change_around_cell, radius)
-	
+	var surrounding_cells = radius_cells.duplicate()
+	for i in range(len(surrounding_cells)):
+		surrounding_cells[i]=local_to_map(map_to_local(change_around_cell)+map_to_local(surrounding_cells[i]))
+
 	surrounding_cells.erase(change_around_cell)
 	surrounding_cells.shuffle()
 	surrounding_cells.append(change_around_cell)
@@ -117,9 +119,17 @@ func _unhandled_input(event: InputEvent) -> void:
 				magic_instance.change_state(new_state)
 
 @rpc("call_local", "any_peer", "reliable")
-func place_magic_in_cell(mouse_pos: Vector2, player_id: int):
+func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells: Array, player_id: int):
+	var player_pos = map_to_local(player_cell)
 	var cell_to_place = local_to_map(mouse_pos)
-	
+	var in_radius = false
+	for radius_cell in radius_cells:
+		if cell_to_place==local_to_map(player_pos+map_to_local(radius_cell)):
+			in_radius=true
+			break
+	if not in_radius:
+		return
+		
 	if cell_dict.has(cell_to_place) and not is_instance_valid(cell_dict[cell_to_place]):
 		var magic_instance : Magic = preload("res://scenes/magic.tscn").instantiate()
 		magic_instance.position = map_to_local(cell_to_place)
@@ -129,11 +139,11 @@ func place_magic_in_cell(mouse_pos: Vector2, player_id: int):
 		magic_instance.add_to_group('magic')
 		
 		if player_id!=multiplayer.get_unique_id():
-			magic_instance.modulate = Color.WEB_GRAY
+			magic_instance.modulate = Color.WEB_MAROON
+		else:
+			Magic.last_placed_cell=cell_to_place
 		
 		magic_instance.player_id = player_id
-		
-		Magic.last_placed_cell=cell_to_place
 
 func _draw() -> void:
 	if points.is_empty():
