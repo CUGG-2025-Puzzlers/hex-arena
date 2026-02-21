@@ -81,3 +81,14 @@ func is_channeling() -> bool:
 	
 func is_dashing() -> bool:
 	return dash_ability.is_dashing
+	
+func _unhandled_input(event: InputEvent) -> void:
+	if %InputSynchronizer.get_multiplayer_authority() != multiplayer.get_unique_id():
+		return
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_K:
+			stats.take_damage(10.0)
+		elif event.keycode == KEY_L:
+			stats.heal(10.0)
+		elif event.keycode == KEY_M:
+			stats.use_mana(20.0)
