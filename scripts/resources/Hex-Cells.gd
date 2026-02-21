@@ -116,7 +116,7 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 			
 			if magic_instance.state == Magic.MagicType.NEUTRAL \
 			and magic_instance.player_id == player_id \
-			and not (cell_to_check == change_around_cell and change_around_cell in player_cells and new_state==Magic.MagicType.SHIELD):
+			and not (cell_to_check in player_cells and new_state==Magic.MagicType.SHIELD):
 				magic_instance.change_state(new_state)
 
 @rpc("call_local", "any_peer", "reliable")
@@ -145,6 +145,13 @@ func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells:
 			Magic.last_placed_cell=cell_to_place
 		
 		magic_instance.player_id = player_id
+
+@rpc("call_local","any_peer","reliable")
+func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array):
+	if cell_dict.has(cell) and is_instance_valid(cell_dict[cell]):
+		var magic_instance: Magic = cell_dict[cell]
+		magic_instance.start_rolling(wiggly_path_points)
+		cell_dict[cell]=null
 
 func _draw() -> void:
 	if points.is_empty():

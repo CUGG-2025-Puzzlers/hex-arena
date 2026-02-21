@@ -33,29 +33,39 @@ var player_id : int
 func _ready() -> void:
 	animated_children = find_children("ChildLight*", "Sprite2D")
 
-func _unhandled_key_input(_event: InputEvent) -> void:
+
+func start_rolling(wiggly_path: PackedVector2Array):
 	if rolling:
 		return
 	
-	if Input.is_action_just_pressed("fire_magic"):
-		if state in [MagicType.LIGHT, MagicType.HEAVY] and last_placed_cell!=HexCells.curr_cell:
-			var dir :Vector2 = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(last_placed_cell)
-			dir = dir.normalized()
-			
-			rolling_dir = dir
-			match state:
-				MagicType.LIGHT:
-					roll_speed = BULLET_SPEED*1.2
-				MagicType.HEAVY:
-					roll_speed = BULLET_SPEED*0.6
-
-			if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
-				HexCells.cell_dict[self_cell] = null
-			
-			get_node("VisibleOnScreenNotifier2D").screen_exited.connect(fizzle)
-			rolling = true
-			#instantiate_pellet(dir)
+	match state:
+		MagicType.LIGHT:
+			roll_speed = BULLET_SPEED*1.2
+		MagicType.HEAVY:
+			roll_speed = BULLET_SPEED*0.6
 	
+	var trajectory: Path2D = Path2D.new()
+	trajectory.curve = Curve2D.new()
+	for point in wiggly_path:
+		trajectory.curve.add_point(point)
+	
+	rolling_pathfollow = PathFollow2D.new()
+	rolling_pathfollow.loop = false
+	rolling_pathfollow.rotates = false
+	
+	trajectory.global_position=global_position
+	
+	get_tree().current_scene.add_child(trajectory)
+	trajectory.add_child(rolling_pathfollow)
+	reparent(rolling_pathfollow)
+	
+	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
+		HexCells.cell_dict[self_cell] = null
+	
+	if state==MagicType.LIGHT:
+		rotation = (wiggly_path[len(wiggly_path)-1]-wiggly_path[0]).angle()
+	
+	rolling = true
 
 func change_state(new_state: MagicType):
 	state = new_state
@@ -156,22 +166,7 @@ func _process(delta: float) -> void:
 					MagicType.LIGHT:
 						trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
 				"""
-		else:
-			var trajectory : Path2D = Path2D.new()
-			match state:
-				MagicType.HEAVY:
-					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(1,2))
-				MagicType.LIGHT:
-					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
 			
-			
-			rolling_pathfollow = PathFollow2D.new()
-			rolling_pathfollow.loop = false
-			rolling_pathfollow.rotates = false
-			trajectory.global_position=global_position
-			get_tree().current_scene.add_child(trajectory)
-			trajectory.add_child(rolling_pathfollow)
-			reparent(rolling_pathfollow)
 			
 	#advance_child_pellets(delta)
 
@@ -180,8 +175,11 @@ func instantiate_pellet(dir: Vector2) -> void:
 	var trajectory: Path2D = Path2D.new()
 	pellet_instance.get_node("VisibleOnScreenNotifier2D")\
 	.screen_exited.connect(trajectory.queue_free)
-			
-	trajectory.curve = create_wiggly_path(dir, BULLET_DISTANCE)
+	
+	trajectory.curve = Curve2D.new()
+	for point in create_wiggly_path(dir, BULLET_DISTANCE):
+		trajectory.curve.add_point(point)
+	#trajectory.curve = create_wiggly_path(dir, BULLET_DISTANCE)
 	add_child(trajectory)
 	trajectory.add_child(pellet_instance)
 
@@ -207,10 +205,10 @@ func advance_child_pellets(delta: float) -> void:
 	for child_path in finished_paths:
 		child_path.queue_free()
 
-func create_wiggly_path(dir: Vector2, dist: float) -> Curve2D:
-	var path = Curve2D.new() 
+static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
+	var path : PackedVector2Array = []
 	
-	path.add_point(Vector2.ZERO)
+	path.append(Vector2.ZERO)
 	var last_point: Vector2 = Vector2.ZERO
 	var extra_points = randi_range(1,39)
 	var progress = 0.;
@@ -224,10 +222,10 @@ func create_wiggly_path(dir: Vector2, dist: float) -> Curve2D:
 		.rotated(randfn(0,PI/lerpf(30,6,progress-temp)))*(progress-temp)/(1.-temp)
 		var other_option = dir.rotated(randfn(0,PI/lerpf(100,10,progress-temp)))*dist*progress
 		next_point = abs(randfn(0.,0.05))*(other_option-next_point)+next_point
-		path.add_point(next_point)
+		path.append(next_point)
 		last_point = next_point
 	
-	path.add_point(dir*dist)
+	path.append(dir*dist)
 	return path
 
 
