@@ -19,6 +19,9 @@ func connect_to_player(p: CharacterBody2D) -> void:
 	var stats: StatsComponent = player.get_node("StatsComponent")
 	stats.health_changed.connect(_on_health_changed)
 	stats.mana_changed.connect(_on_mana_changed)
+	
+	_on_health_changed(stats.current_health, stats.max_health)
+	_on_mana_changed(stats.current_mana, stats.max_mana)
 
 func _on_health_changed(current: float, maximum: float) -> void:
 	hp_bar.max_value = maximum
