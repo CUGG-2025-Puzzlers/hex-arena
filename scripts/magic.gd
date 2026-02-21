@@ -108,7 +108,8 @@ func change_state(new_state: MagicType):
 			visualize_shield()
 			scale = 0.9*Vector2.ONE
 			var coll_shape :CollisionShape2D = get_node("CollisionShape2D")
-			coll_shape.shape =	HexCells.hex_polygon_shape
+			coll_shape.shape = HexCells.hex_polygon_shape
+			get_node("StaticBody2D").add_child(coll_shape.duplicate())
 
 func _process(delta: float) -> void:
 	for i in range(len(animation_timers)):

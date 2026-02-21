@@ -130,4 +130,6 @@ scale_amount_max = 8.0
 scale_amount_curve = SubResource("Curve_mgv3p")
 color_ramp = SubResource("Gradient_87hvv")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1907923882]
+
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
