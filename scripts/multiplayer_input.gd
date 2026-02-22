@@ -5,8 +5,6 @@ var direction: Vector2
 var ability: Util.Ability
 var mouse_pos: Vector2
 
-var camera_offset: Vector2
-
 var player_id: int
 
 @onready var own_stats: StatsComponent = get_parent().get_node("StatsComponent")
@@ -18,9 +16,6 @@ func _ready() -> void:
 		set_process_unhandled_input(false)
 	else:
 		player_id = multiplayer.get_unique_id()
-	
-	var camera = get_viewport().get_camera_2d()
-	camera_offset = camera.position - camera.get_viewport_rect().size / 2
 	
 	direction = Input.get_vector("left", "right", "up", "down")
 	mouse_pos = get_parent().get_global_mouse_position()
