@@ -134,3 +134,30 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 50
 text = " Start "
+
+[node name="CopyIPButton" type="Button" parent="." unique_id=1286893130]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 955.0
+offset_right = 225.0
+offset_bottom = 1065.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 35
+text = "Copy IP To
+  Clipboard  "
+
+[node name="PortForwardingLabel" type="Label" parent="." unique_id=1022525613]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 1030.0
+offset_right = 424.0
+offset_bottom = 1065.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 25
+text = "Manual Port Forwarding Required"
