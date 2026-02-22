@@ -12,7 +12,7 @@ var current_multiplier: float = 1.0
 func _init() -> void:
 	ability_name = "Ghost"
 	input_action = "ghost_ability"
-	cooldown_duration = 1.0
+	cooldown_duration = 15.0
 
 func _process(delta: float) -> void:
 	super._process(delta)

@@ -3,7 +3,7 @@ extends AbilityBase
 class_name DashAbility
 
 # these values need to be better adjusted
-@export var dash_distance : float = 200.0
+@export var dash_distance : float = 400.0
 @export var dash_duration : float = 0.35 
 @export var dash_speed_curve : float = 2.0  # decelerate
 

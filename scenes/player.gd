@@ -33,7 +33,7 @@ func _ready() -> void:
 	radius_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, radius)
 	get_node("Drawing range").draw_range(radius_cells)
 	
-	
+	get_node("Area2D").area_entered.connect(_on_area_entered)
 
 func _physics_process(delta: float) -> void:
 	#no movement if dashing
@@ -98,3 +98,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			stats.heal(10.0)
 		elif event.keycode == KEY_M:
 			stats.use_mana(20.0)
+
+
+
+
+func _on_area_entered(area: Area2D) -> void:
+	if area is Magic and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] and area.player_id!=player_id:
+		get_node("StatsComponent").take_damage(area.damage/randf_range(3,4))
+		area.call_deferred("fizzle")
+		var blood: CPUParticles2D = get_node("Area2D/CPUParticles2D")
+		blood.restart()
