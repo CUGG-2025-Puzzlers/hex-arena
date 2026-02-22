@@ -7,10 +7,7 @@ extends CharacterBody2D
 @onready var _input: MultiplayerInput = %InputSynchronizer
 
 @onready var stats : StatsComponent = $StatsComponent
-@onready var flash_ability : FlashAbility = $FlashAbility
-@onready var dash_ability: DashAbility = $DashAbility
-@onready var ghost_ability : GhostAbility = $GhostAbility
-@onready var teleport_ability : TeleportAbility = $TeleportAbility
+@onready var _ability : AbilityBase = %Ability
 
 var do_ability : String
 var input : Vector2
@@ -40,10 +37,10 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	#no movement if dashing
-	if dash_ability.is_controlling_movement():
+	if _ability is DashAbility and _ability.is_controlling_movement():
 		return
 		
-	if teleport_ability.is_channeling:
+	if _ability is TeleportAbility and _ability.is_channeling:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
@@ -69,17 +66,12 @@ func update_animation_parameters():
 
 func _handle_movement(_delta: float) -> void:	
 	# ghost speed multiplier when active
-	var speed = base_speed * ghost_ability.get_speed_multiplier()
+	var speed = base_speed
+	if _ability is GhostAbility:
+		speed *= _ability.get_speed_multiplier()
 	
-	match _input.ability:
-		Util.Ability.Flash:
-			flash_ability.try_activate()
-		Util.Ability.Dash:
-			dash_ability.try_activate()
-		Util.Ability.Ghost:
-			ghost_ability.try_activate()
-		Util.Ability.Teleport:
-			teleport_ability.try_activate()
+	if _input.use_ability:
+		_ability.try_activate()
 
 	velocity = _input.direction * speed
 	move_and_slide()
@@ -91,10 +83,10 @@ func get_stats() -> StatsComponent:
 	return stats
 	
 func is_channeling() -> bool:
-	return teleport_ability.is_channeling
+	return _ability is TeleportAbility and _ability.is_channeling
 	
 func is_dashing() -> bool:
-	return dash_ability.is_dashing
+	return _ability is DashAbility and _ability.is_dashing
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if %InputSynchronizer.get_multiplayer_authority() != player_id:
