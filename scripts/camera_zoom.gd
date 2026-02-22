@@ -47,4 +47,9 @@ func _process(delta: float) -> void:
 	if dist_ratio > lower_bound:
 		new_zoom = max(0.73,1./(dist_ratio/upper_bound))
 
+	#if abs(zoom.x-new_zoom)>0.005:
+	#	HexCells.player_unique_instance.queue_redraw()
 	zoom = Vector2.ONE * ((new_zoom-zoom.x)*delta+zoom.x)
+	
+	# FOR NOW, LATER RENDER AND SAVE AS TEXTURE
+	HexCells.player_unique_instance.queue_redraw()
