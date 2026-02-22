@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="7_n5ll0"]
 [ext_resource type="Script" uid="uid://er414tfvhsml" path="res://scripts/abilities/teleport_ability.gd" id="8_jorvl"]
 [ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_sniku"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="10_hkro6"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
 properties/0/path = NodePath(".:player_id")
@@ -300,6 +301,10 @@ scale_min = 2.0
 scale_max = 4.0
 color = Color(0.959805, 0.99, 0.3861, 1)
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dmjat"]
+radius = 8.0
+height = 62.0
+
 [node name="Player" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
 collision_layer = 2
 collision_mask = 7
@@ -381,3 +386,27 @@ process_material = SubResource("ParticleProcessMaterial_fjrip")
 [node name="Drawing range" type="Node2D" parent="." unique_id=771124319]
 show_behind_parent = true
 script = ExtResource("9_sniku")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=495044529]
+position = Vector2(-1, -34)
+shape = SubResource("CapsuleShape2D_dmjat")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Area2D" unique_id=1037178925]
+modulate = Color(0.6, 0.13333334, 0.13333334, 1)
+position = Vector2(0, -40)
+emitting = false
+amount = 15
+texture = ExtResource("10_hkro6")
+lifetime = 0.52
+one_shot = true
+explosiveness = 0.71
+randomness = 0.26
+lifetime_randomness = 0.67
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+initial_velocity_min = 56.66
+initial_velocity_max = 178.47
