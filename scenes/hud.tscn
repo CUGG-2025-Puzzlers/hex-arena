@@ -2,6 +2,39 @@
 
 [ext_resource type="Script" uid="uid://bscgkyr277i63" path="res://scripts/hud.gd" id="1_ahhtf"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahhtf"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.5019608, 0.2, 0.8, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oo0fn"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.39126247, 0.5714745, 0.97166294, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5ysmq"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.5506047, 0.082686625, 0.08518959, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="HUD" type="CanvasLayer" unique_id=1928650332]
 script = ExtResource("1_ahhtf")
 
@@ -22,6 +55,41 @@ theme_override_constants/margin_bottom = 20
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1594959854]
 layout_mode = 2
 theme_override_constants/separation = 4
+
+[node name="AbilityContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=758315931]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Shield" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=19660061]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ahhtf")
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/Shield" unique_id=1823860068]
+layout_mode = 2
+text = "Q
+Shield
+15 Mana"
+
+[node name="LightMagic" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=1534534003]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_oo0fn")
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/LightMagic" unique_id=423303866]
+layout_mode = 2
+text = "E
+Light
+10 Mana"
+
+[node name="HeavyMagic" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=1658931680]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5ysmq")
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/HeavyMagic" unique_id=1128202923]
+layout_mode = 2
+text = "R
+Heavy
+20 Mana"
 
 [node name="HPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer" unique_id=1552030233]
 custom_minimum_size = Vector2(300, 24)
@@ -56,7 +124,3 @@ grow_vertical = 2
 text = "100 / 100"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="AbilityContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=758315931]
-layout_mode = 2
-theme_override_constants/separation = 8
