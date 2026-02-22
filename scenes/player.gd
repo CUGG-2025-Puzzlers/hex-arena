@@ -39,6 +39,10 @@ func _ready() -> void:
 	_on_overhead_hp_changed.call_deferred(stats.current_health, stats.max_health)
 
 func _physics_process(delta: float) -> void:
+	#SERVER FORCES PLAYER TO POSITION
+	if multiplayer.is_server():
+		_reconcile_pos.rpc(position)
+
 	#no movement if dashing
 	if _ability is DashAbility and _ability.is_controlling_movement():
 		return
@@ -51,11 +55,7 @@ func _physics_process(delta: float) -> void:
 	_handle_movement(delta)
 	select_animation()
 	update_animation_parameters()
-	
-	#SERVER FORCES PLAYER TO POSITION
-	if multiplayer.is_server():
-		_reconcile_pos.rpc(position)
-	
+		
 	cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
 
 func select_animation():
