@@ -22,6 +22,8 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	direction = Input.get_vector("left", "right", "up", "down")
+	
+	HexCells.player_unique_instance.rpc("sync_pos",get_parent().global_position, get_parent().player_id, player_id)
 
 func _unhandled_input(event: InputEvent) -> void:
 	mouse_pos = get_parent().get_global_mouse_position()

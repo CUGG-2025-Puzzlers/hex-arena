@@ -34,6 +34,8 @@ static var hex_polygon_shape : ConvexPolygonShape2D
 
 static var player_unique_instance : HexCells
 
+var pos_dict = {}
+
 func recalculate() -> void:
 	hex_height = 2*r
 	hex_width = sqrt(3)*r
@@ -275,3 +277,18 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Arra
 					surrounding_cells.append(surrond_cell)
 			extend_past_index+=1
 	return surrounding_cells
+
+@rpc("call_local","any_peer")
+func sync_pos(pos: Vector2,player_id: int, setter: int):
+	if not pos_dict.has(player_id):
+		pos_dict[player_id]=pos
+		return
+	var discr = pos_dict[player_id] - pos
+	discr = discr.length()
+	if discr>5:
+		if setter==player_id:
+			pos_dict[player_id]=pos
+		else:
+			var player = get_node("../Players/"+str(player_id))
+			player.global_position=pos_dict[player_id]
+		
