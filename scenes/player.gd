@@ -114,8 +114,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_area_entered(area: Area2D) -> void:
-	if area is Magic and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] and area.player_id!=player_id:
-		get_node("StatsComponent").take_damage(area.damage/randf_range(3,4))
+	if area is Magic and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] and area.player_id != player_id:
 		area.call_deferred("fizzle")
 		var blood: CPUParticles2D = get_node("Area2D/CPUParticles2D")
 		blood.restart()
+
+		# only server calculates and then syncs damage
+		if multiplayer.is_server():
+			var damage_amount = area.damage / randf_range(3.0, 4.0)
+			_apply_damage.rpc(damage_amount)
+
+@rpc("authority", "call_local", "reliable")
+func _apply_damage(amount: float) -> void:
+	stats.take_damage(amount)
