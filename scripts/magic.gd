@@ -8,9 +8,9 @@ static var last_placed_cell : Vector2i
 
 static var cost = {
 	MagicType.NEUTRAL: 5,
-	MagicType.LIGHT: 10,
-	MagicType.HEAVY: 20,
-	MagicType.SHIELD: 15, }
+	MagicType.LIGHT: 5,
+	MagicType.HEAVY: 10,
+	MagicType.SHIELD: 5, }
 
 const BULLET_SPEED : float = 450
 const BULLET_DISTANCE : float = 800
