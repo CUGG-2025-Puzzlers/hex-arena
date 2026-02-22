@@ -41,7 +41,7 @@ func _on_mouse_pressed():
 	if locked:
 		return
 	
-	Events.select_character(character)
+	MultiplayerManager.select_character(character)
 
 #endregion
 

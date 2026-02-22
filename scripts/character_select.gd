@@ -20,15 +20,17 @@ func _ready() -> void:
 	_start_button.pressed.connect(_on_start_pressed)
 	
 	_start_button.hide()
+	
 	_local_player_name.text = MultiplayerManager.player_info.name
+	_set_character_info(MultiplayerManager.player_info.character, true)
 	
 	if MultiplayerManager.players.size() > 1:
-		_remote_player_name.text = MultiplayerManager.get_other_player_info().name
+		var other_player_info = MultiplayerManager.get_other_player_info()
+		_remote_player_name.text = other_player_info.name
+		_set_character_info(other_player_info.character, false)
 	else:
 		_remote_player_name.text = WAITING_FOR_PLAYER
-	
-	_set_character_info(Util.Character.None, true)
-	_set_character_info(Util.Character.None, false)
+		_set_character_info(Util.Character.None, false)
 
 #region Event Listeners
 
@@ -43,23 +45,15 @@ func _on_player_disconnected(_id):
 	_set_character_info(Util.Character.None, false)
 
 # Sets this client's selected character on all clients
-func _on_character_selected(character: Util.Character):
-	_set_character.rpc(character)
+func _on_character_selected(character: Util.Character, player_id: int):
+	var sender_is_local_client = player_id == multiplayer.get_unique_id()
+	_set_character_info(character, sender_is_local_client)
+	_check_players_ready()
 
 func _on_start_pressed():
 	_start_game.rpc()
 
 #endregion
-
-# Sets the sending client's selected character on this client
-@rpc("call_local", "any_peer", "reliable")
-func _set_character(character: Util.Character):
-	var sender_id = multiplayer.get_remote_sender_id()
-	var sender_is_local_client = sender_id == multiplayer.get_unique_id()
-	print("%s selected %s" % [MultiplayerManager.players[sender_id].name, Util.Character.keys()[character]])
-	MultiplayerManager.set_player_character(sender_id, character)
-	_set_character_info(character, sender_is_local_client)
-	_check_players_ready()
 
 # Starts the game for all clients
 @rpc("call_local", "any_peer", "reliable")
