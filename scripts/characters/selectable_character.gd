@@ -47,6 +47,8 @@ func _on_mouse_pressed():
 
 func _set_display_icon():
 	%Icon.texture = icon
+	%Icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	%Icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _set_display_name():
 	%Name.text = Util.Character.keys()[character]

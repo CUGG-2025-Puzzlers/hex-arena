@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c0gojosq378ye" path="res://scripts/character_select.gd" id="1_x8mhf"]
 [ext_resource type="PackedScene" uid="uid://b3a0qvr67qhuw" path="res://scenes/selectable_character.tscn" id="2_jgus3"]
+[ext_resource type="Texture2D" uid="uid://if7xxb44kfxs" path="res://assets/textures/IMG_0633.png" id="3_bow2h"]
+[ext_resource type="Texture2D" uid="uid://cps56w3hlht21" path="res://assets/textures/61457.png" id="4_uxcyu"]
 
 [node name="CharacterSelect" type="Node2D" unique_id=1709553184]
 script = ExtResource("1_x8mhf")
@@ -104,16 +106,18 @@ theme_override_constants/separation = 20
 
 [node name="SelectableCharacter" parent="CharacterContainer/CharacterList" unique_id=20013062 instance=ExtResource("2_jgus3")]
 layout_mode = 2
+icon = ExtResource("3_bow2h")
 character = 1
 
-[node name="SelectableCharacter2" parent="CharacterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-character = 2
-locked = true
-
-[node name="SelectableCharacter3" parent="CharacterContainer/CharacterList" unique_id=840476462 instance=ExtResource("2_jgus3")]
+[node name="SelectableCharacter2" parent="CharacterContainer/CharacterList" unique_id=840476462 instance=ExtResource("2_jgus3")]
 layout_mode = 2
 character = 3
+
+[node name="SelectableCharacter3" parent="CharacterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
+layout_mode = 2
+icon = ExtResource("4_uxcyu")
+character = 2
+locked = true
 
 [node name="StartButton" type="Button" parent="." unique_id=2091587044]
 unique_name_in_owner = true
