@@ -127,13 +127,25 @@ func _on_connection_failed():
 
 #endregion
 
+# Selects the given character for this player on all clients
+func select_character(character: Util.Character):
+	_set_character.rpc(character)
+
+# Sets the sending client's selected character on this client
+@rpc("call_local", "any_peer", "reliable")
+func _set_character(character: Util.Character):
+	var sender_id = multiplayer.get_remote_sender_id()
+	var sender_is_local_client = sender_id == multiplayer.get_unique_id()
+	print("%s selected %s" % [MultiplayerManager.players[sender_id].name, Util.Character.keys()[character]])
+	_set_player_character(sender_id, character)
+	Events.select_character(character, sender_id)
+
 # Sets a player's selected character
-func set_player_character(player_id: int, character: Util.Character):
+func _set_player_character(player_id: int, character: Util.Character):
 	if not player_id in players:
 		return
 	
 	players[player_id].character = character
-	_print_players()
 
 # Resets all players' selected character
 func reset_character_selections():
