@@ -2,7 +2,7 @@ class_name MultiplayerInput
 extends Node
 
 var direction: Vector2
-var ability: Util.Ability
+var use_ability: bool
 var mouse_pos: Vector2
 
 var player_id: int
@@ -26,16 +26,7 @@ func _physics_process(_delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	mouse_pos = get_parent().get_global_mouse_position()
 	
-	if event.is_action_pressed("flash_ability"):
-		ability = Util.Ability.Flash
-	elif event.is_action_pressed("dash_ability"):
-		ability = Util.Ability.Dash
-	elif event.is_action_pressed("ghost_ability"):
-		ability = Util.Ability.Ghost
-	elif event.is_action_pressed("teleport_ability"):
-		ability = Util.Ability.Teleport
-	else:
-		ability = Util.Ability.None
+	use_ability = event.is_action_pressed("ability")
 	
 	if Input.is_action_just_pressed("fire_magic"):
 		var rolling_dir : Vector2 = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(Magic.last_placed_cell)

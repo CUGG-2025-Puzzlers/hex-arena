@@ -3,10 +3,7 @@
 [ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_g2els"]
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_smehm"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
-[ext_resource type="Script" uid="uid://btpjo0pne2vdu" path="res://scripts/abilities/flash_ability.gd" id="4_dqkch"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
-[ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="6_tuyoq"]
-[ext_resource type="Script" uid="uid://er414tfvhsml" path="res://scripts/abilities/teleport_ability.gd" id="7_fjrip"]
 [ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_ur7pv"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
@@ -21,10 +18,10 @@ properties/1/replication_mode = 1
 properties/0/path = NodePath("InputSynchronizer:direction")
 properties/0/spawn = true
 properties/0/replication_mode = 1
-properties/1/path = NodePath("InputSynchronizer:ability")
+properties/1/path = NodePath("InputSynchronizer:mouse_pos")
 properties/1/spawn = true
 properties/1/replication_mode = 1
-properties/2/path = NodePath("InputSynchronizer:mouse_pos")
+properties/2/path = NodePath("InputSynchronizer:use_ability")
 properties/2/spawn = true
 properties/2/replication_mode = 1
 
@@ -666,24 +663,13 @@ parameters/Walk/blend_position = Vector2(0, 0)
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1925996960]
 libraries/ = SubResource("AnimationLibrary_qlg0r")
 
-[node name="FlashAbility" type="Node" parent="." unique_id=560110184]
-script = ExtResource("4_dqkch")
-cooldown_duration = 1.0
-metadata/_custom_type_script = "uid://btpjo0pne2vdu"
-
-[node name="DashAbility" type="Node" parent="." unique_id=1460347397]
+[node name="Ability" type="Node" parent="." unique_id=1460347397]
+unique_name_in_owner = true
 script = ExtResource("5_qlg0r")
 metadata/_custom_type_script = "uid://cty0adueu5syp"
 
-[node name="GhostAbility" type="Node" parent="." unique_id=679062097]
-script = ExtResource("6_tuyoq")
-metadata/_custom_type_script = "uid://cciheadly5brc"
-
-[node name="TeleportAbility" type="Node" parent="." unique_id=1604331524]
-script = ExtResource("7_fjrip")
-metadata/_custom_type_script = "uid://er414tfvhsml"
-
 [node name="FlashAnimation" type="GPUParticles2D" parent="." unique_id=409151462]
+visible = false
 position = Vector2(-2.842171e-14, -3.8146973e-06)
 scale = Vector2(0.99999994, 0.99999994)
 emitting = false
