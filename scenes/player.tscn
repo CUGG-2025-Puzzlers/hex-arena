@@ -4,7 +4,8 @@
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_smehm"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
-[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_ur7pv"]
+[ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="7_fjrip"]
+[ext_resource type="Script" path="res://scripts/range_drawing.gd" id="9_ur7pv"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="9_y4r1p"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
@@ -710,3 +711,10 @@ direction = Vector2(0, -1)
 spread = 80.57
 initial_velocity_min = 56.66
 initial_velocity_max = 178.47
+
+[node name="OverheadHp" parent="." unique_id=1343235313 instance=ExtResource("7_fjrip")]
+z_index = 10
+offset_left = -50.0
+offset_top = -100.0
+offset_right = 50.0
+offset_bottom = -91.0
