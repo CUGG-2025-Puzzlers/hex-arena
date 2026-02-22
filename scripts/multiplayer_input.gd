@@ -78,5 +78,5 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
 		var pos = get_parent().get_node("CollisionShape2D").global_position
-		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius_cells, state, player_id, own_stats, floori(own_stats.current_mana*1./Magic.cost[state]),randi())
+		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius_cells, state, player_id, own_stats, floori(own_stats.current_mana*1./Magic.cost[state]))#randi()
 		#HexCells.player_unique_instance.change_magic(pos, get_parent().radius_cells, state,player_id)
