@@ -47,11 +47,12 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
-		
+	
 	_handle_movement(delta)
 	select_animation()
 	update_animation_parameters()
 	
+	#SERVER FORCES PLAYER TO POSITION
 	if multiplayer.is_server():
 		_reconcile_pos.rpc(position)
 	
@@ -133,6 +134,7 @@ func _on_area_entered(area: Area2D) -> void:
 func _apply_damage(amount: float) -> void:
 	stats.take_damage(amount)
 
+#FORCE POSITION
 @rpc("authority", "call_local", "reliable")
 func _reconcile_pos(target_pos: Vector2) -> void:
 	position = target_pos
