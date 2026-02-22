@@ -3,7 +3,7 @@ extends Path2D
 class_name HexCells
 
 
-@onready var text = get_node("Label")
+@onready var text = get_node("Coordinates")
 # Radius == side
 @export var r: float = 60.:
 	set(new_r):

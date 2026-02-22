@@ -65,7 +65,8 @@ show_behind_parent = true
 scale = Vector2(1.6406251, 1.6406251)
 texture = ExtResource("4_4ag8t")
 
-[node name="Label" type="Label" parent="Path2D" unique_id=1072220071]
+[node name="Coordinates" type="Label" parent="Path2D" unique_id=1072220071]
+visible = false
 z_index = 10
 offset_right = 40.0
 offset_bottom = 23.0
