@@ -34,6 +34,8 @@ var shield_animated_texture : GradientTexture2D
 
 var points =[]
 
+var screen : Rect2
+
 @onready var player_id : int = multiplayer.get_unique_id()
 
 func _ready() -> void:
@@ -44,6 +46,10 @@ func _ready() -> void:
 	else:
 		HexCells.player_unique_instance.cell_dict[self_cell]=self
 	animated_children = find_children("ChildLight*", "Sprite2D")
+	
+	screen.size = Vector2(HexCells.player_unique_instance.width,HexCells.player_unique_instance.height)
+	screen.size*=1.33
+	screen.position=-0.5*screen.size
 
 
 func start_rolling(wiggly_path: PackedVector2Array):
@@ -180,7 +186,8 @@ func _process(delta: float) -> void:
 					MagicType.LIGHT:
 						trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
 				"""
-			
+		if not screen.has_point(global_position):
+			fizzle()
 			
 	#advance_child_pellets(delta)
 
