@@ -2,9 +2,9 @@ extends AbilityBase
 
 class_name GhostAbility
 
-@export var duration : float = 5.0
-@export var speed_multiplier: float = 2.0
-@export var ramp_up_time: float = 0.5  # till full speed
+@export var duration : float = 3.5
+@export var speed_multiplier: float = 1.75
+@export var ramp_up_time: float = 0.7  # till full speed
 
 var elapsed : float = 0.0
 var current_multiplier: float = 1.0
@@ -12,7 +12,7 @@ var current_multiplier: float = 1.0
 func _init() -> void:
 	ability_name = "Ghost"
 	input_action = "ghost_ability"
-	cooldown_duration = 15.0
+	cooldown_duration = 8.5
 
 func _process(delta: float) -> void:
 	super._process(delta)
