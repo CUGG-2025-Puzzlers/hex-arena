@@ -32,8 +32,6 @@ _limits = [0.0, 2.0, 0.0, 1.0]
 _data = [Vector2(0, 0.4925651), 0.0, 0.7901357, 0, 0, Vector2(0.26764706, 0.5115242), 0.0, 0.0, 0, 0, Vector2(0.6220588, 0.62750936), 0.25944108, 0.25944108, 0, 0, Vector2(1, 0.430979), 0.45105314, 0.0, 0, 0]
 point_count = 4
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mgv3p"]
-
 [node name="Magic" type="Area2D" unique_id=627565832]
 script = ExtResource("1_1u1wh")
 
@@ -133,8 +131,5 @@ scale_amount_curve = SubResource("Curve_mgv3p")
 color_ramp = SubResource("Gradient_87hvv")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1907923882]
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1178892771]
-replication_config = SubResource("SceneReplicationConfig_mgv3p")
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
