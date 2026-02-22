@@ -5,7 +5,7 @@ extends CharacterBody2D
 @export var animation_player : AnimationPlayer
 
 @onready var _input: MultiplayerInput = %InputSynchronizer
-
+@onready var OverheadHp : ProgressBar = $OverheadHp
 @onready var stats : StatsComponent = $StatsComponent
 @onready var _ability : AbilityBase = %Ability
 
@@ -34,6 +34,9 @@ func _ready() -> void:
 	get_node("Drawing range").draw_range(radius_cells)
 	
 	get_node("Area2D").area_entered.connect(_on_area_entered)
+	
+	stats.health_changed.connect(_on_overhead_hp_changed)
+	_on_overhead_hp_changed.call_deferred(stats.current_health, stats.max_health)
 
 func _physics_process(delta: float) -> void:
 	#no movement if dashing
@@ -78,6 +81,14 @@ func _handle_movement(_delta: float) -> void:
 
 func set_player_name(player_name: String):
 	%NameLabel.text = player_name
+
+func _on_overhead_hp_changed(current: float, maximum: float) -> void:
+	if not OverheadHp:
+		return
+		
+	print("Overhead HP update: ", current, " / ", maximum)
+	OverheadHp.max_value = maximum
+	OverheadHp.value = current
 
 func get_stats() -> StatsComponent:
 	return stats
