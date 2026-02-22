@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dbkuln5v5ie2q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1nx0m"]
+bg_color = Color(0.14901961, 0.14901961, 0.14901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3hn8"]
+bg_color = Color(0.101960786, 0.8, 0.2, 1)
+
+[node name="OverheadHp" type="ProgressBar" unique_id=1343235313]
+offset_left = -40.0
+offset_top = -75.0
+offset_right = 60.0
+offset_bottom = -66.0
+theme_override_styles/background = SubResource("StyleBoxFlat_1nx0m")
+theme_override_styles/fill = SubResource("StyleBoxFlat_s3hn8")
+value = 100.0
+show_percentage = false
