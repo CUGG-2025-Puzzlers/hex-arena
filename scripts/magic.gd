@@ -282,7 +282,8 @@ func _on_area_entered(area: Area2D) -> void:
 		return
 	
 	take_damage(area.damage)
-	if area.state==MagicType.SHIELD:
+	
+	if state!=MagicType.SHIELD and area.state in [MagicType.SHIELD, MagicType.HEAVY]:
 		fizzle()
 
 # Decreases this magic object's health
@@ -295,6 +296,15 @@ func take_damage(damage_to_take: float):
 
 # Destroys this object and its associated path
 func fizzle():
+	if is_queued_for_deletion() or not is_inside_tree():
+		return
+	
+	if is_instance_valid(get_tree()) and is_instance_valid(get_tree().current_scene):
+		var magic_particles_instance = get_node("CPUParticles2D")
+		magic_particles_instance.reparent(get_tree().current_scene)
+		magic_particles_instance.finished.connect(magic_particles_instance.queue_free)
+		magic_particles_instance.restart()
+	
 	if is_instance_valid(rolling_pathfollow):
 		if rolling_pathfollow.get_parent() is Path2D:
 			rolling_pathfollow.get_parent().queue_free()
