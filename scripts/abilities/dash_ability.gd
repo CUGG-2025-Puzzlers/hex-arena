@@ -15,7 +15,7 @@ var dash_start_pos : Vector2 = Vector2.ZERO
 func _init() -> void:
 	ability_name = "Dash"
 	input_action = "dash_ability"
-	cooldown_duration = 1.0
+	cooldown_duration = 0.7
 
 func _physics_process(delta: float) -> void:
 	if is_dashing:
