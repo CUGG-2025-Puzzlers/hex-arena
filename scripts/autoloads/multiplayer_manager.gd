@@ -35,6 +35,12 @@ func _ready() -> void:
 # Creates a server with at the port specified in settings
 # The user who creates the server is considered the 'host'
 func create_game(player_name: String):
+	print("Setting up port forwarding...")
+	
+	var external_ip = setup_upnp(DEFAULT_PORT)
+	
+	print(external_ip)
+	
 	print("Creating new game as host")
 	
 	var server_peer = ENetMultiplayerPeer.new()
@@ -61,6 +67,23 @@ func join_game(player_name: String, ip: String, port: int):
 	player_info["name"] = player_name
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 
+func setup_upnp(port: int):
+	var upnp = UPNP.new()
+	
+	var discover_result = upnp.discover()
+	if discover_result == UPNP.UPNP_RESULT_SUCCESS:
+
+		if upnp.get_gateway() and upnp.get_gateway().is_valid_gateway():
+			var map_result_udp = upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "godot_udp", "UDP", 0)
+			var map_result_tcp = upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "godot_tcp", "UDP", 0)
+			
+			if not map_result_udp == UPNP.UPNP_RESULT_SUCCESS:
+				upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
+			if not map_result_tcp == UPNP.UPNP_RESULT_SUCCESS:
+				upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
+				
+	return upnp.query_external_address()
+	
 # Registers a player
 # Adds a player to the players list
 @rpc("any_peer", "reliable")
