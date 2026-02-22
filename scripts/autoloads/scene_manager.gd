@@ -13,4 +13,4 @@ func load_arena():
 
 func load_end_scene(winner: String) -> void:
 	winner_name = winner
-	get_tree().change_scene_to_file("res://scenes/EndScene.tscn") 
+	get_tree().call_deferred("change_scene_to_file","res://scenes/EndScene.tscn") 

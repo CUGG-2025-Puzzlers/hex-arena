@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="3_fggut"]
 [ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="5_87hvv"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="6_mgv3p"]
+[ext_resource type="Texture2D" uid="uid://fs4nj03e7j1t" path="res://assets/textures/magic.tres" id="7_hug0r"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
 radius = 18.0
@@ -31,6 +32,10 @@ colors = PackedColorArray(1, 1, 1, 1, 0.5999999, 0, 1, 1, 0.39069343, 0.98, 0.11
 _limits = [0.0, 2.0, 0.0, 1.0]
 _data = [Vector2(0, 0.4925651), 0.0, 0.7901357, 0, 0, Vector2(0.26764706, 0.5115242), 0.0, 0.0, 0, 0, Vector2(0.6220588, 0.62750936), 0.25944108, 0.25944108, 0, 0, Vector2(1, 0.430979), 0.45105314, 0.0, 0, 0]
 point_count = 4
+
+[sub_resource type="Gradient" id="Gradient_wwhys"]
+offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 0.5543131, 0.5942492, 0.6645367, 0.74440897)
+colors = PackedColorArray(1.3025239, 2.037959, 2.7259471, 1, 1.8759707, 1.4488999, 0, 1, 0, 0, 0, 0, 0.97, 0, 0.87299967, 0.6627451, 0.46199986, 0, 0.63, 1, 0.608, 0.95, 0.8246, 1, 0.9215, 0.95, 0.93955, 0.9843137)
 
 [node name="Magic" type="Area2D" unique_id=627565832]
 script = ExtResource("1_1u1wh")
@@ -131,5 +136,27 @@ scale_amount_curve = SubResource("Curve_mgv3p")
 color_ramp = SubResource("Gradient_87hvv")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1907923882]
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=1158731197]
+emitting = false
+amount = 15
+texture = ExtResource("7_hug0r")
+lifetime = 0.52
+one_shot = true
+explosiveness = 0.71
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+initial_velocity_min = 56.66
+initial_velocity_max = 178.47
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
