@@ -52,6 +52,9 @@ func _physics_process(delta: float) -> void:
 	select_animation()
 	update_animation_parameters()
 	
+	if multiplayer.is_server():
+		_reconcile_pos.rpc(position)
+	
 	cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
 
 func select_animation():
@@ -102,6 +105,8 @@ func is_dashing() -> bool:
 func _unhandled_input(event: InputEvent) -> void:
 	if %InputSynchronizer.get_multiplayer_authority() != player_id:
 		return
+	"""
+	for testing damage, heal, mana use
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_K:
 			stats.take_damage(10.0)
@@ -109,7 +114,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			stats.heal(10.0)
 		elif event.keycode == KEY_M:
 			stats.use_mana(20.0)
-
+	"""
 
 
 
@@ -127,3 +132,7 @@ func _on_area_entered(area: Area2D) -> void:
 @rpc("authority", "call_local", "reliable")
 func _apply_damage(amount: float) -> void:
 	stats.take_damage(amount)
+
+@rpc("authority", "call_local", "reliable")
+func _reconcile_pos(target_pos: Vector2) -> void:
+	position = target_pos
