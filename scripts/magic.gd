@@ -129,7 +129,7 @@ func change_state(new_state: MagicType):
 			
 		MagicType.SHIELD:
 			#modulate=Color.WEB_PURPLE
-			health = 100
+			health = 150
 			damage = 100
 			
 			animation_total_times[0] = 5
@@ -276,15 +276,20 @@ static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
 
 # Take damage when colliding with other magic
 func _on_area_entered(area: Area2D) -> void:
-	if not area.is_in_group('magic'):
+	if not area.is_in_group('magic') or \
+	area.player_id==player_id and not \
+	(area.state==MagicType.SHIELD or state ==MagicType.SHIELD):
 		return
 	
 	take_damage(area.damage)
+	if area.state==MagicType.SHIELD:
+		fizzle()
 
 # Decreases this magic object's health
 # Destroys it if no health remains
 func take_damage(damage_to_take: float):
 	health -= damage_to_take
+	
 	if health <= 0:
 		fizzle()
 

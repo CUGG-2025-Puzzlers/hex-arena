@@ -90,7 +90,7 @@ func _on_overhead_hp_changed(current: float, maximum: float) -> void:
 	if not OverheadHp:
 		return
 		
-	print("Overhead HP update: ", current, " / ", maximum)
+	#print("Overhead HP update: ", current, " / ", maximum)
 	OverheadHp.max_value = maximum
 	OverheadHp.value = current
 

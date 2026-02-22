@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="4_uajpi"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="7_n5ll0"]
 [ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="8_b15l6"]
-[ext_resource type="Script" path="res://scripts/range_drawing.gd" id="9_sniku"]
+[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_sniku"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="10_hkro6"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
@@ -303,6 +303,10 @@ color = Color(0.959805, 0.99, 0.3861, 1)
 radius = 8.0
 height = 62.0
 
+[sub_resource type="Gradient" id="Gradient_b15l6"]
+offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 1)
+colors = PackedColorArray(1, 0.06999999, 0.06999999, 1, 2.2848396, 2.2848396, 2.2848396, 1, 0, 0, 0, 1, 0.6004017, 0, 0.07136438, 1)
+
 [node name="Player" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
 collision_layer = 2
 collision_mask = 7
@@ -397,6 +401,7 @@ direction = Vector2(0, -1)
 spread = 80.57
 initial_velocity_min = 56.66
 initial_velocity_max = 178.47
+color_ramp = SubResource("Gradient_b15l6")
 
 [node name="OverheadHp" parent="." unique_id=1343235313 instance=ExtResource("8_b15l6")]
 offset_left = -50.0
