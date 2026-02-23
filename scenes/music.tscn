@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cqx5k3psrd4xg"]
+
+[ext_resource type="AudioStream" uid="uid://3n35c4s63oca" path="res://assets/music/Hex Arena_harp.mp3" id="1_05ggv"]
+
+[node name="Music" type="AudioStreamPlayer" unique_id=1649631207]
+stream = ExtResource("1_05ggv")
+volume_db = -18.0
+autoplay = true
+
+[connection signal="finished" from="." to="." method="play"]

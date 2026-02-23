@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bp8o6uys4edc8"
+path="res://.godot/imported/Hex Arena piano.mp3-9acab47b9d666f5fe28dce31fd344fba.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Hex Arena piano.mp3"
+dest_files=["res://.godot/imported/Hex Arena piano.mp3-9acab47b9d666f5fe28dce31fd344fba.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
