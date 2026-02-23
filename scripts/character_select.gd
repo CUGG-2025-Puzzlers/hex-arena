@@ -23,12 +23,15 @@ func _ready() -> void:
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 	Events.character_selected.connect(_on_character_selected)
 	_start_button.pressed.connect(_on_start_pressed)
-	_copy_internal_ip_button.pressed.connect(_on_copy_internal_ip_pressed)
 	
+	_copy_internal_ip_button.hide()
 	_copy_external_ip_button.hide()
 	_port_forwarding_label.hide()
 	
 	if multiplayer.is_server():
+		_copy_internal_ip_button.show()
+		_copy_internal_ip_button.pressed.connect(_on_copy_internal_ip_pressed)
+		
 		if MultiplayerManager.external_ip:
 			_copy_external_ip_button.show()
 			_copy_external_ip_button.pressed.connect(_on_copy_external_ip_pressed)

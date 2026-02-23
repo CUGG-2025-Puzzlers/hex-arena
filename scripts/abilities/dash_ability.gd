@@ -33,7 +33,9 @@ func _physics_process(delta: float) -> void:
 		player.move_and_slide()
 
 func _execute() -> void:
-	dash_direction = get_aim_direction()
+	dash_direction = player.get_node("InputSynchronizer").direction.normalized()
+	if dash_direction == Vector2.ZERO:
+		dash_direction = get_aim_direction()
 	dash_start_pos = player.global_position
 	dash_elapsed = 0.0
 	is_dashing = true
