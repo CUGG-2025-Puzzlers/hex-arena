@@ -16,6 +16,8 @@ const SELECT_CHARACTER = "Select Character"
 @onready var _port_forwarding_label: Label = %PortForwardingLabel
 @onready var _start_button: Button = %StartButton
 
+@export var texture_list: Array[Texture2D]
+
 func _ready() -> void:
 	MultiplayerManager.player_connected.connect(_on_player_connected)
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
@@ -45,6 +47,7 @@ func _ready() -> void:
 	else:
 		_remote_player_name.text = WAITING_FOR_PLAYER
 		_set_character_info(Util.Character.None, false)
+		
 
 #region Event Listeners
 
@@ -88,13 +91,14 @@ func _start_game():
 # Sets the character info for the local or remote player
 func _set_character_info(character: Util.Character, is_local_client: bool):
 	var character_name = Util.Character.keys()[character] if character != Util.Character.None else SELECT_CHARACTER
+	var character_texture = texture_list[character]
 	
 	if is_local_client:
 		_local_character_name.text = character_name
-		_local_character_art.texture = null
+		_local_character_art.texture = character_texture
 	else:
 		_remote_character_name.text = character_name
-		_remote_character_art.texture = null
+		_remote_character_art.texture = character_texture
 
 # Returns the name associated with the given character enum
 # If the given enum is None, returns a default string
