@@ -107,7 +107,7 @@ func change_state(new_state: MagicType):
 			#arrow_particles.scale *= 4
 		MagicType.HEAVY:
 			#modulate=Color.CRIMSON
-			health = 200
+			health = 50
 			damage = 100
 			
 			animated_sprite.visible = false
@@ -129,8 +129,8 @@ func change_state(new_state: MagicType):
 			
 		MagicType.SHIELD:
 			#modulate=Color.WEB_PURPLE
-			health = 150
-			damage = 100
+			health = 100
+			damage = 200
 			
 			animation_total_times[0] = 5
 			shield_animated_texture = find_child("Shield Glow").texture.duplicate()
