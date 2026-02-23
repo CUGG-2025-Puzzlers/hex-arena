@@ -11,7 +11,8 @@ const SELECT_CHARACTER = "Select Character"
 @onready var _remote_character_art: TextureRect = %RemoteCharacterArt
 @onready var _remote_character_name: Label = %RemoteCharacterName
 
-@onready var _copy_ip_button: Button = %CopyIPButton
+@onready var _copy_external_ip_button: Button = %CopyExternalIPButton
+@onready var _copy_internal_ip_button: Button = %CopyInternalIPButton
 @onready var _port_forwarding_label: Label = %PortForwardingLabel
 @onready var _start_button: Button = %StartButton
 
@@ -20,14 +21,15 @@ func _ready() -> void:
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 	Events.character_selected.connect(_on_character_selected)
 	_start_button.pressed.connect(_on_start_pressed)
+	_copy_internal_ip_button.pressed.connect(_on_copy_internal_ip_pressed)
 	
-	_copy_ip_button.hide()
+	_copy_external_ip_button.hide()
 	_port_forwarding_label.hide()
 	
 	if multiplayer.is_server():
 		if MultiplayerManager.external_ip:
-			_copy_ip_button.show()
-			_copy_ip_button.pressed.connect(_on_copy_ip_pressed)
+			_copy_external_ip_button.show()
+			_copy_external_ip_button.pressed.connect(_on_copy_external_ip_pressed)
 		else:
 			_port_forwarding_label.show()
 	
@@ -62,12 +64,16 @@ func _on_character_selected(character: Util.Character, player_id: int):
 	_set_character_info(character, sender_is_local_client)
 	_check_players_ready()
 
-func _on_copy_ip_pressed():
+func _on_copy_external_ip_pressed():
 	if not MultiplayerManager.external_ip:
 		return
 	
 	DisplayServer.clipboard_set(MultiplayerManager.external_ip)
 	print("Copied public IP Address to Clipboard!")
+
+func _on_copy_internal_ip_pressed():
+	DisplayServer.clipboard_set(MultiplayerManager.local_ip)
+	print("Copied local IP Address to Clipboard!")
 
 func _on_start_pressed():
 	_start_game.rpc()

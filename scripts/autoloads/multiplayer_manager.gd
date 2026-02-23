@@ -25,6 +25,7 @@ var player_info = {
 const DEFAULT_PORT = 6769
 const SERVER_IP = "127.0.0.1"
 
+var local_ip: String
 var external_ip: String
 
 func _ready() -> void:
@@ -32,6 +33,8 @@ func _ready() -> void:
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
+	
+	local_ip = IP.get_local_addresses()[-1]
 
 # Creates a game that other players can connect to
 # Creates a server with at the port specified in settings
@@ -40,7 +43,6 @@ func create_game(player_name: String):
 	print("Setting up port forwarding...")
 	
 	external_ip = setup_upnp(DEFAULT_PORT)
-	
 	if external_ip:
 		print("External IP is [%s]" % external_ip)
 	else:
