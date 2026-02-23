@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://if7xxb44kfxs"
-path="res://.godot/imported/IMG_0633.png-ad08e4b537424445da83ffe4327dab23.ctex"
+path="res://.godot/imported/zilo_splash.png-5ed2c785cd434a139c0429f49986b544.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/IMG_0633.png"
-dest_files=["res://.godot/imported/IMG_0633.png-ad08e4b537424445da83ffe4327dab23.ctex"]
+source_file="res://assets/textures/zilo_splash.png"
+dest_files=["res://.godot/imported/zilo_splash.png-5ed2c785cd434a139c0429f49986b544.ctex"]
 
 [params]
 
