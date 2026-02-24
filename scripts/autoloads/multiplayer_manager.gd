@@ -35,6 +35,9 @@ func _ready() -> void:
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	
 	local_ip = IP.get_local_addresses()[-1]
+	
+	if local_ip == "fe80:0:0:0:0:0:0:1":
+		local_ip = IP.get_local_addresses()[11]
 
 # Creates a game that other players can connect to
 # Creates a server with at the port specified in settings
