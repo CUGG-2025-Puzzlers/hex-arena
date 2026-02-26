@@ -6,6 +6,11 @@ var state = MagicType.NEUTRAL
 
 static var last_placed_cell : Vector2i
 
+# Hard enable/disable randomness for path generation
+const RANDOM_PATHS = true
+# Set between 1 (fully random) and 0 (fully corrected with snapping)
+static var path_randomness_ratio : float = 0.4
+
 static var cost = {
 	MagicType.NEUTRAL: 5,
 	MagicType.LIGHT: 5,
@@ -243,7 +248,11 @@ static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
 	
 	path.append(Vector2.ZERO)
 	var last_point: Vector2 = Vector2.ZERO
-	var extra_points: int = randi_range(1,39)
+	var extra_points: int = 0
+	
+	if RANDOM_PATHS:
+		extra_points = randi_range(1,39)
+	
 	var progress: float = 0;
 	
 	for i in range(extra_points, 0, -1):
@@ -267,6 +276,9 @@ static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
 		rand_rot = randfn(0, PI / lerpf(100, 10, diff))
 		var rotated_cur_progress: Vector2 = dir.rotated(rand_rot) * dist * progress
 		next_point += abs(randfn(0, 0.05)) * (rotated_cur_progress - next_point)
+		
+		# Interpolate between offset and straightened next point
+		next_point = (1.-path_randomness_ratio) * ((next_point-path[0]).project(dir)+path[0]-next_point)+next_point
 		
 		path.append(next_point)
 		last_point = next_point
