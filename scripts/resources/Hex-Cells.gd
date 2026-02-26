@@ -136,37 +136,65 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 					break
 
 @rpc("call_local", "any_peer", "reliable")
-func place_magic_in_cell(mouse_pos: Vector2, player_cell:Vector2i, radius_cells: Array, player_id: int, player_stats):
+func place_magic_in_cell_check(mouse_pos: Vector2, player_cell:Vector2i, radius_cells: Array, player_id: int):
+	if not multiplayer.is_server():
+		return false
+	
 	var player_pos = map_to_local(player_cell)
 	var cell_to_place = local_to_map(mouse_pos)
+	
+	if not cell_dict.has(cell_to_place) or is_instance_valid(cell_dict[cell_to_place]):
+		return false
+	
 	var in_radius = false
 	for radius_cell in radius_cells:
 		if cell_to_place==local_to_map(player_pos+map_to_local(radius_cell)):
 			in_radius=true
 			break
 	if not in_radius:
-		return
+		return false
+	
+	"""
+	# Prevents placing magic on top of other player
+	# In turn can softlock both players inside a shield circle
+	
+	var other_player_cells = []
+	for player in get_tree().current_scene.find_child("Players").get_children():
+		if int(player.name)!=player_id:
+			other_player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
+	if cell_to_place in other_player_cells:
+		return false
+	"""
+	
+	place_magic_in_cell.rpc(cell_to_place, player_id)
+	return true
+
+@rpc("call_local", "any_peer", "reliable")
+func place_magic_in_cell(cell: Vector2i, player_id: int):
+	if is_instance_valid(cell_dict[cell]):
+		cell_dict[cell].queue_free()
+	
+	var magic_instance : Magic = preload("res://scenes/magic.tscn").instantiate()
 		
-	if cell_dict.has(cell_to_place) and not is_instance_valid(cell_dict[cell_to_place]):
-		var magic_instance : Magic = preload("res://scenes/magic.tscn").instantiate()
+	magic_instance.position = map_to_local(cell)
+	magic_instance.self_cell = cell
+	cell_dict[cell]=magic_instance
+	
+	add_child(magic_instance, true)
+	magic_instance.name = "Magic"
+	magic_instance.add_to_group('magic')
 		
+	if player_id!=multiplayer.get_unique_id():
+		magic_instance.modulate = Color.WEB_MAROON
+	else:
+		Magic.last_placed_cell=cell
+		get_node("LastMagic").global_position=map_to_local(cell)
+		get_node("LastMagic").visible = true
 		
-		magic_instance.position = map_to_local(cell_to_place)
-		magic_instance.self_cell = cell_to_place
-		cell_dict[cell_to_place]=magic_instance
-		add_child(magic_instance, true)
-		magic_instance.name = "Magic"
-		magic_instance.add_to_group('magic')
-		
-		if player_id!=multiplayer.get_unique_id():
-			magic_instance.modulate = Color.WEB_MAROON
-		else:
-			Magic.last_placed_cell=cell_to_place
-			get_node("LastMagic").global_position=map_to_local(cell_to_place)
-			get_node("LastMagic").visible = true
-			player_stats.use_mana(Magic.cost[Magic.MagicType.NEUTRAL])
-		
-		magic_instance.player_id = player_id
+		var player_stats: StatsComponent = get_node("../Players/"+str(player_id)+"/StatsComponent")
+		player_stats.use_mana(Magic.cost[Magic.MagicType.NEUTRAL])
+	
+	magic_instance.player_id = player_id
 
 @rpc("call_local","any_peer","reliable")
 func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array, player_id: int):

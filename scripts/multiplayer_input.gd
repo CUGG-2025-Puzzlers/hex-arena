@@ -49,7 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_pressed("place_magic")\
 	and own_stats.current_mana>=Magic.cost[Magic.MagicType.NEUTRAL]:
 		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
-		HexCells.player_unique_instance.rpc("place_magic_in_cell", global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id, own_stats)
+		HexCells.player_unique_instance.rpc_id(1, "place_magic_in_cell_check", global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
 	
 	var possible_states = []
 	if Input.is_action_just_pressed("turn_pure_to_heavy")\
