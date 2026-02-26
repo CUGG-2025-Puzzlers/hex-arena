@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="5_87hvv"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="6_mgv3p"]
 [ext_resource type="Texture2D" uid="uid://fs4nj03e7j1t" path="res://assets/textures/magic.tres" id="7_hug0r"]
+[ext_resource type="AudioStream" uid="uid://dct16me8au50g" path="res://assets/music/sound-effects/Magic_sound_1.wav" id="8_wwhys"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
 radius = 18.0
@@ -159,4 +160,16 @@ scale_amount_min = 0.0
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_wwhys")
 
+[node name="Change_sound" type="AudioStreamPlayer2D" parent="." unique_id=755359864]
+volume_db = -9.0
+max_distance = 400.0
+attenuation = 2.0
+
+[node name="Spawn_sound" type="AudioStreamPlayer2D" parent="." unique_id=1177504650]
+stream = ExtResource("8_wwhys")
+volume_db = -18.0
+max_distance = 400.0
+attenuation = 2.0
+
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

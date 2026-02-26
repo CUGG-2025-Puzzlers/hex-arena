@@ -230,16 +230,24 @@ func _start_game():
 		
 		_players_spawn_node.add_child(player_node, true)
 		
-		# connecting HUD to local player only
+		# connecting camera, HUD, audio to local player only
 		if player == multiplayer.get_unique_id():
+			# Put in front of other objects, other player
 			player_node.z_index = 1
+			
+			# Set camera as child to follow movement
 			var camera : Camera2D = get_tree().get_current_scene().get_node("Camera2D")
 			camera.reparent(player_node)
 			camera.position=Vector2.ZERO
+			
+			# Connect hud to main player
 			var hud = get_tree().get_current_scene().get_node("HUD")
 			if not hud.is_node_ready():
 				await hud.ready
 			hud.connect_to_player(player_node)
 			#hud.connect_to_player.call_deferred(player_node)
+			
+			# Set node to be main audio listener
+			player_node.get_node("AudioListener2D").current = true
 		
 		player_node.get_node("StatsComponent").deadgeLol.connect(_on_player_died.bind(player))

@@ -5,6 +5,5 @@
 [node name="Music" type="AudioStreamPlayer" unique_id=1649631207]
 stream = ExtResource("1_05ggv")
 volume_db = -18.0
-autoplay = true
 
 [connection signal="finished" from="." to="." method="play"]

@@ -723,3 +723,5 @@ offset_left = -50.0
 offset_top = -100.0
 offset_right = 50.0
 offset_bottom = -91.0
+
+[node name="AudioListener2D" type="AudioListener2D" parent="." unique_id=559521762]

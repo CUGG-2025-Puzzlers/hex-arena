@@ -91,16 +91,16 @@ spawn_limit = 2
 
 [node name="HUD" parent="." unique_id=1928650332 instance=ExtResource("3_olpmc")]
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=976022257]
+[node name="World_Border" type="StaticBody2D" parent="." unique_id=976022257]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=828635459]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World_Border" unique_id=828635459]
 shape = SubResource("WorldBoundaryShape2D_4ag8t")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=1335702283]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="World_Border" unique_id=1335702283]
 shape = SubResource("WorldBoundaryShape2D_xdvfk")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=994577793]
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="World_Border" unique_id=994577793]
 shape = SubResource("WorldBoundaryShape2D_7ft05")
 
-[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=220051452]
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="World_Border" unique_id=220051452]
 shape = SubResource("WorldBoundaryShape2D_olpmc")

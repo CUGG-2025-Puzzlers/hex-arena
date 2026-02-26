@@ -55,6 +55,11 @@ func _ready() -> void:
 	screen.size = Vector2(HexCells.player_unique_instance.width,HexCells.player_unique_instance.height)
 	screen.size*=1.33
 	screen.position=-0.5*screen.size
+	
+	var spawn_sound : AudioStreamPlayer2D = get_node("Spawn_sound")
+	spawn_sound.pitch_scale = clampf(randfn(1.5,0.4),0.8,2)
+	spawn_sound.finished.connect(spawn_sound.queue_free)
+	spawn_sound.play()
 
 
 func start_rolling(wiggly_path: PackedVector2Array):
@@ -93,6 +98,10 @@ func start_rolling(wiggly_path: PackedVector2Array):
 	rolling = true
 
 func change_state(new_state: MagicType):
+	var change_sound : AudioStreamPlayer2D = get_node("Change_sound")
+	change_sound.finished.connect(change_sound.queue_free)
+	change_sound.play()
+	
 	state = new_state
 	match state:
 		MagicType.NEUTRAL:
@@ -297,6 +306,11 @@ func _on_area_entered(area: Area2D) -> void:
 	
 	if state!=MagicType.SHIELD and area.state in [MagicType.SHIELD, MagicType.HEAVY]:
 		fizzle()
+
+func _on_body_entered(body: Node2D) -> void:
+	if body is StaticBody2D and body.name=="World_Border":
+		#fizzle()
+		pass
 
 # Decreases this magic object's health
 # Destroys it if no health remains
