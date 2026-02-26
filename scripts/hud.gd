@@ -13,6 +13,18 @@ func _ready() -> void:
 	# color this way bc easier to handle depletion
 	_style_bar(hp_bar, Color(0.1, 0.8, 0.2), Color(0.15, 0.15, 0.15))
 	_style_bar(mana_bar, Color(0.2, 0.4, 0.9), Color(0.15, 0.15, 0.15))
+	
+	var shield_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/Shield/Label")
+	var light_magic_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/LightMagic/Label")
+	var heavy_magic_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/HeavyMagic/Label")
+	
+	var shield_button:InputEventKey = InputMap.action_get_events("turn_pure_to_shield")[0]
+	var light_button:InputEventKey = InputMap.action_get_events("turn_pure_to_light")[0]
+	var heavy_button:InputEventKey = InputMap.action_get_events("turn_pure_to_heavy")[0]
+	
+	shield_label.text = OS.get_keycode_string(shield_button.physical_keycode)+'\nShield\n'+str(Magic.cost[Magic.MagicType.SHIELD])+' Mana'
+	light_magic_label.text = OS.get_keycode_string(light_button.physical_keycode)+'\nLight\n'+str(Magic.cost[Magic.MagicType.LIGHT])+' Mana'
+	heavy_magic_label.text = OS.get_keycode_string(heavy_button.physical_keycode)+'\nHeavy\n'+str(Magic.cost[Magic.MagicType.HEAVY])+' Mana'
 
 func connect_to_player(p: CharacterBody2D) -> void:
 	player = p
