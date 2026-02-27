@@ -147,7 +147,7 @@ func change_state(new_state: MagicType):
 			get_node("StaticBody2D").add_child(coll_shape.duplicate())
 			
 			var timer := Timer.new()
-			timer.wait_time = 2.0
+			timer.wait_time = 5.0
 			timer.one_shot = true
 			add_child(timer)
 			timer.timeout.connect(func(): fizzle())  # or: timer.timeout.connect(fizzle)

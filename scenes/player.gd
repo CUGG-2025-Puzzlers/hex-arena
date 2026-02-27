@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var base_speed : float = 150.0
+@export var base_speed : float = 135.0
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
 
@@ -127,7 +127,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 		# only server calculates and then syncs damage
 		if multiplayer.is_server():
-			var damage_amount = area.damage / randf_range(3.0, 4.0)
+			var damage_amount = area.damage / randf_range(3.3, 3.5)
 			_apply_damage.rpc(damage_amount)
 
 @rpc("authority", "call_local", "reliable")
