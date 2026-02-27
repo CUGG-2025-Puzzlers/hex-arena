@@ -117,7 +117,7 @@ horizontal_alignment = 1
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="CooldownOverlay" type="ColorRect" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=365637307]
+[node name="CooldownOverlay" type="ColorRect" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff" unique_id=365637307]
 visible = false
 layout_mode = 2
 color = Color(0, 0, 0, 0.7019608)

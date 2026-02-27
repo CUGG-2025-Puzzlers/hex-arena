@@ -9,6 +9,11 @@ var player: CharacterBody2D = null
 @onready var mana_label: Label = $MarginContainer/VBoxContainer/ManaBar/Label
 @onready var ability_container: HBoxContainer = $MarginContainer/VBoxContainer/AbilityContainer
 
+# movement buffs:
+@onready var move_ability_name: Label = $MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer/AbilityName
+@onready var move_timer_label: Label = $MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer/TimerLabel
+@onready var move_overlay: ColorRect = $MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/CooldownOverlay
+
 func _ready() -> void:
 	# color this way bc easier to handle depletion
 	_style_bar(hp_bar, Color(0.1, 0.8, 0.2), Color(0.15, 0.15, 0.15))
@@ -18,10 +23,10 @@ func _ready() -> void:
 	var light_magic_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/LightMagic/Label")
 	var heavy_magic_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/HeavyMagic/Label")
 	
-	var shield_button:InputEventKey = InputMap.action_get_events("turn_pure_to_shield")[0]
-	var light_button:InputEventKey = InputMap.action_get_events("turn_pure_to_light")[0]
-	var heavy_button:InputEventKey = InputMap.action_get_events("turn_pure_to_heavy")[0]
-	
+	var shield_button : InputEventKey = InputMap.action_get_events("turn_pure_to_shield")[0]
+	var light_button : InputEventKey = InputMap.action_get_events("turn_pure_to_light")[0]
+	var heavy_button : InputEventKey = InputMap.action_get_events("turn_pure_to_heavy")[0]
+
 	shield_label.text = OS.get_keycode_string(shield_button.physical_keycode)+'\nShield\n'+str(Magic.cost[Magic.MagicType.SHIELD])+' Mana'
 	light_magic_label.text = OS.get_keycode_string(light_button.physical_keycode)+'\nLight\n'+str(Magic.cost[Magic.MagicType.LIGHT])+' Mana'
 	heavy_magic_label.text = OS.get_keycode_string(heavy_button.physical_keycode)+'\nHeavy\n'+str(Magic.cost[Magic.MagicType.HEAVY])+' Mana'
@@ -34,6 +39,13 @@ func connect_to_player(p: CharacterBody2D) -> void:
 	
 	_on_health_changed(stats.current_health, stats.max_health)
 	_on_mana_changed(stats.current_mana, stats.max_mana)
+	
+	# connect movement ability
+	var ability: AbilityBase = player.get_node("Ability")
+	move_ability_name.text = ability.ability_name
+	ability.cooldown_started.connect(_on_move_cooldown_started)
+	ability.cooldown_updated.connect(_on_move_cooldown_updated)
+	ability.cooldown_finished.connect(_on_move_cooldown_finished)
 
 func _on_health_changed(current: float, maximum: float) -> void:
 	hp_bar.max_value = maximum
@@ -44,6 +56,17 @@ func _on_mana_changed(current: float, maximum: float) -> void:
 	mana_bar.max_value = maximum
 	mana_bar.value = current
 	mana_label.text = "%d / %d" % [ceili(current), ceili(maximum)]
+
+func _on_move_cooldown_started(_duration: float) -> void:
+	move_overlay.visible = true
+	move_timer_label.visible = true
+
+func _on_move_cooldown_updated(remaining: float, _duration: float) -> void:
+	move_timer_label.text = "%0.1f" % remaining
+
+func _on_move_cooldown_finished() -> void:
+	move_overlay.visible = false
+	move_timer_label.visible = false
 
 # handling health and mana depleation
 func _style_bar(bar: ProgressBar, fill_color: Color, bg_color: Color) -> void:
