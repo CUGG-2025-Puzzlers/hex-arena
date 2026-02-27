@@ -101,8 +101,8 @@ func change_state(new_state: MagicType):
 			damage = 0
 		MagicType.LIGHT:
 			#modulate=Color.BLUE
-			health = 50
-			damage = 50
+			health = 30
+			damage = 40
 			
 			animated_sprite.visible = false
 			
@@ -112,7 +112,7 @@ func change_state(new_state: MagicType):
 			#arrow_particles.scale *= 4
 		MagicType.HEAVY:
 			#modulate=Color.CRIMSON
-			health = 50
+			health = 40
 			damage = 100
 			
 			animated_sprite.visible = false
@@ -134,8 +134,8 @@ func change_state(new_state: MagicType):
 			
 		MagicType.SHIELD:
 			#modulate=Color.WEB_PURPLE
-			health = 100
-			damage = 200
+			health = 80
+			damage = 30
 			
 			animation_total_times[0] = 5
 			shield_animated_texture = find_child("Shield Glow").texture.duplicate()
@@ -295,8 +295,9 @@ func _on_area_entered(area: Area2D) -> void:
 	
 	take_damage(area.damage)
 	
-	if state!=MagicType.SHIELD and area.state in [MagicType.SHIELD, MagicType.HEAVY]:
-		fizzle()
+	#what is this force fizzle lol, commented out...
+	#if state!=MagicType.SHIELD and area.state in [MagicType.SHIELD, MagicType.HEAVY]:
+	#	fizzle()
 
 # Decreases this magic object's health
 # Destroys it if no health remains
