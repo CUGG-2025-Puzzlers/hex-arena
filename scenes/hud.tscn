@@ -44,8 +44,9 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 800.0
-offset_top = -120.0
+offset_top = -155.0
 offset_right = -780.0
+offset_bottom = 45.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/margin_left = 20
@@ -69,7 +70,8 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_ahhtf")
 layout_mode = 2
 text = "Q
 Shield
-15 Mana"
+15 MP"
+horizontal_alignment = 1
 
 [node name="LightMagic" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=1534534003]
 layout_mode = 2
@@ -79,7 +81,8 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_oo0fn")
 layout_mode = 2
 text = "E
 Light
-10 Mana"
+10 MP"
+horizontal_alignment = 1
 
 [node name="HeavyMagic" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=1658931680]
 layout_mode = 2
@@ -89,9 +92,11 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_5ysmq")
 layout_mode = 2
 text = "R
 Heavy
-20 Mana"
+20 MP"
+horizontal_alignment = 1
 
 [node name="MovementBuff" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=223986243]
+custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff" unique_id=1512107906]
@@ -100,16 +105,20 @@ alignment = 1
 
 [node name="KeyLabel" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=1185292678]
 layout_mode = 2
+theme_override_font_sizes/font_size = 16
 text = "Shift"
 horizontal_alignment = 1
 
 [node name="AbilityName" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=171281470]
 layout_mode = 2
+horizontal_alignment = 1
 
 [node name="TimerLabel" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=190017898]
 layout_mode = 2
+horizontal_alignment = 1
 
 [node name="CooldownOverlay" type="ColorRect" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=365637307]
+visible = false
 layout_mode = 2
 color = Color(0, 0, 0, 0.7019608)
 
