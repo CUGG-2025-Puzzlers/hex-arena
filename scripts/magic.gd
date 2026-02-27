@@ -145,7 +145,14 @@ func change_state(new_state: MagicType):
 			var coll_shape :CollisionShape2D = get_node("CollisionShape2D")
 			coll_shape.shape = HexCells.hex_polygon_shape
 			get_node("StaticBody2D").add_child(coll_shape.duplicate())
-
+			
+			var timer := Timer.new()
+			timer.wait_time = 2.0
+			timer.one_shot = true
+			add_child(timer)
+			timer.timeout.connect(func(): fizzle())  # or: timer.timeout.connect(fizzle)
+			timer.start()
+			
 func _process(delta: float) -> void:
 	for i in range(len(animation_timers)):
 		animation_timers[i]+=randfn(delta/animation_total_times[i],delta/animation_total_times[i]*0.3)#+randfn(0,animation_timers[i]/3.)
