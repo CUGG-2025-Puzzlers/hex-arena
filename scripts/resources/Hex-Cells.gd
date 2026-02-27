@@ -185,7 +185,7 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 	magic_instance.add_to_group('magic')
 		
 	if player_id!=multiplayer.get_unique_id():
-		magic_instance.modulate = Color.WEB_MAROON
+		magic_instance.modulate = Color(0.819, 0.205, 0.204, 1.0)
 	else:
 		Magic.last_placed_cell=cell
 		get_node("LastMagic").global_position=map_to_local(cell)
