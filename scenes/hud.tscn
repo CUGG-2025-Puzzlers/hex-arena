@@ -62,6 +62,33 @@ layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
+[node name="MovementBuff" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=223986243]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff" unique_id=1512107906]
+layout_mode = 2
+alignment = 1
+
+[node name="KeyLabel" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=1185292678]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Shift"
+horizontal_alignment = 1
+
+[node name="AbilityName" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=171281470]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="TimerLabel" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=190017898]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="CooldownOverlay" type="ColorRect" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff" unique_id=365637307]
+visible = false
+layout_mode = 2
+color = Color(0, 0, 0, 0.7019608)
+
 [node name="Shield" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=19660061]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ahhtf")
@@ -94,33 +121,6 @@ text = "R
 Heavy
 20 MP"
 horizontal_alignment = 1
-
-[node name="MovementBuff" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=223986243]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff" unique_id=1512107906]
-layout_mode = 2
-alignment = 1
-
-[node name="KeyLabel" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=1185292678]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Shift"
-horizontal_alignment = 1
-
-[node name="AbilityName" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=171281470]
-layout_mode = 2
-horizontal_alignment = 1
-
-[node name="TimerLabel" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer" unique_id=190017898]
-layout_mode = 2
-horizontal_alignment = 1
-
-[node name="CooldownOverlay" type="ColorRect" parent="MarginContainer/VBoxContainer/AbilityContainer/MovementBuff" unique_id=365637307]
-visible = false
-layout_mode = 2
-color = Color(0, 0, 0, 0.7019608)
 
 [node name="HPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer" unique_id=1552030233]
 custom_minimum_size = Vector2(300, 24)

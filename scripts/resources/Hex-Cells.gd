@@ -127,7 +127,8 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 	
 	while not surrounding_cells.is_empty():
 		var cell_to_check = surrounding_cells.pop_back()
-		if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]):
+		if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]) \
+		and cell_dict[cell_to_check] is Magic:
 			var magic_instance : Magic = cell_dict[cell_to_check]
 			
 			if magic_instance.state == Magic.MagicType.NEUTRAL \
@@ -255,7 +256,7 @@ func _draw() -> void:
 	
 	
 	for hex_points in points:
-		draw_polyline(hex_points,Color.CYAN, grid_thickness, true)
+		draw_polyline(hex_points,Color.CYAN, grid_thickness, true if grid_thickness>0 else false)
 	
 	
 	"""

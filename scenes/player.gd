@@ -35,6 +35,21 @@ func _ready() -> void:
 	
 	get_node("Area2D").area_entered.connect(_on_area_entered)
 	
+	if multiplayer.is_server():
+		var feet_coll_area = Area2D.new()
+		var feet_coll_shape : CollisionShape2D = get_node("CollisionShape2D")
+	
+		add_child(feet_coll_area)
+		feet_coll_area.global_position=feet_coll_shape.global_position
+	
+		feet_coll_area.name = "FeetCollisionArea"
+		feet_coll_shape=feet_coll_shape.duplicate()
+	
+		feet_coll_area.add_child(feet_coll_shape)
+		feet_coll_shape.global_position=feet_coll_area.global_position
+	
+		feet_coll_area.area_entered.connect(stepped_on)
+	
 	stats.health_changed.connect(_on_overhead_hp_changed)
 	_on_overhead_hp_changed.call_deferred(stats.current_health, stats.max_health)
 
@@ -131,6 +146,11 @@ func _on_area_entered(area: Area2D) -> void:
 		if multiplayer.is_server():
 			var damage_amount = area.damage / randf_range(3.3, 3.5)
 			_apply_damage.rpc(damage_amount)
+
+func stepped_on(area: Area2D) -> void:
+	#print("Player "+str(player_id)+" stepped on "+str(area.name))
+	if multiplayer.is_server() and area.is_in_group("mana_pool"):
+		ManaSpawner.player_unique_instance.rpc("collect_mana_pool",area. global_position, player_id)
 
 @rpc("authority", "call_local", "reliable")
 func _apply_damage(amount: float) -> void:

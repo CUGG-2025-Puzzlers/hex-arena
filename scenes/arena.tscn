@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
+[ext_resource type="Script" uid="uid://bdx7fttoll74l" path="res://scripts/Mana_spawner.gd" id="7_dpxgc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_wl4x5")
@@ -104,3 +105,9 @@ shape = SubResource("WorldBoundaryShape2D_7ft05")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=220051452]
 shape = SubResource("WorldBoundaryShape2D_olpmc")
+
+[node name="ManaSpawnTimer" type="Timer" parent="." unique_id=1306404596]
+wait_time = 8.0
+script = ExtResource("7_dpxgc")
+
+[connection signal="timeout" from="ManaSpawnTimer" to="ManaSpawnTimer" method="_on_timeout"]

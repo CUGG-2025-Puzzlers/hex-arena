@@ -1,0 +1,154 @@
+[gd_scene format=3 uid="uid://brjewj227to6b"]
+
+[ext_resource type="Texture2D" uid="uid://fs4nj03e7j1t" path="res://assets/textures/magic.tres" id="7_0bxfb"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
+radius = 26.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_8jqt7"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_4xhmb"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.11138016, 0.39308858, 0.86440676)
+colors = PackedColorArray(0.2175, 0.7830001, 0.87, 1, 0.062400002, 0.4589867, 0.52, 1, 0.1235, 0.186675, 0.19, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mki80"]
+gradient = SubResource("Gradient_4xhmb")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.9551282, 0.4957265)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rhq8d"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_wwhys"]
+offsets = PackedFloat32Array(0, 0.17092651, 0.41255605, 0.5543131, 0.5942492, 0.6645367, 0.764574)
+colors = PackedColorArray(1.3025239, 2.037959, 2.7259471, 1, 0, 1.7234452, 1.8759707, 1, 0, 0, 0, 0, 1, 0.45999998, 0.9459998, 0.6627451, 0.6819998, 0, 0.93, 1, 0.608, 0.95, 0.8246, 1, 0.9215, 0.95, 0.93955, 0.9843137)
+
+[node name="Mana_pool" type="Area2D" unique_id=627565832]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=29718005]
+shape = SubResource("CircleShape2D_fggut")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1104602300]
+material = SubResource("CanvasItemMaterial_8jqt7")
+texture = SubResource("GradientTexture2D_mki80")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=1601721410]
+material = SubResource("CanvasItemMaterial_rhq8d")
+amount = 15
+texture = ExtResource("7_0bxfb")
+lifetime = 5.0
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+gravity = Vector2(98, 0)
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="." unique_id=559575791]
+material = SubResource("CanvasItemMaterial_rhq8d")
+amount = 15
+texture = ExtResource("7_0bxfb")
+lifetime = 5.0
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+gravity = Vector2(49, -84.87)
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="CPUParticles2D3" type="CPUParticles2D" parent="." unique_id=1048296434]
+material = SubResource("CanvasItemMaterial_rhq8d")
+amount = 15
+texture = ExtResource("7_0bxfb")
+lifetime = 5.0
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+gravity = Vector2(-49, -84.87)
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="CPUParticles2D4" type="CPUParticles2D" parent="." unique_id=1341607615]
+material = SubResource("CanvasItemMaterial_rhq8d")
+amount = 15
+texture = ExtResource("7_0bxfb")
+lifetime = 5.0
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+gravity = Vector2(-98, 0)
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="CPUParticles2D5" type="CPUParticles2D" parent="." unique_id=1396876805]
+material = SubResource("CanvasItemMaterial_rhq8d")
+amount = 15
+texture = ExtResource("7_0bxfb")
+lifetime = 5.0
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+gravity = Vector2(49, 84.87)
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="CPUParticles2D6" type="CPUParticles2D" parent="." unique_id=1299817388]
+material = SubResource("CanvasItemMaterial_rhq8d")
+amount = 15
+texture = ExtResource("7_0bxfb")
+lifetime = 5.0
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+gravity = Vector2(-49, 84.87)
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="Timer" type="Timer" parent="." unique_id=1357322949]
+wait_time = 8.0
+one_shot = true

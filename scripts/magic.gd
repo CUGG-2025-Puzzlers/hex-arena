@@ -341,6 +341,9 @@ func fizzle():
 		else:
 			rolling_pathfollow.queue_free()
 	
+	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
+		HexCells.cell_dict[self_cell] = null
+	
 	queue_free()
 
 func visualize_shield():
