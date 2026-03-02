@@ -10,6 +10,11 @@ class_name HexCells
 		r = new_r
 		recalculate()
 
+@export var grid_thickness : float = 1:
+	set(new_thickness):
+		grid_thickness=new_thickness
+		queue_redraw()
+
 static var hex_height: float #= 2*r
 static var hex_width: float #= sqrt(3)*r
 
@@ -63,6 +68,7 @@ func recalculate() -> void:
 			var hex_points = get_hex_points_around(map_point)
 			points.append(hex_points)
 	
+	# No need to redraw if using a constant r with fixed texture
 	queue_redraw()
 
 
@@ -206,8 +212,51 @@ func _draw() -> void:
 	if points.is_empty():
 		return
 	
+	"""
+	# Save grid image as texture
+	var grid_image : Image = Image.create(width,height,false,Image.FORMAT_RGBA8)
 	for hex_points in points:
-		draw_polyline(hex_points,Color.CYAN) #1.01, true
+		for i in range(len(hex_points)-1):
+			var prev: Vector2 = hex_points[i]
+			var next: Vector2 = hex_points[i+1]
+			
+			var x_diff = floori(abs(prev.x-next.x))
+			var y_diff = floori(abs(prev.y-next.y))
+			for x in range(x_diff+1):
+				var x_pos : float = min(prev.x,next.x)+x
+				var y_pos = lerpf(prev.y,next.y,(x_pos-prev.x)/(next.x-prev.x))
+				for x_posi in [floori(x_pos),ceili(x_pos)]:
+					var final_x : int = roundi(width/2+x_posi)
+					if final_x<0 or final_x>=width:
+						continue
+					for y_posi in [floori(y_pos),ceili(y_pos)]:
+						var final_y : int = roundi(height/2+y_posi)
+						if final_y<0 or final_y>=height:
+							continue
+						grid_image.set_pixel(final_x,final_y,Color.CYAN)
+			
+			for y in range(y_diff+1):
+				var y_pos : float = min(prev.y, next.y)+y
+				var x_pos = lerpf(prev.x,next.x,(y_pos-prev.y)/(next.y-prev.y))
+				for x_posi in [floori(x_pos),ceili(x_pos)]:
+					var final_x : int = roundi(width/2+x_posi)
+					if final_x<0 or final_x>=width:
+						continue
+					for y_posi in [floori(y_pos),ceili(y_pos)]:
+						var final_y : int = roundi(height/2+y_posi)
+						if final_y<0 or final_y>=height:
+							continue
+						grid_image.set_pixel(final_x,final_y,Color.CYAN)
+	
+	# get_node("GridSprite").texture = ImageTexture.create_from_image(grid_image)
+	# Disable in export
+	grid_image.save_png("res://assets/textures/grid.png")
+	"""
+	
+	
+	for hex_points in points:
+		draw_polyline(hex_points,Color.CYAN, grid_thickness, true)
+	
 	
 	"""
 	var hex_points = get_hex_points_around(curr_cell)

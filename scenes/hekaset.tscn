@@ -300,7 +300,6 @@ scale_max = 4.0
 color = Color(0.959805, 0.99, 0.3861, 1)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dmjat"]
-radius = 8.0
 height = 62.0
 
 [sub_resource type="Gradient" id="Gradient_b15l6"]
@@ -381,7 +380,7 @@ script = ExtResource("9_sniku")
 [node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=495044529]
-position = Vector2(-1, -34)
+position = Vector2(0, -34)
 shape = SubResource("CapsuleShape2D_dmjat")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="Area2D" unique_id=1037178925]

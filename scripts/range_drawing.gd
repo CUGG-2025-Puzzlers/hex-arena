@@ -21,5 +21,6 @@ func _draw() -> void:
 		color = Color.TOMATO
 	for draw_point in radius_cells:
 		var hex_points = HexCells.player_unique_instance.get_hex_points_around(draw_point)
-		draw_polyline(hex_points,color)
+		var thickness = HexCells.player_unique_instance.grid_thickness
+		draw_polyline(hex_points, color, thickness, true if thickness>0 else false)
 	drawn = true

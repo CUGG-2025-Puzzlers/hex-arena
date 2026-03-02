@@ -77,7 +77,7 @@ func join_game(player_name: String, ip: String, port: int):
 	player_info["name"] = player_name
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 
-func setup_upnp(port: int):
+func setup_upnp(_port: int):
 	var result = ""
 	var upnp = UPNP.new()
 	
@@ -160,7 +160,7 @@ func select_character(character: Util.Character):
 @rpc("call_local", "any_peer", "reliable")
 func _set_character(character: Util.Character):
 	var sender_id = multiplayer.get_remote_sender_id()
-	var sender_is_local_client = sender_id == multiplayer.get_unique_id()
+	var _sender_is_local_client = sender_id == multiplayer.get_unique_id()
 	print("%s selected %s" % [MultiplayerManager.players[sender_id].name, Util.Character.keys()[character]])
 	_set_player_character(sender_id, character)
 	Events.select_character(character, sender_id)

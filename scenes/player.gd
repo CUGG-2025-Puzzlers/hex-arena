@@ -102,12 +102,14 @@ func is_channeling() -> bool:
 	
 func is_dashing() -> bool:
 	return _ability is DashAbility and _ability.is_dashing
-	
+
+"""
+# For testing damage, heal, mana use
 func _unhandled_input(event: InputEvent) -> void:
 	if %InputSynchronizer.get_multiplayer_authority() != player_id:
 		return
-	"""
-	for testing damage, heal, mana use
+
+
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_K:
 			stats.take_damage(10.0)
@@ -115,7 +117,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			stats.heal(10.0)
 		elif event.keycode == KEY_M:
 			stats.use_mana(20.0)
-	"""
+"""
 
 
 

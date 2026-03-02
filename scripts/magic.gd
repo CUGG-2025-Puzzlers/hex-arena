@@ -138,8 +138,18 @@ func change_state(new_state: MagicType):
 			damage = 30
 			
 			animation_total_times[0] = 5
+			
 			shield_animated_texture = find_child("Shield Glow").texture.duplicate()
 			find_child("Shield Glow").texture = shield_animated_texture
+			
+			if player_id!=multiplayer.get_unique_id():
+				var pattern: Polygon2D = find_child("Shield Pattern")
+				var glow: Polygon2D = find_child("Shield Glow")
+				
+				var temp = pattern.texture
+				pattern.texture = glow.texture
+				glow.texture=temp
+			
 			visualize_shield()
 			scale = 0.9*Vector2.ONE
 			var coll_shape :CollisionShape2D = get_node("CollisionShape2D")
@@ -353,6 +363,7 @@ func visualize_shield():
 		#polygon.texture_rotation=randfn(PI*randi_range(0,5)/3,PI*0.05)
 	
 		polygon.visible=true
+	
 	get_node("Sprite2D").visible = false
 
 func _draw() -> void:

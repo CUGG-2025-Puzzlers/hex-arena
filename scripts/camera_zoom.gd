@@ -52,4 +52,4 @@ func _process(delta: float) -> void:
 	zoom = Vector2.ONE * ((new_zoom-zoom.x)*delta+zoom.x)
 	
 	# FOR NOW, LATER RENDER AND SAVE AS TEXTURE
-	HexCells.player_unique_instance.queue_redraw()
+	# HexCells.player_unique_instance.queue_redraw()
