@@ -55,8 +55,13 @@ func _physics_process(delta: float) -> void:
 	_handle_movement(delta)
 	select_animation()
 	update_animation_parameters()
-		
-	cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
+	
+	var temp_cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
+	if temp_cell!=cell:
+		HexCells.players_cells[player_id]=temp_cell
+		if player_id==multiplayer.get_unique_id():
+			HexCells.player_unique_instance.queue_redraw()
+	cell = temp_cell
 
 func select_animation():
 	if _input.direction == Vector2.ZERO:

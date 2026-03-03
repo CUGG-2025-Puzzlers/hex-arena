@@ -31,6 +31,7 @@ var vertical_n : int
 var horizontal_n : int
 
 static var cell_dict: Dictionary = {}
+static var players_cells: Dictionary = {1: Vector2i()}
 static var curr_cell: Vector2i = Vector2i()
 
 var points = []
@@ -253,9 +254,18 @@ func _draw() -> void:
 	grid_image.save_png("res://assets/textures/grid.png")
 	"""
 	
+	var center : Vector2 = Vector2()
+	var max_dist = sqrt(width**2+height**2)
+	var mult_id : int = multiplayer.get_unique_id()
+	if players_cells.has(mult_id):
+		center=map_to_local(players_cells[mult_id])
+	center+=Vector2.UP*r
 	
 	for hex_points in points:
-		draw_polyline(hex_points,Color.CYAN, grid_thickness, true)
+		var ratio : float = (hex_points[0]-center).length()*1./max_dist
+		var color : Color = Color.CYAN
+		color.a = (1.-ratio)**5
+		draw_polyline(hex_points, color, grid_thickness, true)
 	
 	
 	"""
