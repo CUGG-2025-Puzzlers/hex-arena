@@ -264,15 +264,25 @@ func _draw() -> void:
 	grid_image.save_png("res://assets/textures/grid.png")
 	"""
 	
-	var center : Vector2 = Vector2()
+	var centers : PackedVector2Array
 	var max_dist = sqrt(width**2+height**2)
-	var mult_id : int = multiplayer.get_unique_id()
-	if players_cells.has(mult_id):
-		center=map_to_local(players_cells[mult_id])
-	center+=Vector2.UP*r
+	for mult_id in players_cells.keys():
+		centers.append(map_to_local(players_cells[mult_id]))
+	if centers.is_empty():
+		centers.append(Vector2())
 	
 	for hex_points in points:
-		var ratio : float = (hex_points[0]-center).length()*1./max_dist
+		var center : Vector2 = centers[0]
+		var hex_center : Vector2 = hex_points[0]-0.5*Vector2.UP*hex_height
+		var dist: float = center.distance_to(hex_center) 
+		for i in range(len(centers)-1):
+			var other_center = centers[i+1]
+			var new_dist : float = other_center.distance_to(hex_center)
+			if new_dist<dist:
+				dist=new_dist
+				center = other_center
+		
+		var ratio : float = dist*1./max_dist
 		#ratio = gradient_dist_curve.sample(ratio)
 		var color : Color = grid_gradient.gradient.sample(ratio)
 		draw_polyline(hex_points, color, grid_thickness, true)
