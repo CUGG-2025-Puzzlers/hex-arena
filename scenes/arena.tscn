@@ -28,6 +28,13 @@ sources/0 = SubResource("TileSetAtlasSource_wl4x5")
 
 [sub_resource type="Curve2D" id="Curve2D_eejgt"]
 
+[sub_resource type="Gradient" id="Gradient_4ag8t"]
+offsets = PackedFloat32Array(0, 0.07709251, 0.16299559, 0.32819384, 0.66519827, 1)
+colors = PackedColorArray(0.54870003, 0.93, 0.910935, 1, 0.17000002, 1, 0.9585, 1, 0.23489998, 0.79590493, 0.87, 0.9098039, 0.3572, 0.78458667, 0.94, 0.7294118, 0.15599999, 0.78, 0.78, 0.8509804, 0.1183, 0.71207505, 0.91, 0.85490197)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_dpxgc"]
+gradient = SubResource("Gradient_4ag8t")
+
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
 distance = -650.0
 
@@ -54,6 +61,7 @@ tile_set = SubResource("TileSet_wl4x5")
 [node name="Path2D" type="Path2D" parent="." unique_id=513764908]
 curve = SubResource("Curve2D_eejgt")
 script = ExtResource("1_gubwe")
+grid_gradient = SubResource("GradientTexture1D_dpxgc")
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
 texture = ExtResource("3_7ft05")

@@ -14,6 +14,16 @@ class_name HexCells
 	set(new_thickness):
 		grid_thickness=new_thickness
 		queue_redraw()
+@export var grid_gradient : GradientTexture1D:
+	set(new_value):
+		grid_gradient=new_value
+		queue_redraw()
+"""
+@export var gradient_dist_curve : Curve:
+	set(new_value):
+		gradient_dist_curve=new_value
+		queue_redraw()
+"""
 
 static var hex_height: float #= 2*r
 static var hex_width: float #= sqrt(3)*r
@@ -263,8 +273,8 @@ func _draw() -> void:
 	
 	for hex_points in points:
 		var ratio : float = (hex_points[0]-center).length()*1./max_dist
-		var color : Color = Color.CYAN
-		color.a = (1.-ratio)**5
+		#ratio = gradient_dist_curve.sample(ratio)
+		var color : Color = grid_gradient.gradient.sample(ratio)
 		draw_polyline(hex_points, color, grid_thickness, true)
 	
 	
