@@ -10,21 +10,6 @@ class_name HexCells
 		r = new_r
 		recalculate()
 
-@export var grid_thickness : float = 1:
-	set(new_thickness):
-		grid_thickness=new_thickness
-		queue_redraw()
-@export var grid_gradient : GradientTexture1D:
-	set(new_value):
-		grid_gradient=new_value
-		queue_redraw()
-"""
-@export var gradient_dist_curve : Curve:
-	set(new_value):
-		gradient_dist_curve=new_value
-		queue_redraw()
-"""
-
 static var hex_height: float #= 2*r
 static var hex_width: float #= sqrt(3)*r
 
@@ -44,7 +29,7 @@ static var cell_dict: Dictionary = {}
 static var players_cells: Dictionary = {1: Vector2i()}
 static var curr_cell: Vector2i = Vector2i()
 
-var points = []
+
 static var hex_shape = []
 static var hex_polygon_shape : ConvexPolygonShape2D
 
@@ -66,7 +51,6 @@ func recalculate() -> void:
 	vertical_n = max(int(height/(hex_height))-1,0)+1
 	horizontal_n = max(int(width/(hex_width))-1,0)+1
 	
-	points = []
 	cell_dict = Dictionary()
 	
 	for j in range(vertical_n):
@@ -76,11 +60,8 @@ func recalculate() -> void:
 			# Create mapping to fill in the future
 			cell_dict[map_point]=null
 			
-			var hex_points = get_hex_points_around(map_point)
-			points.append(hex_points)
-	
-	# No need to redraw if using a constant r with fixed texture
-	queue_redraw()
+	var grid_outline: GridOutline = find_child("GridOutline")
+	grid_outline.recalculate()
 
 
 # Called when the node enters the scene tree for the first time.
@@ -219,83 +200,6 @@ func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array
 		if is_instance_valid(magic_instance) and magic_instance.player_id==player_id and magic_instance.self_cell == cell:
 			magic_instance.start_rolling(wiggly_path_points)
 
-func _draw() -> void:
-	if points.is_empty():
-		return
-	
-	"""
-	# Save grid image as texture
-	var grid_image : Image = Image.create(width,height,false,Image.FORMAT_RGBA8)
-	for hex_points in points:
-		for i in range(len(hex_points)-1):
-			var prev: Vector2 = hex_points[i]
-			var next: Vector2 = hex_points[i+1]
-			
-			var x_diff = floori(abs(prev.x-next.x))
-			var y_diff = floori(abs(prev.y-next.y))
-			for x in range(x_diff+1):
-				var x_pos : float = min(prev.x,next.x)+x
-				var y_pos = lerpf(prev.y,next.y,(x_pos-prev.x)/(next.x-prev.x))
-				for x_posi in [floori(x_pos),ceili(x_pos)]:
-					var final_x : int = roundi(width/2+x_posi)
-					if final_x<0 or final_x>=width:
-						continue
-					for y_posi in [floori(y_pos),ceili(y_pos)]:
-						var final_y : int = roundi(height/2+y_posi)
-						if final_y<0 or final_y>=height:
-							continue
-						grid_image.set_pixel(final_x,final_y,Color.CYAN)
-			
-			for y in range(y_diff+1):
-				var y_pos : float = min(prev.y, next.y)+y
-				var x_pos = lerpf(prev.x,next.x,(y_pos-prev.y)/(next.y-prev.y))
-				for x_posi in [floori(x_pos),ceili(x_pos)]:
-					var final_x : int = roundi(width/2+x_posi)
-					if final_x<0 or final_x>=width:
-						continue
-					for y_posi in [floori(y_pos),ceili(y_pos)]:
-						var final_y : int = roundi(height/2+y_posi)
-						if final_y<0 or final_y>=height:
-							continue
-						grid_image.set_pixel(final_x,final_y,Color.CYAN)
-	
-	# get_node("GridSprite").texture = ImageTexture.create_from_image(grid_image)
-	# Disable in export
-	grid_image.save_png("res://assets/textures/grid.png")
-	"""
-	
-	var centers : PackedVector2Array
-	var max_dist = sqrt(width**2+height**2)
-	for mult_id in players_cells.keys():
-		centers.append(map_to_local(players_cells[mult_id]))
-	if centers.is_empty():
-		centers.append(Vector2())
-	
-	for hex_points in points:
-		var center : Vector2 = centers[0]
-		var hex_center : Vector2 = hex_points[0]-0.5*Vector2.UP*hex_height
-		var dist: float = center.distance_to(hex_center) 
-		for i in range(len(centers)-1):
-			var other_center = centers[i+1]
-			var new_dist : float = other_center.distance_to(hex_center)
-			if new_dist<dist:
-				dist=new_dist
-				center = other_center
-		
-		var ratio : float = dist*1./max_dist
-		#ratio = gradient_dist_curve.sample(ratio)
-		var color : Color = grid_gradient.gradient.sample(ratio)
-		draw_polyline(hex_points, color, grid_thickness, true)
-	
-	
-	"""
-	var hex_points = get_hex_points_around(curr_cell)
-	draw_polyline(hex_points,Color.MAGENTA)
-	
-	for cell in get_surrounding_cells_in_radius(curr_cell,2):
-		hex_points = get_hex_points_around(cell)
-		draw_polyline(hex_points, Color.MAGENTA)
-	"""
 
 func get_hex_points_around(pos: Vector2i):
 	var hex_points = hex_shape.duplicate()

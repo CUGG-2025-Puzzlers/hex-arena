@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_wl4x5"]
 [ext_resource type="Texture2D" uid="uid://bnv70x432w8c1" path="res://assets/textures/select_bubble_texture.tres" id="3_7ft05"]
+[ext_resource type="Script" uid="uid://csgewlrgl6k85" path="res://scripts/grid_outline.gd" id="3_dpxgc"]
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
@@ -61,6 +62,9 @@ tile_set = SubResource("TileSet_wl4x5")
 [node name="Path2D" type="Path2D" parent="." unique_id=513764908]
 curve = SubResource("Curve2D_eejgt")
 script = ExtResource("1_gubwe")
+
+[node name="GridOutline" type="Node2D" parent="Path2D" unique_id=1303454065]
+script = ExtResource("3_dpxgc")
 grid_gradient = SubResource("GradientTexture1D_dpxgc")
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]

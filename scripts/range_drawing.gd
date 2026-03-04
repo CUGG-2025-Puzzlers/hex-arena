@@ -16,14 +16,21 @@ func move_cell(_player_ind:int, new_cell: Vector2i):
 	
 	cell=new_cell
 	global_position=HexCells.map_to_local(cell)
+	
+	# Comment out if it becomes too much with > 2 players
+	reorder()
+
+func reorder():
+	if player_parent.player_id!=multiplayer.get_unique_id() \
+	and get_parent().get_child_count()>1:
+		get_parent().move_child(self,-2)
 
 func draw_range(new_rad_cells):
 	global_position = Vector2.ZERO
 	radius_cells = new_rad_cells 
 	queue_redraw()
-	reparent(HexCells.player_unique_instance)
-	if player_parent.player_id!=multiplayer.get_unique_id():
-		get_parent().move_child(self,0)
+	reparent(GridOutline.player_unique_instance)
+	reorder()
 
 
 func _draw() -> void:
@@ -32,6 +39,6 @@ func _draw() -> void:
 		color = Color.TOMATO
 	for draw_point in radius_cells:
 		var hex_points = HexCells.player_unique_instance.get_hex_points_around(draw_point)
-		var thickness = HexCells.player_unique_instance.grid_thickness
+		var thickness = GridOutline.player_unique_instance.grid_thickness
 		draw_polyline(hex_points, color, thickness, true if thickness>0 else false)
 	drawn = true
