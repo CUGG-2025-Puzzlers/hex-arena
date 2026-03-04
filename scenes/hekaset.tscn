@@ -374,7 +374,6 @@ one_shot = true
 process_material = SubResource("ParticleProcessMaterial_fjrip")
 
 [node name="Drawing range" type="Node2D" parent="." unique_id=771124319]
-show_behind_parent = true
 script = ExtResource("9_sniku")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
