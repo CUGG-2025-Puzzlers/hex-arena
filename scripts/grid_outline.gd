@@ -7,16 +7,18 @@ var hex_outlines = []
 var max_dist : float = 2000.
 
 static var player_unique_instance: GridOutline
+static var player_focus:Sprite2D
 
 @export var grid_thickness : float = 1:
 	set(new_thickness):
 		grid_thickness=new_thickness
 		queue_redraw()
+"""
 @export var grid_gradient : GradientTexture1D:
 	set(new_value):
 		grid_gradient=new_value
 		queue_redraw()
-"""
+
 @export var gradient_dist_curve : Curve:
 	set(new_value):
 		gradient_dist_curve=new_value
@@ -25,6 +27,8 @@ static var player_unique_instance: GridOutline
 
 func _ready() -> void:
 	player_unique_instance=self
+	player_focus = get_node("PlayerFocus")
+	player_focus.visible = false
 
 func recalculate():
 	max_dist = sqrt(HexCells.player_unique_instance.width**2+HexCells.player_unique_instance.height**2)
@@ -41,6 +45,12 @@ func recalculate():
 func _draw() -> void:
 	if hex_outlines.is_empty():
 		return
+	
+	
+	# Just draw the grid in white
+	for hex_outline in hex_outlines:
+		draw_polyline(hex_outline, Color.WHITE, grid_thickness, grid_thickness>0)
+	
 	
 	"""
 	# Save grid image as texture
@@ -83,6 +93,9 @@ func _draw() -> void:
 	grid_image.save_png("res://assets/textures/grid.png")
 	"""
 	
+	
+	"""
+	# Dynamic player-distance coloring
 	var player_cell_centers : PackedVector2Array
 	
 	for mult_id in HexCells.players_cells.keys():
@@ -105,8 +118,8 @@ func _draw() -> void:
 		var ratio : float = dist*1./max_dist
 		#ratio = gradient_dist_curve.sample(ratio)
 		var color : Color = grid_gradient.gradient.sample(ratio)
-		draw_polyline(hex_outlines[i0], color, grid_thickness, true)
-	
+		draw_polyline(hex_outlines[i0], color, grid_thickness, grid_thickness>0)
+	"""
 	
 	"""
 	var hex_points = get_hex_points_around(curr_cell)

@@ -29,9 +29,27 @@ func draw_range(new_rad_cells):
 	global_position = Vector2.ZERO
 	radius_cells = new_rad_cells 
 	queue_redraw()
+	#clip_children=CanvasItem.CLIP_CHILDREN_AND_DRAW
+	
 	reparent(GridOutline.player_unique_instance)
 	reorder()
-
+	
+	var focus = GridOutline.player_focus.duplicate()
+	add_child(focus)
+	
+	var remote : RemoteTransform2D = focus.get_node("RemoteTransform2D")
+	remote.reparent(player_parent.get_node("CollisionShape2D"))
+	
+	remote.position = Vector2()
+	focus.global_position = remote.global_position
+	
+	remote.remote_path=remote.get_path_to(focus)
+	focus.visible = true
+	
+	var texture : GradientTexture2D = focus.texture.duplicate()
+	texture.width = HexCells.hex_width*(player_parent.radius*2+0.5)
+	texture.height=texture.width
+	focus.texture = texture
 
 func _draw() -> void:
 	var color: Color = Color.MAGENTA
