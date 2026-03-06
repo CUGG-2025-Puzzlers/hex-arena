@@ -5,7 +5,14 @@ var radius_cells: Array = []
 
 var drawn = false
 
+var focus: Sprite2D
+
+@export var animation_full_time_mean : float = 5.
+var animation_timer: float = 0.
+@onready var animation_full_time: float  = animation_full_time_mean
+
 @onready var player_parent : CharacterBody2D = get_parent()
+
 func _ready() -> void:
 	player_parent.changed_cell.connect(move_cell)
 	player_parent.tree_exiting.connect(queue_free)
@@ -29,13 +36,16 @@ func draw_range(new_rad_cells):
 	global_position = Vector2.ZERO
 	radius_cells = new_rad_cells 
 	queue_redraw()
+	
 	#clip_children=CanvasItem.CLIP_CHILDREN_AND_DRAW
 	
 	reparent(GridOutline.player_unique_instance)
 	reorder()
 	
-	var focus = GridOutline.player_focus.duplicate()
+	focus = GridOutline.player_focus.duplicate()
 	add_child(focus)
+	
+	#clip_children=CanvasItem.CLIP_CHILDREN_ONLY
 	
 	var remote : RemoteTransform2D = focus.get_node("RemoteTransform2D")
 	remote.reparent(player_parent.get_node("CollisionShape2D"))
@@ -60,3 +70,11 @@ func _draw() -> void:
 		var thickness = GridOutline.player_unique_instance.grid_thickness
 		draw_polyline(hex_points, color, thickness, true if thickness>0 else false)
 	drawn = true
+
+func _process(delta: float) -> void:
+	animation_timer+=delta/animation_full_time
+	if animation_timer>=1:
+		animation_timer=fmod(animation_timer,1)
+		animation_full_time=(abs(randfn(0.3,0.3))+0.7)*animation_full_time_mean
+	
+	#focus.self_modulate.a=lerpf(0.3,0.75, 0.5*cos(2*PI*animation_timer)+0.5)

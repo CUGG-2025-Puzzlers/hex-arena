@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="4_uajpi"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="7_n5ll0"]
 [ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="8_b15l6"]
-[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_sniku"]
+[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/resources/draw_range.gd" id="9_sniku"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="10_hkro6"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
