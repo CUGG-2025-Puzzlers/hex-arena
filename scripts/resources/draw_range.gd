@@ -60,6 +60,14 @@ func draw_range(new_rad_cells):
 	texture.width = HexCells.hex_width*(player_parent.radius*2+0.5)
 	texture.height=texture.width
 	focus.texture = texture
+	
+	"""
+	# Multiply for enemies
+	if player_parent.player_id!=multiplayer.get_unique_id():
+		var material : CanvasItemMaterial = focus.material.duplicate()
+		focus.material = material
+		material.blend_mode=CanvasItemMaterial.BLEND_MODE_MUL
+	"""
 
 func _draw() -> void:
 	var color: Color = Color.MAGENTA
