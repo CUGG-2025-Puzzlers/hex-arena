@@ -37,11 +37,17 @@ var points = []
 static var hex_shape = []
 static var hex_polygon_shape : ConvexPolygonShape2D
 
+static var v : Vector2
+static var w : Vector2
+
 static var player_unique_instance : HexCells
 
 func recalculate() -> void:
 	hex_height = 2*r
 	hex_width = sqrt(3)*r
+	
+	v = Vector2.UP*r
+	w = Vector2.RIGHT.rotated(PI/6)*r
 	
 	hex_shape = []
 	for i in range(6):
@@ -85,10 +91,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		var new_curr_cell = local_to_map(get_global_mouse_position())
 		
+		var vw  = local_to_vw(get_global_mouse_position())
+		vw = Vector2i(roundi(vw.x),roundi(vw.y))
+		text.text = str(new_curr_cell)+"\n"+str(vw)
 		if curr_cell!=new_curr_cell:
 			curr_cell = new_curr_cell
 			
-			text.text = str(curr_cell)
+			
 			if cell_dict.has(curr_cell):
 				get_node("LazyFollow").position = map_to_local(curr_cell)
 			
@@ -352,3 +361,12 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Arra
 					surrounding_cells.append(surrond_cell)
 			extend_past_index+=1
 	return surrounding_cells
+
+static func local_to_vw(pos: Vector2) -> Vector2:
+	var w_units : float = pos.x/w.x
+	var v_units : float = (pos.y-w.y*w_units)/v.y
+	
+	return Vector2(v_units, w_units)
+
+static func vw_to_local(pos: Vector2) -> Vector2:
+	return pos.x*v+pos.y*w
