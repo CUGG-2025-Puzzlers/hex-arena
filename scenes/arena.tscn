@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
+[ext_resource type="Texture2D" uid="uid://brrrp34agwiju" path="res://assets/textures/wall_voronoi.png" id="7_dpxgc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_wl4x5")
@@ -42,6 +43,31 @@ distance = -880.0
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_olpmc"]
 normal = Vector2(0, 1)
 distance = -730.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ag8t"]
+radius = 5.0
+height = 60.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dpxgc"]
+blend_mode = 3
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oexds"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_naajo"]
+offsets = PackedFloat32Array(0, 0.98237884)
+colors = PackedColorArray(0.845177, 0.5971301, 0.14061478, 1, 0.2786088, 0.11276875, 0.015536535, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_41jku"]
+gradient = SubResource("Gradient_naajo")
+width = 3000
+height = 2000
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_k1k1x"]
+radius = 2.0
+height = 60.0
 
 [node name="Arena" type="Node2D" unique_id=669064917]
 
@@ -104,3 +130,28 @@ shape = SubResource("WorldBoundaryShape2D_7ft05")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=220051452]
 shape = SubResource("WorldBoundaryShape2D_olpmc")
+
+[node name="Wall" type="StaticBody2D" parent="." unique_id=388658691]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=2045675942]
+position = Vector2(27, 45)
+rotation = 1.0471976
+shape = SubResource("CapsuleShape2D_4ag8t")
+
+[node name="Sprite2D" type="Sprite2D" parent="Wall/CollisionShape2D" unique_id=760268246]
+clip_children = 2
+material = SubResource("CanvasItemMaterial_dpxgc")
+scale = Vector2(0.0049999994, 0.030000001)
+texture = ExtResource("7_dpxgc")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Wall/CollisionShape2D/Sprite2D" unique_id=1304491935]
+material = SubResource("CanvasItemMaterial_oexds")
+scale = Vector2(1.0000001, 1.0000001)
+texture = SubResource("GradientTexture2D_41jku")
+
+[node name="Area2D" type="Area2D" parent="Wall" unique_id=1711149636 groups=["wall"]]
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Wall/Area2D" unique_id=2132291890]
+position = Vector2(27, 45)
+rotation = 1.0471976
+shape = SubResource("CapsuleShape2D_k1k1x")

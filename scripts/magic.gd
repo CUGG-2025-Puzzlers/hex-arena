@@ -305,6 +305,10 @@ static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
 
 # Take damage when colliding with other magic
 func _on_area_entered(area: Area2D) -> void:
+	if area.is_in_group('wall'):
+		fizzle()
+		return
+		
 	if not area.is_in_group('magic') or \
 	area.player_id==player_id and not \
 	(area.state==MagicType.SHIELD or state ==MagicType.SHIELD):
