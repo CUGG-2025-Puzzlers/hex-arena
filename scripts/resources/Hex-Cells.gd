@@ -82,6 +82,9 @@ func recalculate() -> void:
 func _ready() -> void:
 	player_unique_instance = self
 	recalculate()
+	
+	if multiplayer.is_server():
+		build_wall_tree()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
@@ -368,5 +371,39 @@ static func local_to_vw(pos: Vector2) -> Vector2:
 	
 	return Vector2(v_units, w_units)
 
+static func local_to_vw_int(pos: Vector2) -> Vector2i:
+	var vw: Vector2 = local_to_vw(pos)
+	return Vector2i(roundi(vw.x), roundi(vw.y))
+
 static func vw_to_local(pos: Vector2) -> Vector2:
 	return pos.x*v+pos.y*w
+
+func build_wall_tree():
+	var verts : Array = []
+	var edges : Dictionary = {}
+	
+	for center in cell_dict.keys():
+		var hex_points = get_hex_points_around(center)
+		for j in range(6):
+			var hex_point = local_to_vw_int(hex_points[j])
+			if hex_point not in verts:
+				verts.append(hex_point)
+				edges[hex_point] = []
+			var next = local_to_vw_int(hex_points[j+1])
+			if next not in edges[hex_point]:
+				edges[hex_point].append(next)
+	
+	
+	var graph_node = get_node("Graph")
+	graph_node.Initialize(verts, edges)
+	
+	var random_verts = []
+	while len(random_verts)<5:
+		var temp = verts.pick_random()
+		if temp not in random_verts:
+			random_verts.append(temp)
+	
+	graph_node.build_spanning_tree_between(random_verts)
+	var result = graph_node.get_remaining_connections()
+	for edge in result:
+		print(edge)

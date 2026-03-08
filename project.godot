@@ -39,6 +39,10 @@ window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
 
+[dotnet]
+
+project/assembly_name="Hex Arena"
+
 [input]
 
 up={

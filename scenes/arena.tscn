@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
+[ext_resource type="Script" uid="uid://dadxe2omld8f6" path="res://scripts/resources/Graph.cs" id="5_oexds"]
 [ext_resource type="Texture2D" uid="uid://brrrp34agwiju" path="res://assets/textures/wall_voronoi.png" id="7_dpxgc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
@@ -98,10 +99,14 @@ offset_bottom = 23.0
 theme_override_font_sizes/font_size = 32
 text = "(1,2)"
 
+[node name="Graph" type="Node" parent="Path2D" unique_id=2124119734]
+script = ExtResource("5_oexds")
+metadata/_custom_type_script = "uid://dadxe2omld8f6"
+
 [node name="Camera2D" type="Camera2D" parent="." unique_id=794670418]
-limit_left = -1000
+limit_left = -999
 limit_top = -800
-limit_right = 950
+limit_right = 951
 limit_bottom = 700
 position_smoothing_enabled = true
 position_smoothing_speed = 0.8
