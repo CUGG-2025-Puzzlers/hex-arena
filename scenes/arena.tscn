@@ -30,24 +30,9 @@ sources/0 = SubResource("TileSetAtlasSource_wl4x5")
 
 [sub_resource type="Curve2D" id="Curve2D_eejgt"]
 
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
-distance = -650.0
-
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_xdvfk"]
-normal = Vector2(1, 0)
-distance = -930.0
-
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_7ft05"]
-normal = Vector2(-1, 0)
-distance = -880.0
-
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_olpmc"]
-normal = Vector2(0, 1)
-distance = -730.0
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ag8t"]
-radius = 5.0
-height = 60.0
+radius = 4.4641
+height = 58.301273
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dpxgc"]
 blend_mode = 3
@@ -66,9 +51,20 @@ height = 2000
 fill = 2
 fill_from = Vector2(0.5, 0.5)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_k1k1x"]
-radius = 2.0
-height = 60.0
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
+distance = -650.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_xdvfk"]
+normal = Vector2(1, 0)
+distance = -930.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_7ft05"]
+normal = Vector2(-1, 0)
+distance = -880.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_olpmc"]
+normal = Vector2(0, 1)
+distance = -730.0
 
 [node name="Arena" type="Node2D" unique_id=669064917]
 
@@ -93,6 +89,7 @@ scale = Vector2(1.6406251, 1.6406251)
 texture = ExtResource("4_4ag8t")
 
 [node name="Coordinates" type="Label" parent="Path2D" unique_id=1072220071]
+visible = false
 z_index = 10
 offset_right = 40.0
 offset_bottom = 23.0
@@ -102,6 +99,29 @@ text = "(1,2)"
 [node name="Graph" type="Node" parent="Path2D" unique_id=2124119734]
 script = ExtResource("5_oexds")
 metadata/_custom_type_script = "uid://dadxe2omld8f6"
+
+[node name="Wall" type="StaticBody2D" parent="Path2D" unique_id=388658691]
+position = Vector2(27, 45)
+rotation = 1.0471976
+
+[node name="MainObstacle" type="CollisionShape2D" parent="Path2D/Wall" unique_id=2045675942]
+shape = SubResource("CapsuleShape2D_4ag8t")
+
+[node name="Sprite2D" type="Sprite2D" parent="Path2D/Wall/MainObstacle" unique_id=760268246]
+clip_children = 2
+material = SubResource("CanvasItemMaterial_dpxgc")
+scale = Vector2(0.006, 0.03)
+texture = ExtResource("7_dpxgc")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Path2D/Wall/MainObstacle/Sprite2D" unique_id=1304491935]
+material = SubResource("CanvasItemMaterial_oexds")
+scale = Vector2(1.0000001, 1.0000001)
+texture = SubResource("GradientTexture2D_41jku")
+
+[node name="MagicDetection" type="Area2D" parent="Path2D/Wall" unique_id=1711149636 groups=["wall"]]
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Path2D/Wall/MagicDetection" unique_id=2132291890]
+shape = SubResource("CapsuleShape2D_4ag8t")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=794670418]
 limit_left = -999
@@ -134,28 +154,3 @@ shape = SubResource("WorldBoundaryShape2D_7ft05")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=220051452]
 shape = SubResource("WorldBoundaryShape2D_olpmc")
-
-[node name="Wall" type="StaticBody2D" parent="." unique_id=388658691]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall" unique_id=2045675942]
-position = Vector2(27, 45)
-rotation = 1.0471976
-shape = SubResource("CapsuleShape2D_4ag8t")
-
-[node name="Sprite2D" type="Sprite2D" parent="Wall/CollisionShape2D" unique_id=760268246]
-clip_children = 2
-material = SubResource("CanvasItemMaterial_dpxgc")
-scale = Vector2(0.0049999994, 0.030000001)
-texture = ExtResource("7_dpxgc")
-
-[node name="Sprite2D2" type="Sprite2D" parent="Wall/CollisionShape2D/Sprite2D" unique_id=1304491935]
-material = SubResource("CanvasItemMaterial_oexds")
-scale = Vector2(1.0000001, 1.0000001)
-texture = SubResource("GradientTexture2D_41jku")
-
-[node name="Area2D" type="Area2D" parent="Wall" unique_id=1711149636 groups=["wall"]]
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Wall/Area2D" unique_id=2132291890]
-position = Vector2(27, 45)
-rotation = 1.0471976
-shape = SubResource("CapsuleShape2D_k1k1x")

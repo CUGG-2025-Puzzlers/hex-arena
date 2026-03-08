@@ -378,32 +378,39 @@ static func local_to_vw_int(pos: Vector2) -> Vector2i:
 static func vw_to_local(pos: Vector2) -> Vector2:
 	return pos.x*v+pos.y*w
 
+static func map_to_vw_int(center: Vector2i)->Vector2i:
+	return Vector2i(int(center.x-1.5*center.y+0.5*posmod(center.y,2)),int(2*center.x+posmod(center.y,2)))
+static func vw_to_map_int(pos: Vector2i)->Vector2i:
+	var x = floori(pos.y/2.)
+	var y = int((x-pos.x+0.5*posmod(pos.y,2))*2/3)
+	return Vector2i(x,y)
+
 func build_wall_tree():
-	var verts : Array = []
-	var edges : Dictionary = {}
-	
-	for center in cell_dict.keys():
-		var hex_points = get_hex_points_around(center)
-		for j in range(6):
-			var hex_point = local_to_vw_int(hex_points[j])
-			if hex_point not in verts:
-				verts.append(hex_point)
-				edges[hex_point] = []
-			var next = local_to_vw_int(hex_points[j+1])
-			if next not in edges[hex_point]:
-				edges[hex_point].append(next)
-	
 	
 	var graph_node = get_node("Graph")
-	graph_node.Initialize(verts, edges)
+	graph_node.InitializeFromHexCenters(cell_dict.keys())
+	graph_node.BuildSpanningTreeBetweenRandom(5)
+	var result = graph_node.GetRemainingConnections()
 	
-	var random_verts = []
-	while len(random_verts)<5:
-		var temp = verts.pick_random()
-		if temp not in random_verts:
-			random_verts.append(temp)
+	var screen: Rect2 = Rect2(Vector2.ZERO,Vector2(width,height))
+	screen.size*=0.85
+	screen.position-=screen.size/2
+	for i in range(randi_range(30,70)):
+		var edge = result.pop_at(randi()%len(result))
+		var a : Vector2 = vw_to_local(edge[0])
+		var b : Vector2 = vw_to_local(edge[1])
+		if not screen.has_point(0.5*(a+b)):
+			continue
+		build_wall_between.rpc([a,b])
+	get_node("Wall").queue_free()
+
+@rpc("authority","call_local","reliable")
+func build_wall_between(edge: PackedVector2Array):
+	var wall = get_node("Wall")
+	wall = wall.duplicate()
+	add_child(wall)
 	
-	graph_node.build_spanning_tree_between(random_verts)
-	var result = graph_node.get_remaining_connections()
-	for edge in result:
-		print(edge)
+	var a = edge[0]
+	var b = edge[1]
+	wall.global_position = (a+b)*0.5
+	wall.rotation = (a-b).angle()+PI/2
