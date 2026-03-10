@@ -29,7 +29,7 @@ properties/2/spawn = true
 properties/2/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
-size = Vector2(38, 11)
+size = Vector2(35, 11)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_d2wvv"]
 animation = &"stop_up"
@@ -300,13 +300,17 @@ scale_max = 4.0
 color = Color(0.959805, 0.99, 0.3861, 1)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dmjat"]
-height = 62.0
+radius = 12.0
+height = 90.0
 
 [sub_resource type="Gradient" id="Gradient_b15l6"]
 offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 1)
 colors = PackedColorArray(1, 0.06999999, 0.06999999, 1, 2.2848396, 2.2848396, 2.2848396, 1, 0, 0, 0, 1, 0.6004017, 0, 0.07136438, 1)
 
-[node name="Player" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_b15l6"]
+load_path = "res://.godot/imported/Aztec_walk_draft.png-ca31bbd12d930f750257669e38fcd888.ctex"
+
+[node name="Player2" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
 collision_layer = 2
 collision_mask = 7
 script = ExtResource("1_dmjat")
@@ -326,19 +330,20 @@ script = ExtResource("2_hkro6")
 [node name="NameLabel" type="Label" parent="." unique_id=123225415]
 unique_name_in_owner = true
 offset_left = -75.0
-offset_top = -115.0
+offset_top = -135.0
 offset_right = 75.0
-offset_bottom = -92.0
+offset_bottom = -112.0
 pivot_offset_ratio = Vector2(0.5, 0.5)
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
+position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
-position = Vector2(-4.7683716e-07, -34)
-scale = Vector2(0.05, 0.05)
+position = Vector2(-0.41500115, -45.572887)
+scale = Vector2(0.06510082, 0.06510082)
 texture = ExtResource("3_dmjat")
 hframes = 7
 vframes = 6
@@ -380,7 +385,7 @@ script = ExtResource("9_sniku")
 [node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=495044529]
-position = Vector2(0, -34)
+position = Vector2(-1, -40)
 shape = SubResource("CapsuleShape2D_dmjat")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="Area2D" unique_id=1037178925]
@@ -404,6 +409,16 @@ color_ramp = SubResource("Gradient_b15l6")
 
 [node name="OverheadHp" parent="." unique_id=1343235313 instance=ExtResource("8_b15l6")]
 offset_left = -50.0
-offset_top = -85.0
+offset_top = -105.0
 offset_right = 50.0
-offset_bottom = -76.0
+offset_bottom = -96.0
+
+[node name="SizeRef" type="Sprite2D" parent="." unique_id=981245314]
+visible = false
+position = Vector2(69.99999, -35)
+scale = Vector2(0.05, 0.05)
+texture = SubResource("CompressedTexture2D_b15l6")
+hframes = 7
+vframes = 5
+region_enabled = true
+region_rect = Rect2(0, 640, 11210, 10640)

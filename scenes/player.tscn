@@ -615,7 +615,7 @@ color = Color(0.959805, 0.99, 0.3861, 1)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_smehm"]
 radius = 16.0
-height = 64.0
+height = 86.0
 
 [sub_resource type="Gradient" id="Gradient_b15l6"]
 offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 1)
@@ -695,7 +695,7 @@ script = ExtResource("9_ur7pv")
 [node name="Area2D" type="Area2D" parent="." unique_id=769280904]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1059806792]
-position = Vector2(0, -48)
+position = Vector2(0, -40)
 shape = SubResource("CapsuleShape2D_smehm")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="Area2D" unique_id=2125853540]
