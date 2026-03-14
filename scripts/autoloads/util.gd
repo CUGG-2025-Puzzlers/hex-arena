@@ -17,3 +17,16 @@ enum Ability {
 	Ghost,
 	Teleport,
 }
+
+enum Setting {
+	None,
+	MasterVolume,
+	MoveUp,
+	MoveLeft,
+	MoveDown,
+	MoveRight,
+	MakeShield,
+	MakeLight,
+	MakeHeavy,
+	UseAbility,
+}
