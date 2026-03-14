@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://ke21frtfyv10"]
+
+[ext_resource type="PackedScene" uid="uid://bcdqwatg7vj4x" path="res://scenes/volume_setting.tscn" id="1_c2u1v"]
+[ext_resource type="Script" uid="uid://0ynkw2xuhrtx" path="res://scripts/settings/options.gd" id="1_yjkok"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yjkok"]
+
+[node name="Options" type="Control" unique_id=1441850875]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yjkok")
+
+[node name="TabContainer" type="TabContainer" parent="." unique_id=21064078]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+tab_0/title = "Audio"
+
+[node name="Audio Settings" type="TabBar" parent="TabContainer" unique_id=960721805]
+layout_mode = 2
+metadata/_tab_index = 0
+metadata/_tab_name = "Audio"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Audio Settings" unique_id=692574851]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HSeparator" type="HSeparator" parent="TabContainer/Audio Settings/VBoxContainer" unique_id=1674976169]
+layout_mode = 2
+theme_override_constants/separation = 25
+theme_override_styles/separator = SubResource("StyleBoxEmpty_yjkok")
+
+[node name="VolumeSetting" parent="TabContainer/Audio Settings/VBoxContainer" unique_id=777530646 instance=ExtResource("1_c2u1v")]
+layout_mode = 2
+setting_name = "Master Volume"
+setting_type = 1
+
+[node name="Options" type="TabBar" parent="TabContainer" unique_id=195790346]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=955303601]
+layout_mode = 0
+offset_left = 722.0
+offset_top = 749.0
+offset_right = 1216.0
+offset_bottom = 792.0
+theme_override_constants/separation = 20
+
+[node name="ResetButton" type="Button" parent="HBoxContainer" unique_id=382224889]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 25
+text = " Reset "
+
+[node name="ExitButton" type="Button" parent="HBoxContainer" unique_id=1808295516]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 25
+text = " Exit "
