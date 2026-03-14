@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bcdqwatg7vj4x"]
+
+[ext_resource type="Script" uid="uid://bdq7ck1o88fmr" path="res://scripts/settings/volume_setting.gd" id="1_xpc00"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5apar"]
+
+[node name="VolumeSetting" type="Control" unique_id=777530646]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xpc00")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=5578044]
+layout_mode = 0
+offset_right = 591.0
+offset_bottom = 43.0
+
+[node name="SettingLabel" type="Label" parent="HBoxContainer" unique_id=1698414192]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Volume"
+horizontal_alignment = 2
+
+[node name="VSeparator" type="VSeparator" parent="HBoxContainer" unique_id=120483486]
+layout_mode = 2
+theme_override_constants/separation = 25
+theme_override_styles/separator = SubResource("StyleBoxEmpty_5apar")
+
+[node name="VolumeValue" type="Label" parent="HBoxContainer" unique_id=1842336296]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "0"
+horizontal_alignment = 1
+
+[node name="VolumeSlider" type="HSlider" parent="HBoxContainer" unique_id=961333170]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 1
