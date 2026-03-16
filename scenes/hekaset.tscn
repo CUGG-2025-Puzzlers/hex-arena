@@ -31,6 +31,15 @@ properties/2/replication_mode = 1
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 11)
 
+[sub_resource type="Gradient" id="Gradient_smehm"]
+offsets = PackedFloat32Array(0, 0.1585903, 0.38986784, 0.6057269)
+colors = PackedColorArray(0.2, 0.10333333, 0, 1, 0.14, 0.022400003, 0.13608, 1, 0.05, 0.008000001, 0.0486, 0.76862746, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_b15l6"]
+gradient = SubResource("Gradient_smehm")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_d2wvv"]
 animation = &"stop_up"
 
@@ -340,6 +349,11 @@ vertical_alignment = 1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
 position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_g2els")
+
+[node name="Shadow" type="Sprite2D" parent="CollisionShape2D" unique_id=128723591]
+self_modulate = Color(1, 1, 1, 0.74509805)
+scale = Vector2(1.25, 0.75)
+texture = SubResource("GradientTexture2D_b15l6")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
 position = Vector2(-0.41500115, -45.572887)
