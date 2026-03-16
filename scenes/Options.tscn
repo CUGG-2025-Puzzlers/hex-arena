@@ -51,7 +51,7 @@ theme_override_styles/separator = SubResource("StyleBoxEmpty_yjkok")
 [node name="VolumeSetting" parent="TabContainer/Audio Settings/VBoxContainer" unique_id=777530646 instance=ExtResource("1_c2u1v")]
 layout_mode = 2
 setting_name = "Master Volume"
-setting_type = 1
+setting_type = null
 
 [node name="Options" type="TabBar" parent="TabContainer" unique_id=195790346]
 visible = false
