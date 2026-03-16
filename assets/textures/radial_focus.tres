@@ -1,13 +1,13 @@
 [gd_resource type="GradientTexture2D" format=3 uid="uid://476nrrrlllvf"]
 
-[sub_resource type="Gradient" id="Gradient_oexds"]
+[sub_resource type="Gradient" id="Gradient_2x80i"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0.13656388, 0.31057268, 0.4845815, 0.66079295, 0.83920705, 1)
-colors = PackedColorArray(0.06719999, 0.9451202, 0.96, 1, 0.0156000005, 0.01750669, 0.13, 1, 1, 0, 0, 1, 0.1, 0.079, 0.087400004, 1, 0.24313726, 0.47058824, 0.078431375, 1, 0.9, 1, 1, 0)
+offsets = PackedFloat32Array(0.20044053, 0.46696034, 0.53744495, 0.72246695, 1)
+colors = PackedColorArray(0, 0, 0, 1, 1, 0.90999997, 0.90999997, 1, 0.97151434, 0.8830545, 0.883771, 1.0069975, 0.1, 0.079, 0.087400004, 1, 0.1, 0.079, 0.087400004, 0)
 metadata/_snap_count = 4
 
 [resource]
-gradient = SubResource("Gradient_oexds")
+gradient = SubResource("Gradient_2x80i")
 width = 300
 height = 300
 fill = 1

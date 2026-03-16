@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://csgewlrgl6k85" path="res://scripts/grid_outline.gd" id="3_dpxgc"]
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
-[ext_resource type="Gradient" uid="uid://cb1tfb075sncj" path="res://assets/textures/grid_gradient_texture.tres" id="4_oexds"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
 [ext_resource type="Texture2D" uid="uid://476nrrrlllvf" path="res://assets/textures/radial_focus.tres" id="5_naajo"]
 
@@ -31,10 +30,25 @@ sources/0 = SubResource("TileSetAtlasSource_wl4x5")
 
 [sub_resource type="Curve2D" id="Curve2D_eejgt"]
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_oexds"]
-gradient = ExtResource("4_oexds")
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_naajo"]
+blend_mode = 2
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oexds"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_oexds"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.13656388, 0.37444934, 1)
+colors = PackedColorArray(0.06719999, 0.9451202, 0.96, 1, 0.22199997, 0.18300001, 0.3, 0, 0.9, 1, 1, 0)
+metadata/_snap_count = 4
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_naajo"]
+gradient = SubResource("Gradient_oexds")
+width = 300
+height = 300
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.11111112)
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
 distance = -650.0
@@ -66,18 +80,23 @@ script = ExtResource("1_gubwe")
 [node name="GridOutlines" type="Node2D" parent="Path2D" unique_id=1359692291]
 
 [node name="GridOutline" type="Node2D" parent="Path2D/GridOutlines" unique_id=1303454065]
-self_modulate = Color(0.40404883, 0.40404883, 0.40404883, 1)
+self_modulate = Color(0.13333334, 0.60784316, 0.7411765, 1)
 clip_children = 2
+material = SubResource("CanvasItemMaterial_naajo")
 script = ExtResource("3_dpxgc")
-grid_gradient = SubResource("GradientTexture1D_oexds")
 
 [node name="PlayerFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1796283707]
 material = SubResource("CanvasItemMaterial_oexds")
-position = Vector2(1.5000153, -0.49977112)
-scale = Vector2(1.7766666, 1.7766666)
+scale = Vector2(1.7333333, 1.7333333)
 texture = ExtResource("5_naajo")
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/PlayerFocus" unique_id=134476722]
+
+[node name="MagicFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1473504274]
+scale = Vector2(1.7333333, 1.7333333)
+texture = SubResource("GradientTexture2D_naajo")
+
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/MagicFocus" unique_id=1128658395]
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
 texture = ExtResource("3_7ft05")

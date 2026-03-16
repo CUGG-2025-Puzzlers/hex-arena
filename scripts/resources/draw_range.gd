@@ -37,15 +37,16 @@ func draw_range(new_rad_cells):
 	radius_cells = new_rad_cells 
 	queue_redraw()
 	
-	#clip_children=CanvasItem.CLIP_CHILDREN_AND_DRAW
+	clip_children=CanvasItem.CLIP_CHILDREN_AND_DRAW
 	
-	reparent(GridOutline.player_unique_instance)
+	reparent(GridOutline.player_unique_instance.get_parent())
 	reorder()
 	
 	focus = GridOutline.player_focus.duplicate()
 	add_child(focus)
 	
-	#clip_children=CanvasItem.CLIP_CHILDREN_ONLY
+	focus.material.blend_mode = CanvasItemMaterial.BlendMode.BLEND_MODE_MUL
+	
 	
 	var remote : RemoteTransform2D = focus.get_node("RemoteTransform2D")
 	remote.reparent(player_parent.get_node("CollisionShape2D"))

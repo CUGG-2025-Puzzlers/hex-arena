@@ -60,7 +60,9 @@ func _physics_process(delta: float) -> void:
 	var temp_cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
 	if temp_cell!=cell:
 		HexCells.players_cells[player_id]=temp_cell
-		GridOutline.player_unique_instance.queue_redraw()
+		
+		# Don't call redraw from here
+		#GridOutline.player_unique_instance.queue_redraw()
 		
 		changed_cell.emit(player_id, temp_cell)
 	cell = temp_cell
