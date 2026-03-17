@@ -83,9 +83,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		var new_curr_cell = local_to_map(get_global_mouse_position())
 		
-		var vw  = local_to_vw(get_global_mouse_position())
-		vw = Vector2i(roundi(vw.x),roundi(vw.y))
-		text.text = str(new_curr_cell)+"\n"+str(vw)
+		#var vw  = local_to_vw(get_global_mouse_position())
+		#vw = Vector2i(roundi(vw.x),roundi(vw.y))
+		#text.text = str(new_curr_cell)+"\n"+str(vw)
 		if curr_cell!=new_curr_cell:
 			curr_cell = new_curr_cell
 			
@@ -296,6 +296,40 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Arra
 			extend_past_index+=1
 	return surrounding_cells
 
+func get_edge_outline_around_cells(cells: Array, return_chain : bool= true) -> Array:
+	var all_edges = []
+	var final_edges = []
+	
+	for cell_center in cells:
+		var hex_points = get_hex_points_around(cell_center)
+		for i in range(6):
+			var vert : Vector2i = local_to_vw_int(hex_points[i])
+			var next_vert: Vector2i = local_to_vw_int(hex_points[i+1])
+			if [vert,next_vert] in all_edges or [next_vert,vert] in all_edges:
+				final_edges.erase([vert,next_vert])
+				final_edges.erase([next_vert,vert])
+			else:
+				all_edges.append([vert,next_vert])
+				final_edges.append([vert,next_vert])
+	
+	var result = []
+	if return_chain:
+		var chain = [final_edges[0][0],final_edges[0][1]]
+		while chain.back()!=chain.front():
+			for edge in final_edges:
+				if edge.front()==chain.back():
+					chain.append(edge.back())
+					break
+		for i in range(len(chain)-1):
+			chain[i]=vw_to_local(chain[i])
+		chain[len(chain)-1]=chain[0]
+		return chain	
+	
+	for edge in final_edges:
+		edge = [HexCells.vw_to_local(edge[0]),HexCells.vw_to_local(edge[1])]
+		result.append(edge)
+	return result
+
 static func local_to_vw(pos: Vector2) -> Vector2:
 	var w_units : float = pos.x/w.x
 	var v_units : float = (pos.y-w.y*w_units)/v.y
@@ -304,3 +338,7 @@ static func local_to_vw(pos: Vector2) -> Vector2:
 
 static func vw_to_local(pos: Vector2) -> Vector2:
 	return pos.x*v+pos.y*w
+
+static func local_to_vw_int(pos: Vector2) -> Vector2i:
+	var vw: Vector2 = local_to_vw(pos)
+	return Vector2i(roundi(vw.x), roundi(vw.y))

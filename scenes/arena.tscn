@@ -86,6 +86,7 @@ material = SubResource("CanvasItemMaterial_naajo")
 script = ExtResource("3_dpxgc")
 
 [node name="PlayerFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1796283707]
+visible = false
 material = SubResource("CanvasItemMaterial_oexds")
 scale = Vector2(1.7333333, 1.7333333)
 texture = ExtResource("5_naajo")
@@ -93,6 +94,7 @@ texture = ExtResource("5_naajo")
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/PlayerFocus" unique_id=134476722]
 
 [node name="MagicFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1473504274]
+visible = false
 scale = Vector2(1.7333333, 1.7333333)
 texture = SubResource("GradientTexture2D_naajo")
 
@@ -109,6 +111,7 @@ scale = Vector2(1.6406251, 1.6406251)
 texture = ExtResource("4_4ag8t")
 
 [node name="Coordinates" type="Label" parent="Path2D" unique_id=1072220071]
+visible = false
 z_index = 10
 offset_right = 40.0
 offset_bottom = 23.0

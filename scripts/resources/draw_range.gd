@@ -74,10 +74,23 @@ func _draw() -> void:
 	var color: Color = Color.MAGENTA
 	if player_parent.player_id!=multiplayer.get_unique_id():
 		color = Color.TOMATO
+	
+	
+	
+	var thickness = GridOutline.player_unique_instance.grid_thickness
 	for draw_point in radius_cells:
 		var hex_points = HexCells.player_unique_instance.get_hex_points_around(draw_point)
-		var thickness = GridOutline.player_unique_instance.grid_thickness
 		draw_polyline(hex_points, color, thickness, true if thickness>0 else false)
+	
+	var chain = HexCells.player_unique_instance.get_edge_outline_around_cells(radius_cells)
+	var line: Line2D = Line2D.new()
+	add_child(line)
+	
+	line.width=thickness+1
+	line.default_color = color #Color.WHITE if color==Color.MAGENTA else Color.RED
+	for i in range(len(chain)-1):
+		line.add_point(chain[i])
+	line.closed=true
 	drawn = true
 
 func _process(delta: float) -> void:
