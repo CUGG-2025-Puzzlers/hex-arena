@@ -35,6 +35,7 @@ static var hex_polygon_shape : ConvexPolygonShape2D
 
 static var v : Vector2
 static var w : Vector2
+const hex_vw_points_around = [Vector2i.RIGHT, Vector2i.ONE, Vector2i.DOWN, Vector2i.LEFT, -Vector2i.ONE, Vector2i.UP]
 
 static var player_unique_instance : HexCells
 
@@ -210,12 +211,19 @@ func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array
 			magic_instance.start_rolling(wiggly_path_points)
 
 
-func get_hex_points_around(pos: Vector2i):
+static func get_hex_points_around(pos: Vector2i):
 	var hex_points = hex_shape.duplicate()
 	var center = map_to_local(pos)
 	
 	for k in range(len(hex_points)):
 		hex_points[k]+=center
+	return hex_points
+
+static func get_vw_points_around_vw_point(pos: Vector2i):
+	var hex_points = hex_vw_points_around.duplicate()
+	
+	for k in range(len(hex_points)):
+		hex_points[k]+=pos
 	return hex_points
 
 func local_to_map(pos: Vector2):
@@ -296,37 +304,48 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Arra
 			extend_past_index+=1
 	return surrounding_cells
 
-func get_edge_outline_around_cells(cells: Array, return_chain : bool= true) -> Array:
-	var all_edges = []
-	var final_edges = []
+static func get_edge_outline_around_cells(cells: Array, return_chain : bool= true) -> Array:
+	var edge_counts = {}
 	
 	for cell_center in cells:
-		var hex_points = get_hex_points_around(cell_center)
+		var hex_points = get_vw_points_around_vw_point(map_to_vw_int(cell_center))
 		for i in range(6):
-			var vert : Vector2i = local_to_vw_int(hex_points[i])
-			var next_vert: Vector2i = local_to_vw_int(hex_points[i+1])
-			if [vert,next_vert] in all_edges or [next_vert,vert] in all_edges:
-				final_edges.erase([vert,next_vert])
-				final_edges.erase([next_vert,vert])
+			var vert : Vector2i = hex_points[i]
+			var next_vert: Vector2i = hex_points[(i+1) % 6]
+			if edge_counts.has([vert,next_vert]):
+				edge_counts[[vert,next_vert]]+=1
+			elif edge_counts.has([next_vert, vert]):
+				edge_counts[[next_vert, vert]]+=1
 			else:
-				all_edges.append([vert,next_vert])
-				final_edges.append([vert,next_vert])
+				edge_counts[[vert,next_vert]]=1
+	
+	for edge in edge_counts.keys():
+		if edge_counts[edge]>1:
+			edge_counts.erase(edge)
+	var final_edges = edge_counts.keys()
 	
 	var result = []
-	if return_chain:
-		var chain = [final_edges[0][0],final_edges[0][1]]
-		while chain.back()!=chain.front():
+	if return_chain and not final_edges.is_empty():
+		var chain = final_edges.pop_back()
+		while not final_edges.is_empty():
+			var found_next = false
 			for edge in final_edges:
-				if edge.front()==chain.back():
-					chain.append(edge.back())
+				if chain.back() in edge:
+					for other_vert in edge:
+						if other_vert!=chain.back():
+							chain.append(other_vert)
+							break
+					final_edges.erase(edge)
+					found_next = true
 					break
-		for i in range(len(chain)-1):
+			if not found_next:
+				break
+		for i in range(len(chain)):
 			chain[i]=vw_to_local(chain[i])
-		chain[len(chain)-1]=chain[0]
-		return chain	
+		return chain
 	
 	for edge in final_edges:
-		edge = [HexCells.vw_to_local(edge[0]),HexCells.vw_to_local(edge[1])]
+		edge = [vw_to_local(edge[0]),vw_to_local(edge[1])]
 		result.append(edge)
 	return result
 
@@ -342,3 +361,10 @@ static func vw_to_local(pos: Vector2) -> Vector2:
 static func local_to_vw_int(pos: Vector2) -> Vector2i:
 	var vw: Vector2 = local_to_vw(pos)
 	return Vector2i(roundi(vw.x), roundi(vw.y))
+
+static func map_to_vw_int(center: Vector2i)->Vector2i:
+	return Vector2i(int(center.x-1.5*center.y+0.5*posmod(center.y,2)),int(2*center.x+posmod(center.y,2)))
+static func vw_to_map_int(pos: Vector2i)->Vector2i:
+	var x = floori(pos.y/2.)
+	var y = int((x-pos.x+0.5*posmod(pos.y,2))*2/3)
+	return Vector2i(x,y)

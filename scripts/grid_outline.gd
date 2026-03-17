@@ -48,7 +48,7 @@ func recalculate():
 	
 	hex_outlines = []
 	for center in hex_centers:
-		var hex_points = HexCells.player_unique_instance.get_hex_points_around(center)
+		var hex_points = HexCells.get_hex_points_around(center)
 		hex_outlines.append(hex_points)
 	
 	queue_redraw()

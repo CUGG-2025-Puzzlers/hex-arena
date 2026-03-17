@@ -12,6 +12,8 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if other_player == this_player:
+		if get_parent() is not CharacterBody2D:
+			return
 		for player in get_parent().get_parent().get_children():
 			if player!=this_player:
 				other_player=player

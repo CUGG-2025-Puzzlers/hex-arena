@@ -46,12 +46,12 @@ signal fizzling
 @onready var player_id : int = multiplayer.get_unique_id()
 
 func _ready() -> void:
-	var cell_dict : Dictionary = HexCells.player_unique_instance.cell_dict
+	var cell_dict : Dictionary = HexCells.cell_dict
 
 	if cell_dict.has(self_cell) and is_instance_valid(cell_dict[self_cell]) and cell_dict[self_cell]!=self:
 		cell_dict[self_cell].queue_free()
-	else:
-		HexCells.player_unique_instance.cell_dict[self_cell]=self
+	HexCells.cell_dict[self_cell]=self
+	
 	animated_children = find_children("ChildLight*", "Sprite2D")
 	
 	var magic_focus = GridOutline.magic_focus.duplicate()
