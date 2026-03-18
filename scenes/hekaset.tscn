@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_hkro6"]
 [ext_resource type="Texture2D" uid="uid://cuk2faeygjffr" path="res://assets/textures/sprite_sheet 3.png" id="3_dmjat"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="4_uajpi"]
+[ext_resource type="Texture2D" uid="uid://chd6p47nstr1y" path="res://assets/textures/white_stripes.tres" id="7_dmjat"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="7_n5ll0"]
 [ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="8_b15l6"]
 [ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/resources/draw_range.gd" id="9_sniku"]
@@ -299,6 +300,9 @@ scale_min = 2.0
 scale_max = 4.0
 color = Color(0.959805, 0.99, 0.3861, 1)
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_b15l6"]
+blend_mode = 1
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dmjat"]
 height = 62.0
 
@@ -375,6 +379,13 @@ process_material = SubResource("ParticleProcessMaterial_fjrip")
 
 [node name="Drawing range" type="Node2D" parent="." unique_id=771124319]
 script = ExtResource("9_sniku")
+
+[node name="RangeOutline" type="Line2D" parent="Drawing range" unique_id=1163454997]
+material = SubResource("CanvasItemMaterial_b15l6")
+points = PackedVector2Array(27, -22, 55, 5, -2, 35, -37, 13, -35, -12, -1, -25)
+closed = true
+texture = ExtResource("7_dmjat")
+texture_mode = 2
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
 

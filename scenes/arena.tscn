@@ -86,7 +86,6 @@ material = SubResource("CanvasItemMaterial_naajo")
 script = ExtResource("3_dpxgc")
 
 [node name="PlayerFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1796283707]
-visible = false
 material = SubResource("CanvasItemMaterial_oexds")
 scale = Vector2(1.7333333, 1.7333333)
 texture = ExtResource("5_naajo")
@@ -94,11 +93,14 @@ texture = ExtResource("5_naajo")
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/PlayerFocus" unique_id=134476722]
 
 [node name="MagicFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1473504274]
-visible = false
 scale = Vector2(1.7333333, 1.7333333)
 texture = SubResource("GradientTexture2D_naajo")
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/MagicFocus" unique_id=1128658395]
+
+[node name="RangeOutlines" type="Node2D" parent="Path2D/GridOutlines" unique_id=157620490]
+
+[node name="RangePerimeters" type="Node2D" parent="Path2D/GridOutlines" unique_id=1758316852]
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
 texture = ExtResource("3_7ft05")

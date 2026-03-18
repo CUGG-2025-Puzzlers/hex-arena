@@ -1,0 +1,14 @@
+[gd_resource type="GradientTexture2D" format=3 uid="uid://chd6p47nstr1y"]
+
+[sub_resource type="Gradient" id="Gradient_fjrip"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.25, 0.5)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+metadata/_snap_enabled = true
+metadata/_snap_count = 4
+
+[resource]
+gradient = SubResource("Gradient_fjrip")
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0.9)
+repeat = 1

@@ -7,11 +7,14 @@ var drawn = false
 
 var focus: Sprite2D
 
-@export var animation_full_time_mean : float = 5.
+@export var animation_full_time_mean : float = 10.
 var animation_timer: float = 0.
 @onready var animation_full_time: float  = animation_full_time_mean
 
 @onready var player_parent : CharacterBody2D = get_parent()
+
+var outline_gradient: GradientTexture2D
+@onready var line: Line2D = $RangeOutline
 
 func _ready() -> void:
 	player_parent.changed_cell.connect(move_cell)
@@ -23,24 +26,29 @@ func move_cell(_player_ind:int, new_cell: Vector2i):
 	
 	cell=new_cell
 	global_position=HexCells.map_to_local(cell)
+	line.global_position=global_position
 	
 	# Comment out if it becomes too much with > 2 players
 	reorder()
 
 func reorder():
-	if player_parent.player_id!=multiplayer.get_unique_id() \
-	and get_parent().get_child_count()>1:
-		get_parent().move_child(self,-2)
+	if player_parent.player_id!=multiplayer.get_unique_id():
+		if get_parent().get_child_count()>1:
+			get_parent().move_child(self,-2)
+		if line.get_parent().get_child_count()>1:
+			line.get_parent().move_child(line,-2)
 
 func draw_range(new_rad_cells):
 	global_position = Vector2.ZERO
 	radius_cells = new_rad_cells 
 	queue_redraw()
 	
-	clip_children=CanvasItem.CLIP_CHILDREN_AND_DRAW
-	
-	reparent(GridOutline.player_unique_instance.get_parent())
+	reparent(GridOutline.player_unique_instance.get_node("../RangeOutlines"))
+	line.reparent(GridOutline.player_unique_instance.get_node("../RangePerimeters"))
 	reorder()
+	
+	clip_children=CanvasItem.CLIP_CHILDREN_AND_DRAW
+	animation_timer=randf()
 	
 	focus = GridOutline.player_focus.duplicate()
 	add_child(focus)
@@ -83,14 +91,16 @@ func _draw() -> void:
 		draw_polyline(hex_points, color, thickness, true if thickness>0 else false)
 	
 	var chain = HexCells.get_edge_outline_around_cells(radius_cells)
-	var line: Line2D = Line2D.new()
-	add_child(line)
 	
-	line.width=thickness
+	
+	#line.width=thickness*2
 	line.default_color = color #Color.WHITE if color==Color.MAGENTA else Color.RED
+	line.clear_points()
 	for i in range(len(chain)-1):
 		line.add_point(chain[i])
-	line.closed=true
+	outline_gradient = line.texture.duplicate()
+	line.texture = outline_gradient
+	
 	drawn = true
 
 func _process(delta: float) -> void:
@@ -99,4 +109,6 @@ func _process(delta: float) -> void:
 		animation_timer=fmod(animation_timer,1)
 		animation_full_time=(abs(randfn(0.3,0.3))+0.7)*animation_full_time_mean
 	
+	if drawn:
+		outline_gradient.fill_to=0.5*Vector2.ONE+0.4*Vector2.RIGHT.rotated(animation_timer*2*PI)
 	#focus.self_modulate.a=lerpf(0.3,0.75, 0.5*cos(2*PI*animation_timer)+0.5)
