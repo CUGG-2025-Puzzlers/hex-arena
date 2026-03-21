@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
+[ext_resource type="Script" uid="uid://2b4sc33k36r3" path="res://scripts/grid_outline_template.gd" id="5_41jku"]
 [ext_resource type="Texture2D" uid="uid://476nrrrlllvf" path="res://assets/textures/radial_focus.tres" id="5_naajo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
@@ -86,17 +87,25 @@ material = SubResource("CanvasItemMaterial_naajo")
 script = ExtResource("3_dpxgc")
 
 [node name="PlayerFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1796283707]
+visible = false
 material = SubResource("CanvasItemMaterial_oexds")
 scale = Vector2(1.7333333, 1.7333333)
 texture = ExtResource("5_naajo")
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/PlayerFocus" unique_id=134476722]
+remote_path = NodePath("..")
 
 [node name="MagicFocus" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1473504274]
+visible = false
 scale = Vector2(1.7333333, 1.7333333)
 texture = SubResource("GradientTexture2D_naajo")
 
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/MagicFocus" unique_id=1128658395]
+remote_path = NodePath("..")
+
+[node name="MagicOutlines" type="Node2D" parent="Path2D/GridOutlines" unique_id=1561052985]
+clip_children = 1
+script = ExtResource("5_41jku")
 
 [node name="RangeOutlines" type="Node2D" parent="Path2D/GridOutlines" unique_id=157620490]
 

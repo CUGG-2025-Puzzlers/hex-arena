@@ -55,7 +55,7 @@ func _ready() -> void:
 	animated_children = find_children("ChildLight*", "Sprite2D")
 	
 	var magic_focus = GridOutline.magic_focus.duplicate()
-	GridOutline.player_unique_instance.add_child(magic_focus)
+	GridOutline.player_unique_instance.get_node("../MagicOutlines").add_child(magic_focus)
 	magic_focus.global_position=global_position
 	magic_focus.visible=true
 	fizzling.connect(magic_focus.queue_free)

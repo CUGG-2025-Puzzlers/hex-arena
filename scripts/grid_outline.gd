@@ -31,6 +31,8 @@ static var magic_focus: Sprite2D
 @onready var animation_full_time : float = animation_full_time_mean
 var animation_timer : float = 0.
 
+signal redrawn
+
 func _ready() -> void:
 	player_unique_instance=self
 	
@@ -141,6 +143,8 @@ func _draw() -> void:
 		hex_points = get_hex_points_around(cell)
 		draw_polyline(hex_points, Color.MAGENTA)
 	"""
+	
+	redrawn.emit()
 
 func _process(delta: float) -> void:
 	animation_timer+=delta/animation_full_time
