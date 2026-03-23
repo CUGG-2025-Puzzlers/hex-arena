@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_smehm"]
 [ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="5_qlg0r"]
-[ext_resource type="Texture2D" uid="uid://chd6p47nstr1y" path="res://assets/textures/white_stripes.tres" id="6_smehm"]
+[ext_resource type="PackedScene" uid="uid://cub773k4uxu8h" path="res://scenes/cells_bold_outline.tscn" id="6_smehm"]
 [ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="7_fjrip"]
 [ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/resources/draw_range.gd" id="9_ur7pv"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="9_y4r1p"]
@@ -614,8 +614,18 @@ scale_min = 2.0
 scale_max = 4.0
 color = Color(0.959805, 0.99, 0.3861, 1)
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_fjrip"]
-blend_mode = 1
+[sub_resource type="Gradient" id="Gradient_fjrip"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.25, 0.5)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+metadata/_snap_enabled = true
+metadata/_snap_count = 4
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ur7pv"]
+gradient = SubResource("Gradient_fjrip")
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.34588552, 0.86911887)
+repeat = 1
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_smehm"]
 radius = 16.0
@@ -695,12 +705,8 @@ process_material = SubResource("ParticleProcessMaterial_fjrip")
 [node name="Drawing range" type="Node2D" parent="." unique_id=771124319]
 script = ExtResource("9_ur7pv")
 
-[node name="RangeOutline" type="Line2D" parent="Drawing range" unique_id=844289985]
-material = SubResource("CanvasItemMaterial_fjrip")
-points = PackedVector2Array(27, -22, 55, 5, -2, 35, -37, 13, -35, -12, -1, -25)
-closed = true
-texture = ExtResource("6_smehm")
-texture_mode = 2
+[node name="RangeOutline" parent="Drawing range" unique_id=1250776310 instance=ExtResource("6_smehm")]
+texture = SubResource("GradientTexture2D_ur7pv")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=769280904]
 

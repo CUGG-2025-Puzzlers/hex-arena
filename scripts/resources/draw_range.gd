@@ -13,7 +13,6 @@ var animation_timer: float = 0.
 
 @onready var player_parent : CharacterBody2D = get_parent()
 
-var outline_gradient: GradientTexture2D
 @onready var line: Line2D = $RangeOutline
 
 func _ready() -> void:
@@ -88,18 +87,12 @@ func _draw() -> void:
 	var thickness = GridOutline.player_unique_instance.grid_thickness
 	for draw_point in radius_cells:
 		var hex_points = HexCells.get_hex_points_around(draw_point)
-		draw_polyline(hex_points, color, thickness, true if thickness>0 else false)
-	
-	var chain = HexCells.get_edge_outline_around_cells(radius_cells)
+		draw_polyline(hex_points, color, thickness, thickness>0)
 	
 	
 	#line.width=thickness*2
 	line.default_color = color #Color.WHITE if color==Color.MAGENTA else Color.RED
-	line.clear_points()
-	for i in range(len(chain)-1):
-		line.add_point(chain[i])
-	outline_gradient = line.texture.duplicate()
-	line.texture = outline_gradient
+	line.recalculate(radius_cells)
 	
 	drawn = true
 
@@ -109,6 +102,4 @@ func _process(delta: float) -> void:
 		animation_timer=fmod(animation_timer,1)
 		animation_full_time=(abs(randfn(0.3,0.3))+0.7)*animation_full_time_mean
 	
-	if drawn:
-		outline_gradient.fill_to=0.5*Vector2.ONE+0.4*Vector2.RIGHT.rotated(animation_timer*2*PI)
 	#focus.self_modulate.a=lerpf(0.3,0.75, 0.5*cos(2*PI*animation_timer)+0.5)
