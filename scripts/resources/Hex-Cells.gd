@@ -198,6 +198,7 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 		Magic.last_placed_cell=cell
 		get_node("LastMagic").global_position=map_to_local(cell)
 		get_node("LastMagic").visible = true
+		get_node("LastMagic").reset_timer(cell)
 		
 		var player_stats: StatsComponent = get_node("../Players/"+str(player_id)+"/StatsComponent")
 		player_stats.use_mana(Magic.cost[Magic.MagicType.NEUTRAL])

@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
 [ext_resource type="Script" uid="uid://2b4sc33k36r3" path="res://scripts/grid_outline_template.gd" id="5_41jku"]
 [ext_resource type="Texture2D" uid="uid://476nrrrlllvf" path="res://assets/textures/radial_focus.tres" id="5_naajo"]
+[ext_resource type="Script" uid="uid://bcdryxfbd8jy7" path="res://scripts/last_magic_direction.gd" id="8_41jku"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_wl4x5")
@@ -50,6 +51,14 @@ height = 300
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.11111112)
+
+[sub_resource type="Gradient" id="Gradient_naajo"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_41jku"]
+gradient = SubResource("Gradient_naajo")
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 1)
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
 distance = -650.0
@@ -103,6 +112,13 @@ texture = SubResource("GradientTexture2D_naajo")
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Path2D/GridOutlines/GridOutline/MagicFocus" unique_id=1128658395]
 remote_path = NodePath("..")
 
+[node name="Window" type="Sprite2D" parent="Path2D/GridOutlines/GridOutline" unique_id=1034147830]
+visible = false
+texture_repeat = 2
+position = Vector2(1, -1)
+scale = Vector2(2.515625, 1)
+texture = SubResource("GradientTexture2D_41jku")
+
 [node name="MagicOutlines" type="Node2D" parent="Path2D/GridOutlines" unique_id=1561052985]
 clip_children = 1
 script = ExtResource("5_41jku")
@@ -115,11 +131,12 @@ script = ExtResource("5_41jku")
 texture = ExtResource("3_7ft05")
 
 [node name="LastMagic" type="Sprite2D" parent="Path2D" unique_id=1268473399]
-visible = false
 modulate = Color(0.5019608, 0.5019608, 0.5019608, 1)
 show_behind_parent = true
+position = Vector2(0, -180)
 scale = Vector2(1.6406251, 1.6406251)
 texture = ExtResource("4_4ag8t")
+script = ExtResource("8_41jku")
 
 [node name="Coordinates" type="Label" parent="Path2D" unique_id=1072220071]
 visible = false

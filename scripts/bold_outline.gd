@@ -1,4 +1,4 @@
-@tool
+#@tool
 extends Line2D
 
 @export var animation_full_time_mean : float = 10.

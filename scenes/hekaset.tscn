@@ -300,19 +300,6 @@ scale_min = 2.0
 scale_max = 4.0
 color = Color(0.959805, 0.99, 0.3861, 1)
 
-[sub_resource type="Gradient" id="Gradient_fjrip"]
-interpolation_mode = 1
-offsets = PackedFloat32Array(0.25, 0.5)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
-metadata/_snap_enabled = true
-metadata/_snap_count = 4
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_hkro6"]
-gradient = SubResource("Gradient_fjrip")
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.47332513, 0.10089043)
-repeat = 1
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dmjat"]
 height = 62.0
 
@@ -391,7 +378,6 @@ process_material = SubResource("ParticleProcessMaterial_fjrip")
 script = ExtResource("9_sniku")
 
 [node name="RangeOutline" parent="Drawing range" unique_id=1250776310 instance=ExtResource("7_dmjat")]
-texture = SubResource("GradientTexture2D_hkro6")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
 
