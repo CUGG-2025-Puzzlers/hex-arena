@@ -6,6 +6,17 @@ var state = MagicType.NEUTRAL
 
 static var last_placed_cell : Vector2i
 
+# Hard enable/disable randomness for path generation
+const RANDOM_PATHS = true
+# Set between 1 (fully random) and 0 (fully corrected with snapping)
+static var path_randomness_ratio : float = 0.4
+
+static var cost = {
+	MagicType.NEUTRAL: 5,
+	MagicType.LIGHT: 5,
+	MagicType.HEAVY: 10,
+	MagicType.SHIELD: 5, }
+
 const BULLET_SPEED : float = 450
 const BULLET_DISTANCE : float = 800
 
@@ -28,61 +39,84 @@ var shield_animated_texture : GradientTexture2D
 
 var points =[]
 
-func _ready() -> void:
-	animated_children = find_children("ChildLight*", "Sprite2D")
+var screen : Rect2
 
-func _unhandled_key_input(_event: InputEvent) -> void:
+@onready var player_id : int = multiplayer.get_unique_id()
+
+func _ready() -> void:
+	var cell_dict : Dictionary = HexCells.player_unique_instance.cell_dict
+
+	if cell_dict.has(self_cell) and is_instance_valid(cell_dict[self_cell]) and cell_dict[self_cell]!=self:
+		cell_dict[self_cell].queue_free()
+	else:
+		HexCells.player_unique_instance.cell_dict[self_cell]=self
+	animated_children = find_children("ChildLight*", "Sprite2D")
+	
+	screen.size = Vector2(HexCells.player_unique_instance.width,HexCells.player_unique_instance.height)
+	screen.size*=1.33
+	screen.position=-0.5*screen.size
+
+
+func start_rolling(wiggly_path: PackedVector2Array):
+	match state:
+		MagicType.LIGHT:
+			roll_speed = BULLET_SPEED*1.2
+		MagicType.HEAVY:
+			roll_speed = BULLET_SPEED*0.6
+		_:
+			return
+	
+	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
+		HexCells.cell_dict[self_cell] = null
+	
 	if rolling:
 		return
 	
-	if Input.is_action_just_pressed("fire_magic"):
-		if state in [MagicType.LIGHT, MagicType.HEAVY] and last_placed_cell!=HexCells.curr_cell:
-			var dir :Vector2 = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(last_placed_cell)
-			dir = dir.normalized()
-			
-			rolling_dir = dir
-			match state:
-				MagicType.LIGHT:
-					roll_speed = BULLET_SPEED*1.2
-				MagicType.HEAVY:
-					roll_speed = BULLET_SPEED*0.6
-
-			if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
-				HexCells.cell_dict[self_cell] = null
-			
-			get_node("VisibleOnScreenNotifier2D").screen_exited.connect(fizzle)
-			rolling = true
-			#instantiate_pellet(dir)
+	var trajectory: Path2D = Path2D.new()
+	trajectory.curve = Curve2D.new()
+	for point in wiggly_path:
+		trajectory.curve.add_point(point)
 	
-	if state==MagicType.NEUTRAL:
-		var possible_states = []
-		if Input.is_action_just_pressed("turn_pure_to_heavy"):
-			possible_states.append(MagicType.HEAVY)
-		if Input.is_action_just_pressed("turn_pure_to_light"):
-			possible_states.append(MagicType.LIGHT)
-		if Input.is_action_just_pressed("turn_pure_to_shield"):
-			possible_states.append(MagicType.SHIELD)
-		if not possible_states.is_empty():
-			state = possible_states.pick_random()
-			change_state()
+	rolling_pathfollow = PathFollow2D.new()
+	rolling_pathfollow.loop = false
+	rolling_pathfollow.rotates = false
+	
+	trajectory.global_position=global_position
+	
+	get_tree().current_scene.add_child(trajectory)
+	trajectory.add_child(rolling_pathfollow)
+	reparent(rolling_pathfollow)
+	
+	if state==MagicType.LIGHT:
+		rotation = (wiggly_path[len(wiggly_path)-1]-wiggly_path[0]).angle()
+	
+	rolling = true
 
-func change_state():
+func change_state(new_state: MagicType):
+	state = new_state
 	match state:
 		MagicType.NEUTRAL:
 			modulate=Color.WHITE
 			health = 25
 			damage = 0
 		MagicType.LIGHT:
-			modulate=Color.BLUE
-			health = 50
-			damage = 50
+			#modulate=Color.BLUE
+			health = 30
+			damage = 40
+			
+			animated_sprite.visible = false
+			
+			var arrow_particles : Node2D = get_node("ArrowParticles")
+			arrow_particles.visible = true
+			arrow_particles.rotation = rolling_dir.angle()
+			#arrow_particles.scale *= 4
 		MagicType.HEAVY:
 			#modulate=Color.CRIMSON
-			health = 200
+			health = 40
 			damage = 100
 			
 			animated_sprite.visible = false
-			animated_sprite =	get_node("EyeSprite")
+			animated_sprite = get_node("EyeSprite")
 			animated_sprite.visible = true
 			animated_sprite.scale = Vector2.ONE*randf_range(0.2,0.3)
 			animated_sprite.rotation=randf()*2*PI
@@ -100,17 +134,35 @@ func change_state():
 			
 		MagicType.SHIELD:
 			#modulate=Color.WEB_PURPLE
-			health = 100
-			damage = 100
+			health = 80
+			damage = 30
 			
 			animation_total_times[0] = 5
+			
 			shield_animated_texture = find_child("Shield Glow").texture.duplicate()
 			find_child("Shield Glow").texture = shield_animated_texture
+			
+			if player_id!=multiplayer.get_unique_id():
+				var pattern: Polygon2D = find_child("Shield Pattern")
+				var glow: Polygon2D = find_child("Shield Glow")
+				
+				var temp = pattern.texture
+				pattern.texture = glow.texture
+				glow.texture=temp
+			
 			visualize_shield()
 			scale = 0.9*Vector2.ONE
 			var coll_shape :CollisionShape2D = get_node("CollisionShape2D")
-			coll_shape.shape =	HexCells.hex_polygon_shape
-
+			coll_shape.shape = HexCells.hex_polygon_shape
+			get_node("StaticBody2D").add_child(coll_shape.duplicate())
+			
+			var timer := Timer.new()
+			timer.wait_time = 5.0
+			timer.one_shot = true
+			add_child(timer)
+			timer.timeout.connect(func(): fizzle())  # or: timer.timeout.connect(fizzle)
+			timer.start()
+			
 func _process(delta: float) -> void:
 	for i in range(len(animation_timers)):
 		animation_timers[i]+=randfn(delta/animation_total_times[i],delta/animation_total_times[i]*0.3)#+randfn(0,animation_timers[i]/3.)
@@ -129,32 +181,36 @@ func _process(delta: float) -> void:
 			animated_children[0].position = Vector2.RIGHT.rotated(2*PI*animation_timers[0])*20
 			animated_sprite.position = Vector2.UP*sin(animation_timers[1]*2*PI)*6
 			#animated_children[1].position = Vector2.RIGHT.rotated(-2*PI*animation_timer*3)*150
+		MagicType.LIGHT:
+			var dir : Vector2 = rolling_dir
+			if not rolling:
+				#dir = (get_global_mouse_position()-global_position).normalized()
+				dir = HexCells.map_to_local(HexCells.curr_cell)-HexCells.map_to_local(last_placed_cell)
+				dir = dir.normalized()
+				if dir == Vector2.ZERO:
+					dir = Vector2.UP
+			get_node("ArrowParticles").rotation = dir.angle()
 	
 	if rolling:
-		if not is_instance_valid(rolling_pathfollow):
-			var trajectory : Path2D = Path2D.new()
-			match state:
-				MagicType.HEAVY:
-					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(1,2))
-				MagicType.LIGHT:
-					trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
-			
-			
-			rolling_pathfollow = PathFollow2D.new()
-			rolling_pathfollow.loop = false
-			rolling_pathfollow.rotates = false
-			trajectory.global_position=global_position
-			get_tree().current_scene.add_child(trajectory)
-			trajectory.add_child(rolling_pathfollow)
-			reparent(rolling_pathfollow)
-		else:
+		if is_instance_valid(rolling_pathfollow):
 			rolling_pathfollow.progress+=roll_speed*delta
-			rotation = 2*PI*rolling_pathfollow.progress_ratio
+			if state == MagicType.HEAVY:
+				rotation = 2*PI*rolling_pathfollow.progress_ratio
 			if rolling_pathfollow.progress_ratio>=1:
+				
 				var trajectory = rolling_pathfollow.get_parent()
-				reparent(trajectory.get_parent())
-				rolling_pathfollow.queue_free()
-				trajectory.queue_free()
+				trajectory.global_position=global_position
+				rolling_pathfollow.progress_ratio = 0
+				"""
+				match state:
+					MagicType.HEAVY:
+						trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(1,2))
+					MagicType.LIGHT:
+						trajectory.curve = create_wiggly_path(rolling_dir, BULLET_DISTANCE*randf_range(0.5,1))
+				"""
+		if not screen.has_point(global_position):
+			fizzle()
+			
 	#advance_child_pellets(delta)
 
 func instantiate_pellet(dir: Vector2) -> void:
@@ -162,78 +218,129 @@ func instantiate_pellet(dir: Vector2) -> void:
 	var trajectory: Path2D = Path2D.new()
 	pellet_instance.get_node("VisibleOnScreenNotifier2D")\
 	.screen_exited.connect(trajectory.queue_free)
-			
-	trajectory.curve = create_wiggly_path(dir, BULLET_DISTANCE)
+	
+	trajectory.curve = Curve2D.new()
+	for point in create_wiggly_path(dir, BULLET_DISTANCE):
+		trajectory.curve.add_point(point)
+	#trajectory.curve = create_wiggly_path(dir, BULLET_DISTANCE)
 	add_child(trajectory)
 	trajectory.add_child(pellet_instance)
 
+# Advances pellets along their path
+# Destroys any paths that are completed
 func advance_child_pellets(delta: float) -> void:
-	if get_child_count()==0:
+	if get_child_count() == 0:
 		return
-	#print(get_child_count())
+	
 	var finished_paths = []
 	for child_path in get_children():
+		# Skip non-Path2D children
 		if not is_instance_valid(child_path) or child_path is not Path2D:
 			continue
-		if child_path.get_child_count()==0:
+		
+		# Path has no children, mark it as finished and continue to next path
+		if child_path.get_child_count() == 0:
 			finished_paths.append(child_path)
 			continue
+		
+		# Path has invalid children, mark it as finished and continue to next path
 		var pellet: PathFollow2D = child_path.get_child(0)
 		if not is_instance_valid(pellet):
 			finished_paths.append(child_path)
 			continue
+		
+		# Advance pellet and mark path as finished if pellet progress ratio decreased
 		var temp = pellet.progress_ratio
-		pellet.progress+=BULLET_SPEED*delta
-		if pellet.progress_ratio<temp:
+		pellet.progress += BULLET_SPEED * delta
+		if pellet.progress_ratio < temp:
 			finished_paths.append(child_path)
+	
+	# Destroy finished paths
 	for child_path in finished_paths:
 		child_path.queue_free()
 
-func create_wiggly_path(dir: Vector2, dist: float) -> Curve2D:
-	var path = Curve2D.new() 
+# Creates a path to (dir * dist) with random deviations
+static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
+	var path : PackedVector2Array = []
 	
-	path.add_point(Vector2.ZERO)
+	path.append(Vector2.ZERO)
 	var last_point: Vector2 = Vector2.ZERO
-	var extra_points = randi_range(1,39)
-	var progress = 0.;
+	var extra_points: int = 0
 	
-	for i in range(extra_points):
-		var temp = progress
-		progress+=(1-progress)*1./(randf_range(1,extra_points-i))*clampf(abs(randfn(0,0.2)),0,1)
-		if progress>=1:
+	if RANDOM_PATHS:
+		extra_points = randi_range(1,39)
+	
+	var progress: float = 0;
+	
+	for i in range(extra_points, 0, -1):
+		# Progress by a random amount of the remaining progress
+		var rand: float = clampf(abs(randfn(0, 0.2)), 0,1) / randf_range(1, i)
+		var diff: float = (1 - progress) * rand
+		progress += diff
+		
+		# Stop adding extra points after reaching 100% progress
+		if progress >= 1:
 			break
-		var next_point = last_point + (dir*dist-last_point)\
-		.rotated(randfn(0,PI/lerpf(30,6,progress-temp)))*(progress-temp)/(1.-temp)
-		var other_option = dir.rotated(randfn(0,PI/lerpf(100,10,progress-temp)))*dist*progress
-		next_point = abs(randfn(0.,0.05))*(other_option-next_point)+next_point
-		path.add_point(next_point)
+		
+		# Get a randomly rotated remaining distance vector
+		# Next point is the last point plus the random amount of the rotated remainder 
+		var rand_rot: float = randfn(0, PI / lerpf(30, 6, diff))
+		var rotated_remaining: Vector2 = (dir * dist - last_point).rotated(rand_rot)
+		var next_point: Vector2 = last_point + rotated_remaining * rand
+		
+		# Get a randomly rotated current progress vector
+		# Nudge the next point slightly in the direction of the rotated progress
+		rand_rot = randfn(0, PI / lerpf(100, 10, diff))
+		var rotated_cur_progress: Vector2 = dir.rotated(rand_rot) * dist * progress
+		next_point += abs(randfn(0, 0.05)) * (rotated_cur_progress - next_point)
+		
+		# Interpolate between offset and straightened next point
+		next_point = (1.-path_randomness_ratio) * ((next_point-path[0]).project(dir)+path[0]-next_point)+next_point
+		
+		path.append(next_point)
 		last_point = next_point
 	
-	path.add_point(dir*dist)
+	path.append(dir * dist)
 	return path
 
-
+# Take damage when colliding with other magic
 func _on_area_entered(area: Area2D) -> void:
-	if area.is_in_group('magic'):
-		#if area.state==state:
-		#	print('jinx -- bumped into same kind of magic')
-		take_damage(area.damage)
-		#if area.state==MagicType.SHIELD and state<MagicType.HEAVY:
-		#	fizzle()
-		#else:
-		#	take_damage(area.damage)
+	if not area.is_in_group('magic') or \
+	area.player_id==player_id and not \
+	(area.state==MagicType.SHIELD or state ==MagicType.SHIELD):
+		return
+	
+	take_damage(area.damage)
+	
+	#what is this force fizzle lol, commented out...
+	#if state!=MagicType.SHIELD and area.state in [MagicType.SHIELD, MagicType.HEAVY]:
+	#	fizzle()
 
+# Decreases this magic object's health
+# Destroys it if no health remains
 func take_damage(damage_to_take: float):
-	health-=damage_to_take
-	if health<=0:
+	health -= damage_to_take
+	
+	if health <= 0:
 		fizzle()
 
+# Destroys this object and its associated path
 func fizzle():
+	if is_queued_for_deletion() or not is_inside_tree():
+		return
+	
+	if is_instance_valid(get_tree()) and is_instance_valid(get_tree().current_scene):
+		var magic_particles_instance = get_node("CPUParticles2D")
+		magic_particles_instance.reparent(get_tree().current_scene)
+		magic_particles_instance.finished.connect(magic_particles_instance.queue_free)
+		magic_particles_instance.restart()
+	
 	if is_instance_valid(rolling_pathfollow):
-			if rolling_pathfollow.get_parent() is Path2D:
-				rolling_pathfollow.get_parent().queue_free()
-			else:
-				rolling_pathfollow.queue_free()
+		if rolling_pathfollow.get_parent() is Path2D:
+			rolling_pathfollow.get_parent().queue_free()
+		else:
+			rolling_pathfollow.queue_free()
+	
 	queue_free()
 
 func visualize_shield():
@@ -256,27 +363,43 @@ func visualize_shield():
 		#polygon.texture_rotation=randfn(PI*randi_range(0,5)/3,PI*0.05)
 	
 		polygon.visible=true
+	
 	get_node("Sprite2D").visible = false
 
-
 func _draw() -> void:
-	if not points.is_empty():
-		var fill_prog = 0.5*(cos(2*PI*animation_timers[0])+1)
+	if state == MagicType.HEAVY:
+		if points.is_empty():
+			return
 		
-		draw_circle(Vector2.ZERO, lerpf(15.5,17,fill_prog), Color.RED)
-		for i in range(len(points)):
-			var point = points[i]*0.5*(cos(2*PI*animation_timers[i+1])+1)
-			var tri = [point*2.5]
-			tri.append(point-point.rotated(PI/12))
-			tri.append(point-point.rotated(-PI/12))
-			tri.append(point*2.5)
-			draw_polygon(tri,[Color.RED])
+		_draw_heavy()
+
+# Draws the heavy magic red and white texture
+func _draw_heavy():
+	var fill_prog: float  = 0.5 * (cos(2 * PI * animation_timers[0]) + 1)
+	
+	draw_circle(Vector2.ZERO, lerpf(15.5, 17, fill_prog), Color.RED)
+	draw_circle(Vector2.ZERO, lerpf(12, 15, fill_prog), Color.WHITE)
+	
+	var scaled_points = points.duplicate()
+	for i in range(len(points)):
+		scaled_points[i] *= 0.5 * (cos(2 * PI * animation_timers[i + 1]) + 1)
+		var point: Vector2 = scaled_points[i]
+		var start: Vector2 = point * 2.5
+		var angle: float = PI / 12
+		_draw_tri(point, start, angle, Color.RED)
+	
+	for i in range(len(points)):
+		var point: Vector2 = scaled_points[i]
+		var start: Vector2 = point * lerpf(1.5, 2, fill_prog)
+		var angle: float = PI / lerpf(12, 20, fill_prog)
 		
-		draw_circle(Vector2.ZERO, lerpf(12,15,fill_prog), Color.WHITE)
-		for i in range(len(points)):
-			var point = points[i]*0.5*(cos(2*PI*animation_timers[i+1])+1)
-			var tri = [point*lerpf(1.5,2,fill_prog)]
-			tri.append(point-point.rotated(PI/lerpf(12,20,fill_prog)))
-			tri.append(point-point.rotated(-PI/lerpf(12,20,fill_prog)))
-			tri.append(point*lerpf(1.5,2,fill_prog))
-			draw_polygon(tri,[Color.WHITE])
+		_draw_tri(point, start, angle, Color.WHITE)
+
+# Draws a triangle based on a point, a scaled version of that point, and an angle
+# Fills the triangle with the given color
+func _draw_tri(point: Vector2, scaled_point: Vector2, angle: float, color: Color):
+	var tri = [scaled_point]
+	tri.append(point - point.rotated(angle))
+	tri.append(point - point.rotated(-angle))
+	tri.append(scaled_point)
+	draw_polygon(tri, [color])

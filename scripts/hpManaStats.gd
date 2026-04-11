@@ -17,10 +17,8 @@ var current_mana : float
 func _ready() -> void:
 	current_health = max_health
 	current_mana = max_mana
-	health_changed.emit(current_health, max_health)
-	mana_changed.emit(current_mana, max_mana)
 	
-#########Health
+#==================== Health =====================
 func take_damage(amount: float) -> void:
 	set_health(current_health - amount)
 	if current_health <= 0.0:
@@ -33,7 +31,7 @@ func set_health(value: float) -> void:
 	current_health = clampf(value, 0.0, max_health)
 	health_changed.emit(current_health, max_health)
 
-##########Mana
+#==================== Mana =====================
 func use_mana(amount: float) -> bool:
 	if current_mana < amount:
 		return false

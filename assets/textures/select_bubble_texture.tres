@@ -1,0 +1,13 @@
+[gd_resource type="GradientTexture2D" format=3 uid="uid://bnv70x432w8c1"]
+
+[sub_resource type="Gradient" id="Gradient_xdvfk"]
+offsets = PackedFloat32Array(0.659306, 0.7302839, 0.78864354)
+colors = PackedColorArray(0.56, 0.067200005, 0.4696533, 0.47058824, 1, 0.20999998, 0.68400025, 1, 1, 1, 1, 0.003921569)
+
+[resource]
+gradient = SubResource("Gradient_xdvfk")
+width = 60
+height = 60
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8696581, 0.29700854)

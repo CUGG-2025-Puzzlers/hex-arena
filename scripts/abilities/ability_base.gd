@@ -19,6 +19,12 @@ var is_active: bool = false
 # player reference
 var player: CharacterBody2D
 
+func _ready() -> void:
+	player = get_parent()
+
+func _is_local() -> bool:
+	return player.player_id == player.multiplayer.get_unique_id()
+
 func _process(delta: float) -> void:
 	if is_on_cooldown:
 		cooldown_remaining -= delta
@@ -50,7 +56,7 @@ func _execute() -> void:
 	pass
 
 func get_aim_direction() -> Vector2:
-	var mouse_pos = player.get_global_mouse_position()
+	var mouse_pos = %InputSynchronizer.mouse_pos
 	return (mouse_pos - player.global_position).normalized()
 
 func get_aim_distance() -> float:

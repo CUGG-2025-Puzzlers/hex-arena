@@ -11,9 +11,9 @@ frequency = 0.0014
 offset = Vector3(-420.72, -111.57, 0)
 
 [resource]
-width = 400
-height = 400
+width = 10
+height = 10
 noise = SubResource("FastNoiseLite_0f2g5")
 color_ramp = SubResource("Gradient_788o1")
 seamless = true
-seamless_blend_skirt = 1.0
+seamless_blend_skirt = 0.4

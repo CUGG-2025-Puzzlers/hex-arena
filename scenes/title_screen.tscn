@@ -1,0 +1,268 @@
+[gd_scene format=3 uid="uid://bxue7p844nv7d"]
+
+[ext_resource type="Script" uid="uid://ce3s23apcqhow" path="res://scripts/title_screen.gd" id="1_fgkus"]
+
+[node name="TitleScreen" type="Node2D" unique_id=1287481627]
+script = ExtResource("1_fgkus")
+
+[node name="MainPanel" type="Panel" parent="." unique_id=2096537197]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 785.0
+offset_top = 415.0
+offset_right = 1135.0
+offset_bottom = 665.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MainPanel" unique_id=1133559526]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel/CenterContainer" unique_id=143864159]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HostGameButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=75787454]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = " Host Game "
+
+[node name="JoinGameButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=1984129057]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Join Game"
+
+[node name="NameContainer" type="HBoxContainer" parent="." unique_id=7973569]
+offset_left = 480.0
+offset_top = 40.0
+offset_right = 1500.0
+offset_bottom = 160.0
+theme_override_constants/separation = 20
+
+[node name="NamePanel" type="Panel" parent="NameContainer" unique_id=215951254]
+custom_minimum_size = Vector2(500, 120)
+layout_mode = 2
+
+[node name="NameErrorLabel" type="Label" parent="NameContainer/NamePanel" unique_id=1417586793]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 226.0
+offset_right = 386.0
+offset_bottom = 35.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 25
+text = "Invalid Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="NameContainer/NamePanel" unique_id=1519482048]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 39.0
+offset_right = 154.0
+offset_bottom = 89.0
+theme_override_font_sizes/font_size = 35
+text = "Name: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="NameLineEdit" type="LineEdit" parent="NameContainer/NamePanel" unique_id=253069408]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 160.0
+offset_top = 35.0
+offset_right = 460.0
+offset_bottom = 92.0
+theme_override_font_sizes/font_size = 35
+max_length = 16
+
+[node name="NameInfoPanel" type="Panel" parent="NameContainer" unique_id=282669142]
+custom_minimum_size = Vector2(500, 110)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="NameContainer/NameInfoPanel" unique_id=1159234265]
+layout_mode = 0
+offset_left = 150.0
+offset_right = 350.0
+offset_bottom = 35.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "Name Rules"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="NameContainer/NameInfoPanel" unique_id=1450701704]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 37.0
+offset_right = 480.0
+offset_bottom = 110.0
+theme_override_font_sizes/font_size = 25
+text = "Must be between 2-16 characters, lowercase and uppercase letters only"
+autowrap_mode = 2
+
+[node name="JoinContainer" type="HBoxContainer" parent="." unique_id=2113765539]
+unique_name_in_owner = true
+offset_left = 480.0
+offset_top = 340.0
+offset_right = 1500.0
+offset_bottom = 740.0
+theme_override_constants/separation = 20
+
+[node name="JoinPanel" type="Panel" parent="JoinContainer" unique_id=695321650]
+custom_minimum_size = Vector2(500, 400)
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="JoinContainer/JoinPanel" unique_id=1936349280]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="JoinContainer/JoinPanel/CenterContainer" unique_id=1280948475]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="IPField" type="Control" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer" unique_id=913333004]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="IPErrorLabel" type="Label" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/IPField" unique_id=1581729105]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 225.0
+offset_right = 475.0
+offset_bottom = 35.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 25
+text = "Invalid IP Address"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IPLabel" type="Label" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/IPField" unique_id=756439528]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 35.0
+offset_right = 215.0
+offset_bottom = 92.0
+theme_override_font_sizes/font_size = 35
+text = "IP Address: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="IPLineEdit" type="LineEdit" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/IPField" unique_id=1418683015]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 225.0
+offset_top = 35.0
+offset_right = 475.0
+offset_bottom = 92.0
+theme_override_font_sizes/font_size = 35
+placeholder_text = "127.0.0.1"
+max_length = 15
+
+[node name="PortField" type="Control" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer" unique_id=1731529964]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="PortErrorLabel" type="Label" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/PortField" unique_id=1979254635]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 225.0
+offset_right = 475.0
+offset_bottom = 35.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 25
+text = "Invalid Port"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PortLabel" type="Label" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/PortField" unique_id=484609462]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 35.0
+offset_right = 215.0
+offset_bottom = 92.0
+theme_override_font_sizes/font_size = 35
+text = "Port: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PortLineEdit" type="LineEdit" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/PortField" unique_id=958010255]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 225.0
+offset_top = 35.0
+offset_right = 475.0
+offset_bottom = 92.0
+theme_override_font_sizes/font_size = 35
+placeholder_text = "6769"
+max_length = 5
+
+[node name="Buttons" type="HBoxContainer" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer" unique_id=1481893487]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="ConnectButton" type="Button" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/Buttons" unique_id=1759602935]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 35
+text = " Connect "
+
+[node name="BackButton" type="Button" parent="JoinContainer/JoinPanel/CenterContainer/VBoxContainer/Buttons" unique_id=644963433]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 35
+text = " Back "
+
+[node name="InfoPanel" type="Panel" parent="JoinContainer" unique_id=1860023995]
+custom_minimum_size = Vector2(500, 400)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="JoinContainer/InfoPanel" unique_id=1657139735]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 5.0
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 25
+text = "How To Join A Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="JoinContainer/InfoPanel" unique_id=2068167460]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 55.0
+offset_right = -20.0
+offset_bottom = 280.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 25
+text = "- Enter the IP ADDRESS of the user who's hosting the game. Leave empty for default.
+
+- Enter the PORT the host is using, the value must be between 1 and 65535. Leave empty for default."
+autowrap_mode = 2
