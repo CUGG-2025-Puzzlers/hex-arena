@@ -78,9 +78,9 @@ func draw_range(new_rad_cells):
 	"""
 
 func _draw() -> void:
-	var color: Color = Color.MAGENTA
+	var color: Color = line.colors['purple'] #Color.MAGENTA
 	if player_parent.player_id!=multiplayer.get_unique_id():
-		color = Color.TOMATO
+		color = line.colors['orange'] #Color.TOMATO
 	
 	
 	

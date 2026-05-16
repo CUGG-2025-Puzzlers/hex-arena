@@ -7,6 +7,14 @@ extends Line2D
 
 @onready var outline_gradient : GradientTexture2D
 
+@export var colors : Dictionary = {
+	"orange": Color.TOMATO,
+	"purple": Color.BLUE_VIOLET, #Color.DARK_ORCHID, #Color.VIOLET, 
+	"pink":  Color.MEDIUM_VIOLET_RED,
+	"yellow": Color.DARK_GOLDENROD,
+	"lilac": Color.DARK_SLATE_BLUE,
+}
+
 var chain = []
 
 # Called when the node enters the scene tree for the first time.
