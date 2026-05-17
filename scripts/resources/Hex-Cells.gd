@@ -290,7 +290,7 @@ static func get_surrounding_cells(cell: Vector2i) -> Array:
 		cells[i]+=cell
 	return cells
 
-static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Array:
+static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int, valid_only: bool = false, outer_only: bool = false) -> Array:
 	var surrounding_cells = [cell]
 	var extend_past_index = 0
 	for i in range(radius):
@@ -303,6 +303,20 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int) -> Arra
 				if surrond_cell not in surrounding_cells:
 					surrounding_cells.append(surrond_cell)
 			extend_past_index+=1
+	
+	# Only return cells that are in the map dictionary, OFF by default
+	if valid_only:
+		var to_delete = []
+		for surrounding_cell in surrounding_cells:
+			if not cell_dict.has(surrounding_cell):
+				to_delete.append(surrounding_cell)
+		for surrounding_cell in to_delete:
+			surrounding_cells.erase(surrounding_cell)
+	
+	# Only return the outer-most radius ring
+	if outer_only:
+		for surrounding_cell in get_surrounding_cells_in_radius(cell, radius-1):
+			surrounding_cells.erase(surrounding_cell)
 	return surrounding_cells
 
 static func get_edge_outline_around_cells(cells: Array, return_chain : bool= true) -> Array:

@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_4ag8t"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_4ag8t"]
 [ext_resource type="Script" uid="uid://2b4sc33k36r3" path="res://scripts/grid_outline_template.gd" id="5_41jku"]
+[ext_resource type="Script" uid="uid://cfr16akyiivel" path="res://scripts/shrinking_circle_outline.gd" id="5_k1k1x"]
 [ext_resource type="Texture2D" uid="uid://476nrrrlllvf" path="res://assets/textures/radial_focus.tres" id="5_naajo"]
 [ext_resource type="Script" uid="uid://bcdryxfbd8jy7" path="res://scripts/last_magic_direction.gd" id="8_41jku"]
 
@@ -59,6 +60,10 @@ gradient = SubResource("Gradient_naajo")
 fill = 2
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0, 1)
+
+[sub_resource type="Curve" id="Curve_k1k1x"]
+_data = [Vector2(0, 0), 0.0, 0.04095113, 0, 0, Vector2(0.4770992, 0.09390128), 0.58521605, 0.58521605, 0, 0, Vector2(0.6278626, 0.42949343), 4.884729, 4.884729, 0, 0, Vector2(0.76145035, 0.8993224), -6.594385, -6.594385, 0, 0, Vector2(0.7900763, 0.31623107), -2.5435476, -2.4728942, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 6
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
 distance = -650.0
@@ -118,6 +123,12 @@ texture_repeat = 2
 position = Vector2(1, -1)
 scale = Vector2(2.515625, 1)
 texture = SubResource("GradientTexture2D_41jku")
+
+[node name="ShrinkingCircleOutline" type="Node2D" parent="Path2D/GridOutlines" unique_id=2023536118]
+clip_children = 2
+script = ExtResource("5_k1k1x")
+rad = -5
+guess_speed_curve = SubResource("Curve_k1k1x")
 
 [node name="MagicOutlines" type="Node2D" parent="Path2D/GridOutlines" unique_id=1561052985]
 clip_children = 1
