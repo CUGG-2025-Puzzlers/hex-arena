@@ -14,12 +14,14 @@ extends GridOutline
 		recalculate_rad()
 @export var timer_full_time : float = 12
 @export var shrinking_timer : float = 0
+@export var guessing_timer : float = 0
 @export var full_rad : int = 15
 @export var guessing_prop : float = 0.4 
 @export var guessing_rad:int = 1
 @export var guess_speed_curve: Curve
-@export var guess_curve_frame_chance_multiplier: float = 0.1
+@export var guessing_speedup_multiplier: float = 2.5
 var random_center: Vector2i = Vector2i.ZERO
+var guessing_accumulator : float = 0
 
 func _ready() -> void:
 	center = HexCells.map_to_local(global_position)
@@ -49,13 +51,28 @@ func announce_final_choice():
 		queue_redraw()
 
 func _process(delta: float) -> void:
-	if shrinking_timer >0:
-		shrinking_timer-=0.2*delta/timer_full_time+abs(randfn(0.8*delta/timer_full_time, delta/timer_full_time))
-	if shrinking_timer<0:
-		shrinking_timer=0
-		announce_final_choice()
-	if shrinking_timer == 0:
-		return
-	var new_rad = int(full_rad*shrinking_timer)+guessing_rad-int(full_rad*guessing_prop)
-	if rad!=new_rad or shrinking_timer>0 and new_rad<=0 and randf()<guess_curve_frame_chance_multiplier*(shrinking_timer/guessing_prop)*guess_speed_curve.sample(shrinking_timer/guessing_prop):
-		rad = new_rad
+	if shrinking_timer > 0:
+		var ratio = delta/(timer_full_time*(1.-guessing_prop))
+		shrinking_timer-=0.2*ratio+abs(randfn(0.8*ratio, ratio))
+		
+		if shrinking_timer<=0:
+			guessing_timer = 1.+shrinking_timer
+			guessing_accumulator = 0
+			shrinking_timer=0
+		else:
+			var new_rad = int((full_rad-guessing_rad)*shrinking_timer)+guessing_rad
+			if rad!=new_rad:
+				rad = new_rad
+	elif guessing_timer>0:
+		var ratio : float = delta/(timer_full_time*guessing_prop)
+		guessing_timer -= 0.2*ratio+abs(randfn(0.8*ratio, ratio))
+		
+		if guessing_timer <= 0:
+			guessing_timer = 0
+			guessing_accumulator = 0
+			announce_final_choice()
+		else:
+			var temp = guessing_accumulator
+			guessing_accumulator+=(full_rad-guessing_rad)*ratio*lerpf(1,guessing_speedup_multiplier,guess_speed_curve.sample(fmod(1-guessing_timer,1)))
+			if int(guessing_accumulator)>int(temp):
+				pick_random_center()

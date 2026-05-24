@@ -127,8 +127,8 @@ texture = SubResource("GradientTexture2D_41jku")
 [node name="ShrinkingCircleOutline" type="Node2D" parent="Path2D/GridOutlines" unique_id=2023536118]
 clip_children = 2
 script = ExtResource("5_k1k1x")
-rad = -5
 guess_speed_curve = SubResource("Curve_k1k1x")
+guessing_speedup_multiplier = 3.0
 
 [node name="MagicOutlines" type="Node2D" parent="Path2D/GridOutlines" unique_id=1561052985]
 clip_children = 1
