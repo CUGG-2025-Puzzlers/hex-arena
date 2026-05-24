@@ -9,6 +9,9 @@ func load_arena():
 	var tree = get_tree()
 	tree.change_scene_to_file("res://scenes/arena.tscn")
 	await tree.root.child_entered_tree
+	await get_tree().process_frame
+	await get_tree().process_frame
+
 	MultiplayerManager._start_game()
 
 func load_end_scene(winner: String) -> void:

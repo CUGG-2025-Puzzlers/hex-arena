@@ -207,39 +207,68 @@ func _end_game(winner_name: String):
 	SceneManager.load_end_scene(winner_name)
 
 func _start_game():
-	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
-	for player in players:
-		var player_node
-		
-		if Util.Character.keys()[players[player].character] == "Hekaset":
-			player_node = hekaset.instantiate()
-		else: 
-			player_node = player_scene.instantiate()
-		
-		# change spawn positions of each player
-		if player == 1:
-			player_node.position.x += 200
-			player_node.position.y += 200
-		else:
-			player_node.position.x -= 200
-			player_node.position.y -= 200
+	print("[START_GAME] peer=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
+	print("[START_GAME] scene=", get_tree().get_current_scene().name)
 
-		player_node.player_id = player
-		player_node.name = str(player)
-		player_node.set_player_name(players[player].name)
-		
-		_players_spawn_node.add_child(player_node, true)
-		
-		# connecting HUD to local player only
-		if player == multiplayer.get_unique_id():
-			player_node.z_index = 1
-			var camera : Camera2D = get_tree().get_current_scene().get_node("Camera2D")
-			camera.reparent(player_node)
-			camera.position=Vector2.ZERO
-			var hud = get_tree().get_current_scene().get_node("HUD")
-			if not hud.is_node_ready():
-				await hud.ready
-			hud.connect_to_player(player_node)
-			#hud.connect_to_player.call_deferred(player_node)
-		
-		player_node.get_node("StatsComponent").deadgeLol.connect(_on_player_died.bind(player))
+	var spawner: MultiplayerSpawner = get_tree().get_current_scene().get_node("MultiplayerSpawner")
+	print("[SPAWNER CHECK] inside_tree=", spawner.is_inside_tree())
+	print("[SPAWNER CHECK] has_peer=", multiplayer.has_multiplayer_peer())
+	print("[SPAWNER CHECK] authority=", spawner.get_multiplayer_authority())
+	print("[SPAWNER CHECK] is_authority=", spawner.is_multiplayer_authority())
+	spawner.spawn_function = Callable(self, "_spawn_player_from_data")
+
+	if not multiplayer.is_server():
+		return
+
+	for player in players:
+		var spawn_position := Vector2.ZERO
+
+		if player == 1:
+			spawn_position = Vector2(200, 200)
+		else:
+			spawn_position = Vector2(-200, -200)
+
+		var spawn_data := {
+			"id": player,
+			"name": players[player].name,
+			"character": players[player].character,
+			"position": spawn_position,
+		}
+
+		print("[SERVER SPAWN REQUEST] ", spawn_data)
+
+		var player_node = spawner.spawn(spawn_data)
+
+		if player_node != null:
+			print("[SERVER SPAWNED] ", player_node.name, " path=", player_node.get_path())
+
+			player_node.get_node("StatsComponent").deadgeLol.connect(
+				_on_player_died.bind(player)
+			)
+			
+func _spawn_player_from_data(data: Dictionary) -> Node:
+	print("[SPAWN FUNCTION] peer=", multiplayer.get_unique_id(), " data=", data)
+
+	var player_node: Node2D
+
+	if Util.Character.keys()[data["character"]] == "Hekaset":
+		player_node = hekaset.instantiate()
+	else:
+		player_node = player_scene.instantiate()
+
+	player_node.player_id = data["id"]
+	player_node.name = str(data["id"])
+	player_node.position = data["position"]
+	player_node.set_player_name(data["name"])
+
+	# Server owns the actual player state.
+	player_node.set_multiplayer_authority(1)
+
+	# The owning client controls its input synchronizer.
+	var input_sync = player_node.get_node_or_null("InputSynchronizer")
+	if input_sync != null:
+		input_sync.set_multiplayer_authority(data["id"])
+	else:
+		push_warning("Missing InputSynchronizer on spawned player: " + str(player_node.name))
+
+	return player_node
