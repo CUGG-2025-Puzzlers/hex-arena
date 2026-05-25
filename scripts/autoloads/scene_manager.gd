@@ -13,6 +13,12 @@ func load_arena():
 	await get_tree().process_frame
 
 	MultiplayerManager._start_game()
+	
+func load_tutorial():
+	var tree = get_tree()
+	tree.change_scene_to_file("res://scenes/tutorial_arena.tscn")
+	await tree.root.child_entered_tree
+	MultiplayerManager._start_tutorial()
 
 func load_end_scene(winner: String) -> void:
 	winner_name = winner

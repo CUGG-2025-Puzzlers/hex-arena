@@ -4,11 +4,9 @@ var other_player : Node2D
 var this_player : Node2D
 var camera_ready := false
 
-
 func _ready() -> void:
 	await _wait_for_players()
 	camera_ready = true
-
 
 func _wait_for_players() -> void:
 	var current_scene = get_tree().get_current_scene()
@@ -34,7 +32,6 @@ func _wait_for_players() -> void:
 	reparent(this_player)
 	position = Vector2.ZERO
 	make_current()
-
 
 func _process(delta: float) -> void:
 	if not camera_ready:

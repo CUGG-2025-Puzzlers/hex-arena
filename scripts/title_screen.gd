@@ -2,6 +2,8 @@ extends Node
 
 @onready var _host_game_button: Button = %HostGameButton
 @onready var _join_game_button: Button = %JoinGameButton
+@onready var _tutorial_button: Button = %TutorialButton
+
 @onready var _connect_button: Button = %ConnectButton
 @onready var _back_button: Button = %BackButton
 
@@ -21,6 +23,7 @@ extends Node
 func _ready() -> void:
 	_host_game_button.pressed.connect(_on_host_game)
 	_join_game_button.pressed.connect(_on_join_game)
+	_tutorial_button.pressed.connect(_on_start_tutorial)
 	_connect_button.pressed.connect(_on_connect)
 	_back_button.pressed.connect(_on_back)
 	
@@ -45,6 +48,9 @@ func _on_host_game() -> void:
 		_name_error_label.hide()
 	
 	MultiplayerManager.create_game(player_name)
+
+func _on_start_tutorial() -> void:
+	SceneManager.load_tutorial()
 
 # Opens up the join menu
 func _on_join_game() -> void:

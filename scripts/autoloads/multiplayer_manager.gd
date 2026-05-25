@@ -183,7 +183,6 @@ func get_other_player_info():
 	for player_id in players:
 		if player_id != multiplayer.get_unique_id():
 			return players[player_id]
-	
 	return null
 
 # Prints out the players for debugging purposes
@@ -245,7 +244,55 @@ func _start_game():
 			player_node.get_node("StatsComponent").deadgeLol.connect(
 				_on_player_died.bind(player)
 			)
-			
+
+func _start_tutorial():
+	var character = Util.Character.Hekaset
+	
+	print("[START_TUTORIAL] scene=", get_tree().get_current_scene().name)
+
+	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
+
+	# Clear old players/dummies from the tutorial scene.
+	if not _players_spawn_node == null:
+		for child in _players_spawn_node.get_children():
+			child.queue_free()
+
+	await get_tree().process_frame
+
+	var tutorial_player_id := 1
+
+	players.clear()
+	players[tutorial_player_id] = {
+		"name": "Hekaset",
+		"character": character,
+	}
+
+	var spawn_data := {
+		"id": tutorial_player_id,
+		"name": "Hekaset",
+		"character": character,
+		"position": Vector2(0, 500),
+	}
+
+	var player_node := _spawn_player_from_data(spawn_data) as Node2D
+
+	# Tutorial is local-only, so add it manually.
+	# Do NOT use MultiplayerSpawner.spawn() here.
+	_players_spawn_node.add_child(player_node)
+
+	await get_tree().process_frame
+
+	_setup_tutorial_camera_and_hud(player_node)
+
+	var stats = player_node.get_node_or_null("StatsComponent")
+	
+	if stats != null:
+		stats.deadgeLol.connect(_on_tutorial_player_died)
+
+func _on_tutorial_player_died() -> void:
+	print("[TUTORIAL] player died")
+	# Later: restart tutorial step, show prompt, reload tutorial, etc.
+
 func _spawn_player_from_data(data: Dictionary) -> Node:
 	print("[SPAWN FUNCTION] peer=", multiplayer.get_unique_id(), " data=", data)
 
@@ -272,3 +319,20 @@ func _spawn_player_from_data(data: Dictionary) -> Node:
 		push_warning("Missing InputSynchronizer on spawned player: " + str(player_node.name))
 
 	return player_node
+
+func _setup_tutorial_camera_and_hud(player_node: Node2D) -> void:
+	var current_scene = get_tree().get_current_scene()
+
+	player_node.z_index = 1
+
+	var camera := current_scene.get_node_or_null("Camera2D") as Camera2D
+	if camera != null:
+		camera.reparent(player_node)
+		camera.position = Vector2.ZERO
+		camera.make_current()
+
+	var hud = current_scene.get_node_or_null("HUD")
+	if hud != null:
+		if not hud.is_node_ready():
+			await hud.ready
+		hud.connect_to_player(player_node)
