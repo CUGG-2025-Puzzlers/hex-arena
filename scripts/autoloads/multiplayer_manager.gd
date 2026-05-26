@@ -271,7 +271,7 @@ func _start_tutorial():
 		"id": tutorial_player_id,
 		"name": "Hekaset",
 		"character": character,
-		"position": Vector2(0, 1050),
+		"position": Vector2(0, 1450),
 	}
 
 	var player_node := _spawn_player_from_data(spawn_data) as Node2D
@@ -307,6 +307,7 @@ func _spawn_player_from_data(data: Dictionary) -> Node:
 	player_node.name = str(data["id"])
 	player_node.position = data["position"]
 	player_node.set_player_name(data["name"])
+	player_node.add_to_group("player")
 
 	# Server owns the actual player state.
 	player_node.set_multiplayer_authority(1)
