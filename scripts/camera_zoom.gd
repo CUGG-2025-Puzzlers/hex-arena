@@ -34,6 +34,7 @@ func _wait_for_players() -> void:
 	make_current()
 
 func _process(delta: float) -> void:
+
 	if not camera_ready:
 		return
 
@@ -70,9 +71,9 @@ func _process(delta: float) -> void:
 		new_zoom = max(0.73, 1.0 / (dist_ratio / upper_bound))
 
 	#if abs(zoom.x-new_zoom)>0.005:
-	#	HexCells.player_unique_instance.queue_redraw()
 
-	zoom = Vector2.ONE * ((new_zoom - zoom.x) * delta + zoom.x)
+	#	GridOutline.player_unique_instance.queue_redraw()
+	zoom = Vector2.ONE * ((new_zoom-zoom.x)*delta+zoom.x)
 	
 	# FOR NOW, LATER RENDER AND SAVE AS TEXTURE
-	# HexCells.player_unique_instance.queue_redraw()
+	# GridOutline.player_unique_instance.queue_redraw()

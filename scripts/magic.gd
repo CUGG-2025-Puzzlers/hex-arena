@@ -41,16 +41,28 @@ var points =[]
 
 var screen : Rect2
 
+signal fizzling
+
 @onready var player_id : int = multiplayer.get_unique_id()
 
 func _ready() -> void:
-	var cell_dict : Dictionary = HexCells.player_unique_instance.cell_dict
+	var cell_dict : Dictionary = HexCells.cell_dict
 
 	if cell_dict.has(self_cell) and is_instance_valid(cell_dict[self_cell]) and cell_dict[self_cell]!=self:
 		cell_dict[self_cell].queue_free()
-	else:
-		HexCells.player_unique_instance.cell_dict[self_cell]=self
+	HexCells.cell_dict[self_cell]=self
+	
 	animated_children = find_children("ChildLight*", "Sprite2D")
+	
+	var magic_focus = GridOutline.magic_focus.duplicate()
+	GridOutline.player_unique_instance.get_node("../MagicOutlines").add_child(magic_focus)
+	magic_focus.global_position=global_position
+	magic_focus.visible=true
+	fizzling.connect(magic_focus.queue_free)
+	var remote: RemoteTransform2D = magic_focus.get_node("RemoteTransform2D")
+	remote.reparent(self)
+	remote.remote_path=magic_focus.get_path()
+	#magic_focus.modulate=modulate
 	
 	screen.size = Vector2(HexCells.player_unique_instance.width,HexCells.player_unique_instance.height)
 	screen.size*=1.33
@@ -328,6 +340,8 @@ func take_damage(damage_to_take: float):
 func fizzle():
 	if is_queued_for_deletion() or not is_inside_tree():
 		return
+	
+	fizzling.emit()
 	
 	if is_instance_valid(get_tree()) and is_instance_valid(get_tree().current_scene):
 		var magic_particles_instance = get_node("CPUParticles2D")
