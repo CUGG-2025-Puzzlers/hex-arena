@@ -11,3 +11,4 @@ export_credentials.cfg
 # Mouad specific ignores
 .claude/
 *.uid
+*.import
