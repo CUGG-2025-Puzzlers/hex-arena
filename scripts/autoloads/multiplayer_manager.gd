@@ -271,7 +271,7 @@ func _start_tutorial():
 		"id": tutorial_player_id,
 		"name": "Hekaset",
 		"character": character,
-		"position": Vector2(0, 500),
+		"position": Vector2(0, 1050),
 	}
 
 	var player_node := _spawn_player_from_data(spawn_data) as Node2D
