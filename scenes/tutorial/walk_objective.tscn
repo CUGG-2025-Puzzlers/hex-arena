@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="5_48gts"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="6_g0qxh"]
 [ext_resource type="Texture2D" uid="uid://fs4nj03e7j1t" path="res://assets/textures/magic.tres" id="7_iufri"]
+[ext_resource type="Texture2D" uid="uid://dk6inwsyt8inh" path="res://assets/particles/star_06_a.png" id="8_wi8ox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
 radius = 18.0
@@ -37,8 +38,15 @@ point_count = 4
 offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 0.5543131, 0.5942492, 0.6645367, 0.74440897)
 colors = PackedColorArray(1.3025239, 2.037959, 2.7259471, 1, 1.8759707, 1.4488999, 0, 1, 0, 0, 0, 0, 0.97, 0, 0.87299967, 0.6627451, 0.46199986, 0, 0.63, 1, 0.608, 0.95, 0.8246, 1, 0.9215, 0.95, 0.93955, 0.9843137)
 
+[sub_resource type="Curve" id="Curve_wi8ox"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.81403863), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [node name="Walk Objective" type="Area2D" unique_id=627565832]
 script = ExtResource("1_48cp3")
+
+[node name="Arrow" type="Sprite2D" parent="." unique_id=84948946]
+scale = Vector2(0.7, 0.7)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=415175278]
 texture_repeat = 3
@@ -158,5 +166,30 @@ angle_max = 180.0
 scale_amount_min = 0.0
 scale_amount_max = 0.1
 color_ramp = SubResource("Gradient_wwhys")
+
+[node name="Glow" type="Sprite2D" parent="." unique_id=981246921]
+visible = false
+modulate = Color(1, 1, 1, 0.19215687)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("2_wi8ox")
+
+[node name="Sparkles" type="CPUParticles2D" parent="." unique_id=764648147]
+visible = false
+scale = Vector2(0.065, 0.065)
+emitting = false
+amount = 6
+texture = ExtResource("8_wi8ox")
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 1200.0
+initial_velocity_max = 1400.0
+damping_min = 250.0
+damping_max = 500.0
+damping_curve = SubResource("Curve_wi8ox")
+scale_amount_min = 0.05
+scale_amount_max = 0.05
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
