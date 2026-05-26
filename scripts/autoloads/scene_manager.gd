@@ -16,7 +16,7 @@ func load_arena():
 	
 func load_tutorial():
 	var tree = get_tree()
-	tree.change_scene_to_file("res://scenes/tutorial_arena.tscn")
+	tree.change_scene_to_file("res://scenes/tutorial/tutorial_arena.tscn")
 	await tree.root.child_entered_tree
 	MultiplayerManager._start_tutorial()
 
