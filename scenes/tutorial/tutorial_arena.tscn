@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://slfpi5dqohny"]
 
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_fw8hh"]
+[ext_resource type="Script" uid="uid://taa5e6nk7hl0" path="res://scenes/tutorial/tutorial_manager.gd" id="1_k1phl"]
 [ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="2_aqsec"]
 [ext_resource type="Script" uid="uid://csgewlrgl6k85" path="res://scripts/grid_outline.gd" id="3_755f1"]
 [ext_resource type="Texture2D" uid="uid://bnv70x432w8c1" path="res://assets/textures/select_bubble_texture.tres" id="3_h1xil"]
@@ -12,6 +13,8 @@
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="6_755f1"]
 [ext_resource type="Texture2D" uid="uid://brrrp34agwiju" path="res://assets/textures/wall_voronoi.png" id="7_df88e"]
 [ext_resource type="PackedScene" uid="uid://c6wowp8fghmag" path="res://scenes/tutorial/walk_objective.tscn" id="8_aqsec"]
+[ext_resource type="Script" uid="uid://bcdryxfbd8jy7" path="res://scripts/last_magic_direction.gd" id="9_df88e"]
+[ext_resource type="Script" uid="uid://dlu2dnpjxjdpt" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_fw8hh")
@@ -67,7 +70,7 @@ _data = [Vector2(0, 0), 0.0, 0.04095113, 0, 0, Vector2(0.4770992, 0.09390128), 0
 point_count = 6
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
-distance = -1200.0
+distance = -1600.0
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_xdvfk"]
 normal = Vector2(1, 0)
@@ -82,6 +85,7 @@ normal = Vector2(0, 1)
 distance = -730.0
 
 [node name="Tutorial Arena" type="Node2D" unique_id=669064917]
+script = ExtResource("1_k1phl")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1388945420]
 modulate = Color(0.74, 0.68006, 0.1406, 1)
@@ -142,12 +146,13 @@ script = ExtResource("6_17lip")
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]
 texture = ExtResource("3_h1xil")
 
-[node name="LastMagic" type="Sprite2D" parent="Path2D" unique_id=1268473399]
-visible = false
+[node name="LastMagic" type="Sprite2D" parent="Path2D" unique_id=2048668175]
 modulate = Color(0.5019608, 0.5019608, 0.5019608, 1)
 show_behind_parent = true
+position = Vector2(0, -180)
 scale = Vector2(1.6406251, 1.6406251)
 texture = ExtResource("4_h4p41")
+script = ExtResource("9_df88e")
 
 [node name="Coordinates" type="Label" parent="Path2D" unique_id=1072220071]
 visible = false
@@ -161,7 +166,7 @@ text = "(1,2)"
 limit_left = -1000
 limit_top = -800
 limit_right = 950
-limit_bottom = 1200
+limit_bottom = 1600
 position_smoothing_enabled = true
 position_smoothing_speed = 0.8
 script = ExtResource("5_mqr3e")
@@ -176,17 +181,17 @@ spawn_limit = 2
 [node name="HUD" parent="." unique_id=1928650332 instance=ExtResource("6_755f1")]
 
 [node name="TextureRect2" type="TextureRect" parent="." unique_id=419691914]
-offset_left = -955.0
-offset_top = 1203.0
-offset_right = 1063.0
-offset_bottom = 3220.0
+offset_left = -964.0
+offset_top = 1597.0
+offset_right = 1054.0
+offset_bottom = 3614.0
 texture = ExtResource("7_df88e")
 
 [node name="TextureRect3" type="TextureRect" parent="." unique_id=2036380139]
-offset_left = -2200.0
-offset_top = -756.0
-offset_right = -182.0
-offset_bottom = 1261.0
+offset_left = -2176.0
+offset_top = -775.0
+offset_right = -158.0
+offset_bottom = 1949.0
 texture = ExtResource("7_df88e")
 
 [node name="TextureRect4" type="TextureRect" parent="." unique_id=1758389916]
@@ -200,7 +205,7 @@ texture = ExtResource("7_df88e")
 offset_left = 156.0
 offset_top = -744.0
 offset_right = 2174.0
-offset_bottom = 1273.0
+offset_bottom = 2024.0
 texture = ExtResource("7_df88e")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=976022257]
@@ -217,5 +222,11 @@ shape = SubResource("WorldBoundaryShape2D_7ft05")
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=220051452]
 shape = SubResource("WorldBoundaryShape2D_olpmc")
 
-[node name="Walk Objective" parent="." unique_id=627565832 instance=ExtResource("8_aqsec")]
-position = Vector2(-5, -547)
+[node name="Place Magic Objective" parent="." unique_id=627565832 instance=ExtResource("8_aqsec")]
+modulate = Color(0.5800901, 0.8284342, 0.9999998, 1)
+position = Vector2(0, 541)
+script = ExtResource("15_17lip")
+
+[node name="Walk Objective" parent="." unique_id=1568870816 instance=ExtResource("8_aqsec")]
+modulate = Color(0.5803922, 0.827451, 1, 1)
+position = Vector2(0, 850)
