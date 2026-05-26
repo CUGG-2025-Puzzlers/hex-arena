@@ -4,6 +4,8 @@ class_name Magic
 enum MagicType {NEUTRAL, LIGHT, HEAVY, SHIELD}
 var state = MagicType.NEUTRAL
 
+signal state_changed(magic: Magic, old_state: MagicType, new_state: MagicType)
+
 static var last_placed_cell : Vector2i
 
 # Hard enable/disable randomness for path generation
@@ -105,6 +107,9 @@ func start_rolling(wiggly_path: PackedVector2Array):
 	rolling = true
 
 func change_state(new_state: MagicType):
+	if state == new_state:
+		return
+	var old_state = state
 	state = new_state
 	match state:
 		MagicType.NEUTRAL:
@@ -174,6 +179,8 @@ func change_state(new_state: MagicType):
 			add_child(timer)
 			timer.timeout.connect(func(): fizzle())  # or: timer.timeout.connect(fizzle)
 			timer.start()
+			
+	state_changed.emit(self, old_state, new_state)
 			
 func _process(delta: float) -> void:
 	for i in range(len(animation_timers)):
