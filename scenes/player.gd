@@ -32,6 +32,9 @@ func _ready() -> void:
 	set_collision_mask_value(2, false)   # player cant collide with layer 2
 	
 	radius_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, radius)
+	
+	if multiplayer.get_unique_id()!=player_id:
+		get_node("Drawing range").line.draw.connect(get_node("Drawing range").line.set_visible.bind(false))
 	get_node("Drawing range").draw_range(radius_cells)
 	
 	get_node("Area2D").area_entered.connect(_on_area_entered)

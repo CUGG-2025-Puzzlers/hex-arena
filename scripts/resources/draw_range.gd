@@ -93,6 +93,8 @@ func _draw() -> void:
 	#line.width=thickness*2
 	line.default_color = color #Color.WHITE if color==Color.MAGENTA else Color.RED
 	line.recalculate(radius_cells)
+	# Make player focus invisible
+	line.draw.connect(set_visible.bind(false))
 	
 	drawn = true
 

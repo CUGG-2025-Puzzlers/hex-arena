@@ -319,8 +319,9 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int, valid_o
 			surrounding_cells.erase(surrounding_cell)
 	return surrounding_cells
 
-static func get_edge_outline_around_cells(cells: Array, return_chain : bool= true) -> Array:
+static func get_edge_outline_around_cells(cells: Array, return_chain : bool= true, return_corners : bool = false) -> Array:
 	var edge_counts = {}
+	var edge_belongs_center = {}
 	
 	for cell_center in cells:
 		var hex_points = get_vw_points_around_vw_point(map_to_vw_int(cell_center))
@@ -329,19 +330,22 @@ static func get_edge_outline_around_cells(cells: Array, return_chain : bool= tru
 			var next_vert: Vector2i = hex_points[(i+1) % 6]
 			if edge_counts.has([vert,next_vert]):
 				edge_counts[[vert,next_vert]]+=1
+				edge_belongs_center.erase([vert,next_vert])
 			elif edge_counts.has([next_vert, vert]):
 				edge_counts[[next_vert, vert]]+=1
+				edge_belongs_center.erase([next_vert, vert])
 			else:
 				edge_counts[[vert,next_vert]]=1
+				edge_belongs_center[[vert,next_vert]]=cell_center
 	
-	for edge in edge_counts.keys():
-		if edge_counts[edge]>1:
-			edge_counts.erase(edge)
-	var final_edges = edge_counts.keys()
+	#for edge in edge_counts.keys():
+	#	if edge_counts[edge]>1:
+	#		edge_counts.erase(edge)
+	var final_edges = edge_belongs_center.keys()
 	
 	var result = []
 	if return_chain and not final_edges.is_empty():
-		var chain = final_edges.pop_back()
+		var chain = final_edges.pop_back().duplicate()
 		while not final_edges.is_empty():
 			var found_next = false
 			for edge in final_edges:
@@ -355,9 +359,24 @@ static func get_edge_outline_around_cells(cells: Array, return_chain : bool= tru
 					break
 			if not found_next:
 				break
-		for i in range(len(chain)):
-			chain[i]=vw_to_local(chain[i])
-		return chain
+		if not return_corners:
+			for i in range(len(chain)):
+				chain[i]=vw_to_local(chain[i])
+			return chain
+		else:
+			var corners_chain = []
+			if chain.back()==chain.front() and len(chain)>1:
+				chain.append(chain[1])
+			for i in range(len(chain)-2):
+				var incoming = [chain[i], chain[i+1]]
+				if not edge_belongs_center.has(incoming):
+					incoming.reverse()
+				var outgoing = [chain[i+1], chain[i+2]]
+				if not edge_belongs_center.has(incoming):
+					outgoing.reverse()
+				if edge_belongs_center[incoming]==edge_belongs_center[outgoing]:
+					corners_chain.append([vw_to_local(chain[i]),vw_to_local(chain[i+1]),vw_to_local(chain[i+2])])
+			return corners_chain
 	
 	for edge in final_edges:
 		edge = [vw_to_local(edge[0]),vw_to_local(edge[1])]

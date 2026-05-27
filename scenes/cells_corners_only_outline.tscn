@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://b668d4lxny0yr"]
+
+[ext_resource type="Texture2D" uid="uid://chd6p47nstr1y" path="res://assets/textures/white_stripes.tres" id="1_xhj27"]
+[ext_resource type="Script" uid="uid://brfn51ci0sypn" path="res://scripts/bold_outline.gd" id="2_ijtmk"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_fjrip"]
+blend_mode = 1
+
+[node name="RangeOutline" type="Line2D" unique_id=1250776310]
+modulate = Color(0.65882355, 0.65882355, 0.65882355, 1)
+material = SubResource("CanvasItemMaterial_fjrip")
+points = PackedVector2Array(27, -22, 55, 5, -2, 35, -37, 13, -35, -12, -1, -25)
+closed = true
+texture = ExtResource("1_xhj27")
+texture_mode = 2
+script = ExtResource("2_ijtmk")
+animation_full_time_mean = 7.0
+corners_only = true
