@@ -387,6 +387,18 @@ static func get_edge_outline_around_cells(cells: Array, return_chain : bool= tru
 					corner.pop_back()
 					corner.append_array(corners_chain.front())
 					corners_chain[0]= corner
+			chain = corners_chain
+			corners_chain = []
+			for i in range(len(chain)):
+				corner = [chain[i][0]]
+				for j in range(1, len(chain[i])-1):
+					if len(corner)<max_corner_len:
+						corner.append(chain[i][j])
+					if len(corner)==max_corner_len:
+						corners_chain.append(corner.duplicate())
+						corner = [chain[i][j-1],chain[i][j]]
+				corner.append(chain[i].back())
+				corners_chain.append(corner.duplicate())
 			for i in range(len(corners_chain)):
 				for j in range(len(corners_chain[i])):
 					corners_chain[i][j]=vw_to_local(corners_chain[i][j])

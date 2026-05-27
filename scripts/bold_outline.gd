@@ -33,7 +33,10 @@ func _ready() -> void:
 func recalculate(cells: Array):
 	clear_points()
 	if corners_only:
-		corners = HexCells.get_edge_outline_around_cells(cells,true,true)
+		# Strict smaller corners
+		#corners = HexCells.get_edge_outline_around_cells(cells,true,true,3)
+		# Larger corner segments
+		corners = HexCells.get_edge_outline_around_cells(cells,true,true,7)
 	else:
 		chain = HexCells.get_edge_outline_around_cells(cells)
 		for i in range(len(chain)-1):
@@ -46,11 +49,18 @@ func _draw() -> void:
 			var temp = corner.duplicate()
 			temp[0]=lerp(corner[1],corner[0],corner_fill_ratio)
 			temp[len(temp)-1]=lerp(corner[len(corner)-2],corner[len(corner)-1],corner_fill_ratio)
-			# Uneven overlapping lines
+			# Disjoint lines
 			draw_polyline(temp,Color.WHITE,thickness, thickness>0)
 			# Smoother gradient
-			#draw_polyline_colors([corner[0],temp[0],corner[1],temp[2],corner[2]],
-			#[Color.BLACK,Color.WHITE,Color.WHITE,Color.WHITE,Color.BLACK],thickness,thickness>0)
+			#temp.append(corner.back())
+			#corner = [corner[0]]
+			#corner.append_array(temp)
+			#var color_arr = corner.duplicate()
+			#for i in range(1, len(color_arr)-1):
+			#	color_arr[i] = Color.WHITE
+			#color_arr[0]=Color.BLACK
+			#color_arr[len(color_arr)-1]=Color.BLACK
+			#draw_polyline_colors(corner,color_arr,thickness,thickness>0)
 
 func _process(delta: float) -> void:
 	animation_timer+=delta/animation_full_time
