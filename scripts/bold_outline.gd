@@ -33,10 +33,24 @@ func _ready() -> void:
 func recalculate(cells: Array):
 	clear_points()
 	if corners_only:
-		# Strict smaller corners
-		#corners = HexCells.get_edge_outline_around_cells(cells,true,true,3)
-		# Larger corner segments
-		corners = HexCells.get_edge_outline_around_cells(cells,true,true,7)
+		corners = HexCells.get_edge_outline_around_cells(cells,true,true)
+		
+		"""
+		# For breaking up into smaller corners
+		var max_corner_len=3
+		var smaller_corners = []
+		for i in range(len(corners)):
+			var corner = [corners[i][0]]
+			for j in range(1, len(corners[i])-1):
+				if len(corner)<max_corner_len:
+					corner.append(corners[i][j])
+				if len(corner)==max_corner_len:
+					smaller_corners.append(corner.duplicate())
+					corner = [corners[i][j-1],corners[i][j]]
+			corner.append(corners[i].back())
+			smaller_corners.append(corner.duplicate())
+		corners = smaller_corners
+		"""
 	else:
 		chain = HexCells.get_edge_outline_around_cells(cells)
 		for i in range(len(chain)-1):
