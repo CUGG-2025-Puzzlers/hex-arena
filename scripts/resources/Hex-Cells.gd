@@ -319,7 +319,7 @@ static func get_surrounding_cells_in_radius(cell: Vector2i, radius: int, valid_o
 			surrounding_cells.erase(surrounding_cell)
 	return surrounding_cells
 
-static func get_edge_outline_around_cells(cells: Array, return_chain : bool= true, return_corners : bool = false) -> Array:
+static func get_edge_outline_around_cells(cells: Array, return_chain : bool= true, return_corners : bool = false, max_corner_len : int = 3) -> Array:
 	var edge_counts = {}
 	var edge_belongs_center = {}
 	
@@ -365,17 +365,31 @@ static func get_edge_outline_around_cells(cells: Array, return_chain : bool= tru
 			return chain
 		else:
 			var corners_chain = []
-			if chain.back()==chain.front() and len(chain)>1:
-				chain.append(chain[1])
-			for i in range(len(chain)-2):
-				var incoming = [chain[i], chain[i+1]]
-				if not edge_belongs_center.has(incoming):
-					incoming.reverse()
-				var outgoing = [chain[i+1], chain[i+2]]
-				if not edge_belongs_center.has(incoming):
-					outgoing.reverse()
-				if edge_belongs_center[incoming]==edge_belongs_center[outgoing]:
-					corners_chain.append([vw_to_local(chain[i]),vw_to_local(chain[i+1]),vw_to_local(chain[i+2])])
+			var temp_center = null
+			var corner = []
+			for i in range(len(chain)-1):
+				var edge = [chain[i], chain[i+1]]
+				if not edge_belongs_center.has(edge):
+					edge.reverse()
+				if edge_belongs_center[edge]==temp_center:
+					corner.append(chain[i+1])
+				else:
+					temp_center=edge_belongs_center[edge]
+					if not corner.is_empty():
+						corners_chain.append(corner)
+					corner = [chain[i], chain[i+1]]
+			if not corners_chain.is_empty() and len(chain)>1 and chain.front()==chain.back():
+				var edge = corners_chain[0]
+				edge = [edge[0],edge[1]]
+				if not edge_belongs_center.has(edge):
+					edge.reverse()
+				if edge_belongs_center[edge]==temp_center:
+					corner.pop_back()
+					corner.append_array(corners_chain.front())
+					corners_chain[0]= corner
+			for i in range(len(corners_chain)):
+				for j in range(len(corners_chain[i])):
+					corners_chain[i][j]=vw_to_local(corners_chain[i][j])
 			return corners_chain
 	
 	for edge in final_edges:

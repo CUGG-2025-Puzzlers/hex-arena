@@ -45,7 +45,7 @@ func _draw() -> void:
 		for corner in corners:
 			var temp = corner.duplicate()
 			temp[0]=lerp(corner[1],corner[0],corner_fill_ratio)
-			temp[2]=lerp(corner[1],corner[2],corner_fill_ratio)
+			temp[len(temp)-1]=lerp(corner[len(corner)-2],corner[len(corner)-1],corner_fill_ratio)
 			# Uneven overlapping lines
 			draw_polyline(temp,Color.WHITE,thickness, thickness>0)
 			# Smoother gradient
