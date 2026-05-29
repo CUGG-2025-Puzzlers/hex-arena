@@ -23,3 +23,7 @@ func load_tutorial():
 func load_end_scene(winner: String) -> void:
 	winner_name = winner
 	get_tree().call_deferred("change_scene_to_file","res://scenes/EndScene.tscn") 
+
+func load_title():
+	var tree = get_tree()
+	tree.call_deferred("change_scene_to_file","res://scenes/title_screen.tscn")
