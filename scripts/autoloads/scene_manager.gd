@@ -5,6 +5,12 @@ var winner_name : String = ""
 func load_character_select():
 	get_tree().change_scene_to_file("res://scenes/character_select.tscn")
 
+func load_title_screen():
+	get_tree().change_scene_to_file("res://scenes/title_screen.tscn")
+
+func load_account_page():
+	get_tree().change_scene_to_file("res://scenes/account_page.tscn")
+
 func load_arena():
 	var tree = get_tree()
 	tree.change_scene_to_file("res://scenes/arena.tscn")

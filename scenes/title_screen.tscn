@@ -15,9 +15,23 @@ anchor_bottom = 0.5
 offset_left = 785.0
 offset_top = 415.0
 offset_right = 1135.0
-offset_bottom = 665.0
+offset_bottom = 842.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="NameErrorLabel" type="Label" parent="MainPanel" unique_id=1591911701]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -160.0
+offset_top = -16.0
+offset_right = 267.0
+offset_bottom = 19.0
+scale = Vector2(1.5, 1.5)
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 25
+text = "Please set a name in your Account!!"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CenterContainer" type="CenterContainer" parent="MainPanel" unique_id=1133559526]
 layout_mode = 1
@@ -49,74 +63,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 35
 text = "Tutorial"
 
-[node name="NameContainer" type="HBoxContainer" parent="." unique_id=7973569]
-offset_left = 480.0
-offset_top = 40.0
-offset_right = 1500.0
-offset_bottom = 160.0
-theme_override_constants/separation = 20
-
-[node name="NamePanel" type="Panel" parent="NameContainer" unique_id=215951254]
-custom_minimum_size = Vector2(500, 120)
-layout_mode = 2
-
-[node name="NameErrorLabel" type="Label" parent="NameContainer/NamePanel" unique_id=1417586793]
+[node name="AccountButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=696000209]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 226.0
-offset_right = 386.0
-offset_bottom = 35.0
-theme_override_colors/font_color = Color(1, 0, 0, 1)
-theme_override_font_sizes/font_size = 25
-text = "Invalid Name"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="NameLabel" type="Label" parent="NameContainer/NamePanel" unique_id=1519482048]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 39.0
-offset_right = 154.0
-offset_bottom = 89.0
-theme_override_font_sizes/font_size = 35
-text = "Name: "
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="NameLineEdit" type="LineEdit" parent="NameContainer/NamePanel" unique_id=253069408]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 160.0
-offset_top = 35.0
-offset_right = 460.0
-offset_bottom = 92.0
-theme_override_font_sizes/font_size = 35
-max_length = 16
-
-[node name="NameInfoPanel" type="Panel" parent="NameContainer" unique_id=282669142]
-custom_minimum_size = Vector2(500, 110)
 layout_mode = 2
-
-[node name="Title" type="Label" parent="NameContainer/NameInfoPanel" unique_id=1159234265]
-layout_mode = 0
-offset_left = 150.0
-offset_right = 350.0
-offset_bottom = 35.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 25
-text = "Name Rules"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Description" type="Label" parent="NameContainer/NameInfoPanel" unique_id=1450701704]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 37.0
-offset_right = 480.0
-offset_bottom = 110.0
-theme_override_font_sizes/font_size = 25
-text = "Must be between 2-16 characters, lowercase and uppercase letters only"
-autowrap_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Account"
 
 [node name="JoinContainer" type="HBoxContainer" parent="." unique_id=2113765539]
 unique_name_in_owner = true

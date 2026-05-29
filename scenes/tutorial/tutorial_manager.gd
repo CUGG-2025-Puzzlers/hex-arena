@@ -26,6 +26,9 @@ func _on_target_magic_state_changed(magic: Magic, state: Magic.MagicType, new_st
 
 	if state == Magic.MagicType.NEUTRAL and new_state == Magic.MagicType.LIGHT:
 		print("[TUTORIAL] Basic magic changed into Light magic.")
+		print("[TUTORIAL] Tutorial Complete! Awarding 10 XP.")
+		GameManager.add_xp(10)
+		get_tree().create_timer(3.0).timeout.connect(SceneManager.load_title_screen)
 	elif state == Magic.MagicType.NEUTRAL and new_state == Magic.MagicType.SHIELD:
 		print("Shields are good for blocking, but we want to practice making light magic.")
 		print("It'll fizzle out in a few seconds, then we can try again.")
