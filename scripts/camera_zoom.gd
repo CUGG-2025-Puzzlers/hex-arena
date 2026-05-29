@@ -13,6 +13,8 @@ func _wait_for_players() -> void:
 	var players_node = current_scene.get_node("Players")
 
 	while true:
+		if multiplayer == null:
+			return
 		this_player = players_node.get_node_or_null(str(multiplayer.get_unique_id())) as Node2D
 		other_player = null
 
