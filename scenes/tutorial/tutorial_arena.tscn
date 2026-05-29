@@ -1,20 +1,24 @@
-[gd_scene format=4 uid="uid://slfpi5dqohny"]
+[gd_scene format=4 uid="uid://cxbpmm1evcgtx"]
 
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_fw8hh"]
-[ext_resource type="Script" uid="uid://taa5e6nk7hl0" path="res://scenes/tutorial/tutorial_manager.gd" id="1_k1phl"]
+[ext_resource type="Script" uid="uid://7x41qpnjig0t" path="res://scenes/tutorial/tutorial_manager.gd" id="1_k1phl"]
 [ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="2_aqsec"]
-[ext_resource type="Script" uid="uid://csgewlrgl6k85" path="res://scripts/grid_outline.gd" id="3_755f1"]
+[ext_resource type="Script" path="res://scripts/grid_outline.gd" id="3_755f1"]
 [ext_resource type="Texture2D" uid="uid://bnv70x432w8c1" path="res://assets/textures/select_bubble_texture.tres" id="3_h1xil"]
-[ext_resource type="Texture2D" uid="uid://476nrrrlllvf" path="res://assets/textures/radial_focus.tres" id="4_df88e"]
+[ext_resource type="Texture2D" uid="uid://c1b6o25oor3uk" path="res://assets/textures/radial_focus.tres" id="4_df88e"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_h4p41"]
-[ext_resource type="Script" uid="uid://cfr16akyiivel" path="res://scripts/shrinking_circle_outline.gd" id="5_k1phl"]
+[ext_resource type="Script" path="res://scripts/shrinking_circle_outline.gd" id="5_k1phl"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_mqr3e"]
-[ext_resource type="Script" uid="uid://2b4sc33k36r3" path="res://scripts/grid_outline_template.gd" id="6_17lip"]
+[ext_resource type="Script" path="res://scripts/grid_outline_template.gd" id="6_17lip"]
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="6_755f1"]
 [ext_resource type="Texture2D" uid="uid://brrrp34agwiju" path="res://assets/textures/wall_voronoi.png" id="7_df88e"]
 [ext_resource type="PackedScene" uid="uid://c6wowp8fghmag" path="res://scenes/tutorial/walk_objective.tscn" id="8_aqsec"]
-[ext_resource type="Script" uid="uid://bcdryxfbd8jy7" path="res://scripts/last_magic_direction.gd" id="9_df88e"]
-[ext_resource type="Script" uid="uid://dlu2dnpjxjdpt" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
+[ext_resource type="Script" path="res://scripts/last_magic_direction.gd" id="9_df88e"]
+[ext_resource type="Script" uid="uid://digjynsntaqjj" path="res://scenes/tutorial/tutorial_ui.gd" id="13_dv6bh"]
+[ext_resource type="Script" uid="uid://ba6r18waxg2oa" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
+[ext_resource type="Script" uid="uid://cjvbmt3wac5x3" path="res://scenes/tutorial/light_objective.gd" id="16_251jp"]
+[ext_resource type="Script" uid="uid://cspddmpur1lme" path="res://scenes/tutorial/shield_objective.gd" id="17_kgflf"]
+[ext_resource type="Script" uid="uid://dibjq8tkgx7bu" path="res://scenes/tutorial/final_objective.gd" id="17_vsbkj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_fw8hh")
@@ -180,7 +184,63 @@ spawn_limit = 2
 
 [node name="HUD" parent="." unique_id=1928650332 instance=ExtResource("6_755f1")]
 
+[node name="TutorialUI" type="CanvasLayer" parent="." unique_id=1091343492]
+script = ExtResource("13_dv6bh")
+
+[node name="ProgressPanel" type="PanelContainer" parent="TutorialUI" unique_id=1587851339]
+custom_minimum_size = Vector2(300, 70)
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 324.0
+offset_bottom = 94.0
+
+[node name="ProgressLabel" type="Label" parent="TutorialUI/ProgressPanel" unique_id=231575602]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="TutorialUI/ProgressPanel" unique_id=180982829]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TaskPanel" type="PanelContainer" parent="TutorialUI" unique_id=853288618]
+custom_minimum_size = Vector2(520, 120)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -254.0
+offset_top = -1030.0
+offset_right = 266.0
+offset_bottom = -910.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="TutorialUI/TaskPanel" unique_id=752847539]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TutorialUI/TaskPanel/MarginContainer" unique_id=826387255]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TaskTitle" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=29318746]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TaskDescription" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=879803828]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=24892872]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="TextureRect2" type="TextureRect" parent="." unique_id=419691914]
+modulate = Color(0.12941177, 0.12941177, 0.12941177, 1)
 offset_left = -964.0
 offset_top = 1597.0
 offset_right = 1054.0
@@ -188,6 +248,7 @@ offset_bottom = 3614.0
 texture = ExtResource("7_df88e")
 
 [node name="TextureRect3" type="TextureRect" parent="." unique_id=2036380139]
+modulate = Color(0.12941177, 0.12941177, 0.12941177, 1)
 offset_left = -2176.0
 offset_top = -775.0
 offset_right = -158.0
@@ -195,6 +256,7 @@ offset_bottom = 1949.0
 texture = ExtResource("7_df88e")
 
 [node name="TextureRect4" type="TextureRect" parent="." unique_id=1758389916]
+modulate = Color(0.12941177, 0.12941177, 0.12941177, 1)
 offset_left = -545.0
 offset_top = -2749.0
 offset_right = 1473.0
@@ -202,6 +264,7 @@ offset_bottom = -732.0
 texture = ExtResource("7_df88e")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1580048284]
+modulate = Color(0.12941177, 0.12941177, 0.12941177, 1)
 offset_left = 156.0
 offset_top = -744.0
 offset_right = 2174.0
@@ -223,10 +286,43 @@ shape = SubResource("WorldBoundaryShape2D_7ft05")
 shape = SubResource("WorldBoundaryShape2D_olpmc")
 
 [node name="Place Magic Objective" parent="." unique_id=627565832 instance=ExtResource("8_aqsec")]
-modulate = Color(0.5800901, 0.8284342, 0.9999998, 1)
+modulate = Color(1, 1, 1, 0.3254902)
 position = Vector2(0, 541)
 script = ExtResource("15_17lip")
+required_transform = 1
 
 [node name="Walk Objective" parent="." unique_id=1568870816 instance=ExtResource("8_aqsec")]
 modulate = Color(0.5803922, 0.827451, 1, 1)
 position = Vector2(0, 850)
+
+[node name="Final Objective" parent="." unique_id=771643546 instance=ExtResource("8_aqsec")]
+visible = false
+modulate = Color(0.5803922, 0.827451, 1, 1)
+position = Vector2(0, -363)
+script = ExtResource("17_vsbkj")
+
+[node name="Light Objective2" parent="." unique_id=1369179776 instance=ExtResource("8_aqsec")]
+modulate = Color(1, 0.18, 0.20733333, 1)
+z_index = 100
+position = Vector2(0, 180)
+script = ExtResource("16_251jp")
+
+[node name="Shield Objective3" type="Node2D" parent="." unique_id=368320722]
+position = Vector2(0, 1452)
+script = ExtResource("17_kgflf")
+shield_cell = Vector2i(1, 0)
+
+[node name="Shield Objective2" type="Node2D" parent="." unique_id=787671893]
+position = Vector2(0, 726)
+script = ExtResource("17_kgflf")
+shield_cell = Vector2i(-1, 0)
+
+[node name="Shield Objective" type="Node2D" parent="." unique_id=2093036003]
+position = Vector2(0, 363)
+script = ExtResource("17_kgflf")
+
+[node name="Light Objective" parent="." unique_id=958320119 instance=ExtResource("8_aqsec")]
+modulate = Color(1, 0.18, 0.20733333, 1)
+z_index = 100
+position = Vector2(0, 363)
+script = ExtResource("16_251jp")
