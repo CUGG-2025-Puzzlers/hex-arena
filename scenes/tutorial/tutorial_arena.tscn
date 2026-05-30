@@ -17,8 +17,10 @@
 [ext_resource type="Script" uid="uid://digjynsntaqjj" path="res://scenes/tutorial/tutorial_ui.gd" id="13_dv6bh"]
 [ext_resource type="Script" uid="uid://ba6r18waxg2oa" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
 [ext_resource type="Script" uid="uid://cjvbmt3wac5x3" path="res://scenes/tutorial/light_objective.gd" id="16_251jp"]
-[ext_resource type="Script" uid="uid://cspddmpur1lme" path="res://scenes/tutorial/shield_objective.gd" id="17_kgflf"]
+[ext_resource type="Script" uid="uid://ds2yb0clljhcm" path="res://scenes/tutorial/shield_objective.gd" id="17_kgflf"]
 [ext_resource type="Script" uid="uid://dibjq8tkgx7bu" path="res://scenes/tutorial/final_objective.gd" id="17_vsbkj"]
+[ext_resource type="Script" uid="uid://cspddmpur1lme" path="res://scenes/tutorial/heavy_objective.gd" id="20_s2il2"]
+[ext_resource type="PackedScene" uid="uid://crlnrtl3r30t4" path="res://scenes/tutorial/magic_ghost_indicator.tscn" id="20_v5nxj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
 texture = ExtResource("1_fw8hh")
@@ -209,10 +211,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -254.0
-offset_top = -1030.0
-offset_right = 266.0
-offset_bottom = -910.0
+offset_left = -945.0
+offset_top = -600.0
+offset_right = -425.0
+offset_bottom = -480.0
 grow_horizontal = 2
 grow_vertical = 0
 
@@ -229,15 +231,21 @@ theme_override_constants/separation = 6
 
 [node name="TaskTitle" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=29318746]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
+autowrap_mode = 3
 
 [node name="TaskDescription" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=879803828]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
+autowrap_mode = 3
 
 [node name="HintLabel" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=24892872]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
+autowrap_mode = 3
 
 [node name="TextureRect2" type="TextureRect" parent="." unique_id=419691914]
 modulate = Color(0.12941177, 0.12941177, 0.12941177, 1)
@@ -296,9 +304,8 @@ modulate = Color(0.5803922, 0.827451, 1, 1)
 position = Vector2(0, 850)
 
 [node name="Final Objective" parent="." unique_id=771643546 instance=ExtResource("8_aqsec")]
-visible = false
 modulate = Color(0.5803922, 0.827451, 1, 1)
-position = Vector2(0, -363)
+position = Vector2(0, -547)
 script = ExtResource("17_vsbkj")
 
 [node name="Light Objective2" parent="." unique_id=1369179776 instance=ExtResource("8_aqsec")]
@@ -307,19 +314,27 @@ z_index = 100
 position = Vector2(0, 180)
 script = ExtResource("16_251jp")
 
-[node name="Shield Objective3" type="Node2D" parent="." unique_id=368320722]
+[node name="Shield Objective" type="Node2D" parent="." unique_id=517623823]
+position = Vector2(3, 1271)
+script = ExtResource("17_kgflf")
+enemy_light_spawn_cell = Vector2i(0, -3)
+
+[node name="Magic Ghost Indicator" parent="Shield Objective" unique_id=1212417562 instance=ExtResource("20_v5nxj")]
+
+[node name="Heavy Objective3" type="Node2D" parent="." unique_id=368320722]
 position = Vector2(0, 1452)
-script = ExtResource("17_kgflf")
-shield_cell = Vector2i(1, 0)
+script = ExtResource("20_s2il2")
+shield_cell = Vector2i(1, -4)
 
-[node name="Shield Objective2" type="Node2D" parent="." unique_id=787671893]
+[node name="Heavy Objective2" type="Node2D" parent="." unique_id=787671893]
 position = Vector2(0, 726)
-script = ExtResource("17_kgflf")
-shield_cell = Vector2i(-1, 0)
+script = ExtResource("20_s2il2")
+shield_cell = Vector2i(-1, -4)
 
-[node name="Shield Objective" type="Node2D" parent="." unique_id=2093036003]
+[node name="Heavy Objective" type="Node2D" parent="." unique_id=2093036003]
 position = Vector2(0, 363)
-script = ExtResource("17_kgflf")
+script = ExtResource("20_s2il2")
+shield_cell = Vector2i(0, -4)
 
 [node name="Light Objective" parent="." unique_id=958320119 instance=ExtResource("8_aqsec")]
 modulate = Color(1, 0.18, 0.20733333, 1)
