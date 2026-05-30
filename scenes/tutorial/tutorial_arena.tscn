@@ -227,24 +227,33 @@ theme_override_constants/margin_bottom = 12
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TutorialUI/TaskPanel/MarginContainer" unique_id=826387255]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 14
 
 [node name="TaskTitle" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=29318746]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
+theme_override_font_sizes/font_size = 48
 autowrap_mode = 3
+
+[node name="Separator" type="Control" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=756579504]
+layout_mode = 2
 
 [node name="TaskDescription" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=879803828]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
+theme_override_font_sizes/font_size = 30
 autowrap_mode = 3
+
+[node name="Separator2" type="Control" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=988531806]
+layout_mode = 2
 
 [node name="HintLabel" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=24892872]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
+theme_override_font_sizes/font_size = 30
 autowrap_mode = 3
 
 [node name="TextureRect2" type="TextureRect" parent="." unique_id=419691914]
