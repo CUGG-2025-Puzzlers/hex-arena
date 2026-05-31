@@ -38,9 +38,9 @@ func _ready() -> void:
 	stats.health_changed.connect(_on_overhead_hp_changed)
 	_on_overhead_hp_changed.call_deferred(stats.current_health, stats.max_health)
 
-func _process(delta: float) -> void:
-	if multiplayer.is_server():
-		_reconcile_pos.rpc(position)
+#func _process(delta: float) -> void:
+#	if multiplayer.is_server():
+#		_reconcile_pos.rpc(position)
 
 func _physics_process(delta: float) -> void:
 

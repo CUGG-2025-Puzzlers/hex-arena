@@ -10,3 +10,7 @@ export_credentials.cfg
 
 # Mouad specific ignores
 .claude/
+
+# EOS Credentials
+scripts/eos/EosCredentials.gd
+scripts/eos/EosCredentials.gd.uid

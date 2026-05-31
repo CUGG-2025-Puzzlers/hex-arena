@@ -13,8 +13,8 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 785.0
-offset_top = 415.0
-offset_right = 1135.0
+offset_top = 362.0
+offset_right = 1205.0
 offset_bottom = 665.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -24,6 +24,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -19.0
+offset_bottom = 19.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -42,6 +44,18 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 35
 text = "Join Game"
+
+[node name="CreateLobbyButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=1238003056]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Create Lobby"
+
+[node name="FindLobbiesButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=780204457]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Find Lobbies"
 
 [node name="NameContainer" type="HBoxContainer" parent="." unique_id=7973569]
 offset_left = 480.0
@@ -266,3 +280,70 @@ text = "- Enter the IP ADDRESS of the user who's hosting the game. Leave empty f
 
 - Enter the PORT the host is using, the value must be between 1 and 65535. Leave empty for default."
 autowrap_mode = 2
+
+[node name="LobbiesContainer" type="HBoxContainer" parent="." unique_id=1106265175]
+unique_name_in_owner = true
+offset_left = 480.0
+offset_top = 300.0
+offset_right = 1500.0
+offset_bottom = 780.0
+theme_override_constants/separation = 20
+
+[node name="LobbiesPanel" type="Panel" parent="LobbiesContainer" unique_id=124385683]
+custom_minimum_size = Vector2(1020, 480)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LobbiesContainer/LobbiesPanel" unique_id=688684876]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="LobbiesContainer/LobbiesPanel/VBoxContainer" unique_id=1062399718]
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Available Lobbies"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LobbiesContainer/LobbiesPanel/VBoxContainer" unique_id=287642336]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LobbiesGrid" type="GridContainer" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/ScrollContainer" unique_id=49793282]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+
+[node name="HostHeader" type="Label" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/ScrollContainer/LobbiesGrid" unique_id=1812797596]
+layout_mode = 2
+text = "Host"
+metadata/header = true
+
+[node name="EndpointHeader" type="Label" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/ScrollContainer/LobbiesGrid" unique_id=1592317130]
+layout_mode = 2
+text = "Endpoint"
+metadata/header = true
+
+[node name="SlotsHeader" type="Label" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/ScrollContainer/LobbiesGrid" unique_id=1323485959]
+layout_mode = 2
+text = "Slots"
+metadata/header = true
+
+[node name="ActionHeader" type="Label" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/ScrollContainer/LobbiesGrid" unique_id=424351317]
+layout_mode = 2
+text = "Action"
+metadata/header = true
+
+[node name="LobbiesBackButton" type="Button" parent="LobbiesContainer/LobbiesPanel/VBoxContainer" unique_id=1087576638]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = " Back "
