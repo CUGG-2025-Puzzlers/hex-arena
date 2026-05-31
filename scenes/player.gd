@@ -123,7 +123,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_area_entered(area: Area2D) -> void:
-	if area is Magic and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] and area.player_id != player_id:
+	if area is Magic and area.state in [Magic.MagicType.LIGHT_ARROW, Magic.MagicType.SPIKE_BALL] and area.player_id != player_id:
 		area.call_deferred("fizzle")
 		var blood: CPUParticles2D = get_node("Area2D/CPUParticles2D")
 		blood.restart()

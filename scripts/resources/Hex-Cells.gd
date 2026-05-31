@@ -137,7 +137,7 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 					magic_instance.change_state(new_state)
 					counter+=1
 					if owned:
-						player_stats.use_mana(Magic.cost[new_state])
+						player_stats.use_mana(Magic.cost_dict[new_state])
 				else:
 					break
 
@@ -198,7 +198,7 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 		get_node("LastMagic").visible = true
 		
 		var player_stats: StatsComponent = get_node("../Players/"+str(player_id)+"/StatsComponent")
-		player_stats.use_mana(Magic.cost[Magic.MagicType.NEUTRAL])
+		player_stats.use_mana(Magic.cost_dict[Magic.MagicType.NEUTRAL])
 	
 	magic_instance.player_id = player_id
 

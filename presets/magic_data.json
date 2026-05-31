@@ -1,0 +1,44 @@
+{
+	"MagicType": [
+		"NEUTRAL", 
+		"LIGHT_ARROW", 
+		"SPIKE_BALL", 
+		"SHIELD"
+		],
+
+	"cost": {
+		"NEUTRAL" : 5,
+		"LIGHT_ARROW" : 5,
+		"SPIKE_BALL" : 10,
+		"SHIELD" : 5,
+	},
+	
+	"health": {
+		"NEUTRAL" : 25,
+		"LIGHT_ARROW" : 30,
+		"SPIKE_BALL" : 40,
+		"SHIELD" : 80,
+	},
+	
+	"damage": {
+		"NEUTRAL" : 0,
+		"LIGHT_ARROW" : 40,
+		"SPIKE_BALL" : 100,
+		"SHIELD" : 30,
+	},
+	
+	"speed": {
+		"NEUTRAL" : 0,
+		"LIGHT_ARROW" : 540,
+		"SPIKE_BALL" : 270,
+		"SHIELD" : 0,
+	},
+	
+	"collide_w_own": {
+		"NEUTRAL" : false,
+		"LIGHT_ARROW" : false,
+		"SPIKE_BALL" : false,
+		"SHIELD" : true,
+	}
+	
+}

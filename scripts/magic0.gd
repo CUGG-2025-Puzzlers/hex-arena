@@ -1,5 +1,5 @@
 extends Area2D
-class_name Magic
+#class_name Magic
 
 enum MagicType {NEUTRAL, LIGHT, HEAVY, SHIELD}
 var state = MagicType.NEUTRAL
