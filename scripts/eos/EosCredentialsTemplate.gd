@@ -1,3 +1,9 @@
+
+# Make a new file called 'EosCredentials.gd' and 
+# put the correct IDs and keys in for testing lobbies
+# Do NOT push to remote with actual IDs and keys
+# .gitignore includes EosCredentials.gd 
+
 class_name EOSCredentialsTemplate
 
 const PRODUCT_NAME = "HexArena"
