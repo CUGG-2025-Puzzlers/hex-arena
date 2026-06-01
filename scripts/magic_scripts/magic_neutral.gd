@@ -14,6 +14,12 @@ func _ready() -> void:
 	
 	create_and_start_animation()
 
+func change_state(new_state: MagicType):
+	match (new_state):
+		MagicType.LIGHT_ARROW:
+			replace_with(preload("res://scenes/magic_types/magic_light_arrow.tscn"))
+
+# Update XP
 func cycle_complete(iteration: int):
 	pass
 	#print('neutral in cell ',self_cell,' finished cycle ', iteration)

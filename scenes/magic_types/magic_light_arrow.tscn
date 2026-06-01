@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://doxqxqp6om1jw"]
+
+[ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_hy8at"]
+[ext_resource type="Script" uid="uid://ia5bsvnn30o0" path="res://scripts/magic_scripts/magic_light_arrow.gd" id="2_0srqf"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="2_7u3xm"]
+
+[sub_resource type="Curve" id="Curve_0srqf"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.48612148), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.7469652, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_kuvl6"]
+offsets = PackedFloat32Array(0.4392971, 0.71565497, 0.8769968, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.5999999, 0, 1, 1, 0.39069343, 0.98, 0.11760001, 1, 0.39069343, 0.98, 0.11760001, 0)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_eini4"]
+
+[sub_resource type="Curve" id="Curve_sn3ai"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.4925651), 0.0, 0.7901357, 0, 0, Vector2(0.26764706, 0.5115242), 0.0, 0.0, 0, 0, Vector2(0.6220588, 0.62750936), 0.25944108, 0.25944108, 0, 0, Vector2(1, 0.430979), 0.45105314, 0.0, 0, 0]
+point_count = 4
+
+[node name="MagicLightArrow" unique_id=627565832 instance=ExtResource("1_hy8at")]
+script = ExtResource("2_0srqf")
+state = 1
+own_health = 30.0
+
+[node name="MainSprite" parent="." index="0" unique_id=415175278]
+visible = false
+
+[node name="ArrowParticles" type="Node2D" parent="." index="3" unique_id=1827010313]
+rotation = 5.30927
+
+[node name="ArrowL" type="CPUParticles2D" parent="ArrowParticles" index="0" unique_id=41472523]
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 30
+texture = ExtResource("2_7u3xm")
+local_coords = true
+direction = Vector2(-0.94, -0.342)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 150.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+scale_amount_curve = SubResource("Curve_0srqf")
+color_ramp = SubResource("Gradient_kuvl6")
+
+[node name="ArrowR" type="CPUParticles2D" parent="ArrowParticles" index="1" unique_id=1265769615]
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 30
+texture = ExtResource("2_7u3xm")
+local_coords = true
+direction = Vector2(-0.94, 0.342)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 150.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+scale_amount_curve = SubResource("Curve_0srqf")
+color_ramp = SubResource("Gradient_kuvl6")
+
+[node name="ArrowH" type="CPUParticles2D" parent="ArrowParticles" index="2" unique_id=2002309380]
+material = SubResource("CanvasItemMaterial_eini4")
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 40
+texture = ExtResource("2_7u3xm")
+local_coords = true
+direction = Vector2(-1, 0)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 300.0
+angle_max = 180.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+scale_amount_curve = SubResource("Curve_sn3ai")
+color_ramp = SubResource("Gradient_kuvl6")

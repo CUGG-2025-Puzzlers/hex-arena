@@ -24,14 +24,15 @@ const BULLET_DISTANCE : float = 800
 var rolling : bool = false
 var rolling_dir : Vector2
 var rolling_pathfollow : PathFollow2D
-var roll_speed : float
 
 var self_cell: Vector2i
 
 @export var own_health: float
-@export var own_damage: float
-@export var own_speed: float
+@export var damage: float
+@export var roll_speed: float
 @export var collides_w_own: bool
+
+@onready var magic_particles_instance : CPUParticles2D = $FizzleParticles
 
 var animation_timers : Array[float]
 var animation_total_times : Array[float]
@@ -41,6 +42,8 @@ var process_callables : Array[Callable]
 var screen : Rect2
 
 var player_id : int
+
+signal started_rolling
 
 
 # By default, reads @export stats from static dictionaries (JSON)
@@ -66,8 +69,8 @@ func setup():
 
 func read_stats_from_dict():
 	own_health = Magic.health_dict[state]
-	own_damage = Magic.damage_dict[state]
-	own_speed = Magic.speed_dict[state]
+	damage = Magic.damage_dict[state]
+	roll_speed = Magic.speed_dict[state]
 	collides_w_own = Magic.collide_w_own_dict[state]
 
 # Create and start moving along provided path
@@ -95,9 +98,17 @@ func start_rolling(wiggly_path: PackedVector2Array):
 	reparent(rolling_pathfollow)
 	
 	rolling = true
+	
+	if _advance_rolling not in process_callables:
+		process_callables.append(_advance_rolling)
+	
+	rolling_dir = wiggly_path[len(wiggly_path)-1] - wiggly_path[0]
+	rolling_dir = rolling_dir.normalized()
+	
+	started_rolling.emit()
 
 # Dummy function to replace in neutral
-func change_state(new_state: MagicType):
+func change_state(_new_state: MagicType):
 	pass
 
 # Replace scene with a different magic scene
@@ -212,7 +223,6 @@ func fizzle():
 		return
 	
 	if is_instance_valid(get_tree()) and is_instance_valid(get_tree().current_scene):
-		var magic_particles_instance = get_node("CPUParticles2D")
 		magic_particles_instance.reparent(get_tree().current_scene)
 		magic_particles_instance.finished.connect(magic_particles_instance.queue_free)
 		magic_particles_instance.restart()

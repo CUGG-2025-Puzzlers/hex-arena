@@ -5,6 +5,7 @@ extends Node
 # Other scripts should call these functions instead of directly emitting from
 # the signals themselves.
 
+@warning_ignore("unused_signal")
 signal select_new_cell
 
 signal character_selected(character: Util.Character, player_id: int)
