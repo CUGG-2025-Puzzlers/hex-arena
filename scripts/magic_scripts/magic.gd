@@ -96,6 +96,10 @@ func start_rolling(wiggly_path: PackedVector2Array):
 	
 	rolling = true
 
+# Dummy function to replace in neutral
+func change_state(new_state: MagicType):
+	pass
+
 # Replace scene with a different magic scene
 func replace_with(new_magic_scene : PackedScene):
 	monitoring = false
@@ -105,9 +109,13 @@ func replace_with(new_magic_scene : PackedScene):
 	
 	new_magic.position = position
 	new_magic.self_cell = self_cell
+	
+	HexCells.cell_dict[self_cell] = new_magic
+	
 	new_magic.player_id = player_id
 	
 	add_sibling(new_magic)
+	
 	
 	queue_free()
 

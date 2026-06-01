@@ -180,11 +180,13 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 	if is_instance_valid(cell_dict[cell]):
 		cell_dict[cell].queue_free()
 	
-	var magic_instance : Magic = preload("res://scenes/magic.tscn").instantiate()
+	var magic_instance : Magic = preload("res://scenes/magic_types/magic_neutral.tscn").instantiate()
 		
 	magic_instance.position = map_to_local(cell)
 	magic_instance.self_cell = cell
 	cell_dict[cell]=magic_instance
+	
+	magic_instance.player_id = player_id
 	
 	add_child(magic_instance, true)
 	magic_instance.name = "Magic"
@@ -199,8 +201,6 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 		
 		var player_stats: StatsComponent = get_node("../Players/"+str(player_id)+"/StatsComponent")
 		player_stats.use_mana(Magic.cost_dict[Magic.MagicType.NEUTRAL])
-	
-	magic_instance.player_id = player_id
 
 @rpc("call_local","any_peer","reliable")
 func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array, player_id: int):

@@ -13,7 +13,7 @@ radius = 18.0
 offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 0.5543131, 0.5942492, 0.6645367, 0.74440897)
 colors = PackedColorArray(1.3025239, 2.037959, 2.7259471, 1, 1.8759707, 1.4488999, 0, 1, 0, 0, 0, 0, 0.97, 0, 0.87299967, 0.6627451, 0.46199986, 0, 0.63, 1, 0.608, 0.95, 0.8246, 1, 0.9215, 0.95, 0.93955, 0.9843137)
 
-[node name="MagicTemplate" type="Area2D" unique_id=627565832]
+[node name="MagicTemplate" type="Area2D" unique_id=627565832 groups=["magic"]]
 script = ExtResource("1_vdrdq")
 
 [node name="MainSprite" type="Sprite2D" parent="." unique_id=415175278]
