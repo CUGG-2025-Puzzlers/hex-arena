@@ -18,6 +18,8 @@ func change_state(new_state: MagicType):
 	match (new_state):
 		MagicType.LIGHT_ARROW:
 			replace_with(preload("res://scenes/magic_types/magic_light_arrow.tscn"))
+		MagicType.SHIELD:
+			replace_with(preload("res://scenes/magic_types/magic_shield.tscn"))
 
 # Update XP
 func cycle_complete(iteration: int):

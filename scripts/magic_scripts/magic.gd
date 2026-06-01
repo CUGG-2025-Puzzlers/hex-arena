@@ -75,6 +75,9 @@ func read_stats_from_dict():
 
 # Create and start moving along provided path
 func start_rolling(wiggly_path: PackedVector2Array):
+	# Might need a separate 'can_roll' property
+	if roll_speed == 0:
+		return
 	
 	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell]==self:
 		HexCells.cell_dict[self_cell] = null
@@ -120,6 +123,8 @@ func replace_with(new_magic_scene : PackedScene):
 	
 	new_magic.position = position
 	new_magic.self_cell = self_cell
+	
+	new_magic.modulate = modulate
 	
 	HexCells.cell_dict[self_cell] = new_magic
 	

@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://bqbyo5dg52x0a"]
+
+[ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_m6aav"]
+[ext_resource type="Script" uid="uid://cgxvc6jo5301v" path="res://scripts/magic_scripts/magic_shield.gd" id="2_1cuk4"]
+[ext_resource type="Texture2D" uid="uid://bgkrluc4yfisl" path="res://assets/textures/shield-pattern1.png" id="2_jgofq"]
+[ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="3_1cuk4"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_n7l14"]
+blend_mode = 3
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_pbyeq"]
+blend_mode = 1
+
+[node name="MagicShield" unique_id=627565832 instance=ExtResource("1_m6aav")]
+scale = Vector2(0.9, 0.9)
+script = ExtResource("2_1cuk4")
+lifetime = 5.0
+state = 3
+own_health = 80.0
+damage = 30.0
+collides_w_own = true
+
+[node name="Shield Pattern" type="Polygon2D" parent="." index="0" unique_id=1079768993]
+clip_children = 2
+texture_repeat = 3
+material = SubResource("CanvasItemMaterial_n7l14")
+texture = ExtResource("2_jgofq")
+texture_scale = Vector2(15, 15)
+polygon = PackedVector2Array(-7, -88, 97, -25, 94, 54, -2, 99, -99, 46, -101, -30)
+
+[node name="Shield Glow" type="Polygon2D" parent="Shield Pattern" index="0" unique_id=456092513]
+texture_repeat = 3
+material = SubResource("CanvasItemMaterial_pbyeq")
+texture = ExtResource("3_1cuk4")
+polygon = PackedVector2Array(-7, -88, 97, -25, 94, 54, -2, 99, -99, 46, -101, -30)
+
+[node name="MainSprite" parent="." index="1" unique_id=415175278]
+visible = false
+
+[node name="ShieldBody" type="StaticBody2D" parent="." index="5" unique_id=903408045]
