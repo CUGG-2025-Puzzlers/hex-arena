@@ -10,6 +10,8 @@ var players = {}
 var player_scene = preload("res://scenes/player.tscn")
 var hekaset = preload("res://scenes/hekaset.tscn")
 
+var bot_controller_script = preload("res://scripts/bot_controller.gd")
+
 var _players_spawn_node
 
 # Local player info
@@ -199,21 +201,18 @@ func _on_player_died(dead_player_id : int) -> void:
 		if id != dead_player_id:
 			winner_name = players[id].name
 			break
-	_end_game.rpc(winner_name)
 	
+	if multiplayer.has_multiplayer_peer():
+		_end_game.rpc(winner_name)
+	else:
+		_end_game(winner_name)
+		
 @rpc("any_peer", "call_local", "reliable")
 func _end_game(winner_name: String):
 	SceneManager.load_end_scene(winner_name)
 
 func _start_game():
-	print("[START_GAME] peer=", multiplayer.get_unique_id(), " is_server=", multiplayer.is_server())
-	print("[START_GAME] scene=", get_tree().get_current_scene().name)
-
 	var spawner: MultiplayerSpawner = get_tree().get_current_scene().get_node("MultiplayerSpawner")
-	print("[SPAWNER CHECK] inside_tree=", spawner.is_inside_tree())
-	print("[SPAWNER CHECK] has_peer=", multiplayer.has_multiplayer_peer())
-	print("[SPAWNER CHECK] authority=", spawner.get_multiplayer_authority())
-	print("[SPAWNER CHECK] is_authority=", spawner.is_multiplayer_authority())
 	spawner.spawn_function = Callable(self, "_spawn_player_from_data")
 
 	if not multiplayer.is_server():
@@ -234,16 +233,82 @@ func _start_game():
 			"position": spawn_position,
 		}
 
-		print("[SERVER SPAWN REQUEST] ", spawn_data)
-
 		var player_node = spawner.spawn(spawn_data)
 
 		if player_node != null:
-			print("[SERVER SPAWNED] ", player_node.name, " path=", player_node.get_path())
-
 			player_node.get_node("StatsComponent").deadgeLol.connect(
 				_on_player_died.bind(player)
 			)
+
+func _start_bot_match():
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	
+	var player_id = 1
+	var bot_id = 999
+
+	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
+
+	if _players_spawn_node != null:
+		for child in _players_spawn_node.get_children():
+			child.queue_free()
+
+	await get_tree().process_frame
+
+	var player_character = Util.Character.Hekaset
+	var bot_character = Util.Character.Hekaset
+
+	players.clear()
+
+	players[player_id] = {
+		"name": player_info.get("name", "Player"),
+		"character": player_character,
+		"is_bot": false,
+	}
+
+	players[bot_id] = {
+		"name": "Training Bot",
+		"character": bot_character,
+		"is_bot": true,
+	}
+
+	var player_spawn_data := {
+		"id": player_id,
+		"name": players[player_id].name,
+		"character": player_character,
+		"position": Vector2(200, 200),
+		"is_bot": false,
+	}
+
+	var bot_spawn_data := {
+		"id": bot_id,
+		"name": players[bot_id].name,
+		"character": bot_character,
+		"position": Vector2(-200, -200),
+		"is_bot": true,
+	}
+
+	var player_node := _spawn_player_from_data(player_spawn_data) as Node2D
+	var bot_node := _spawn_player_from_data(bot_spawn_data) as Node2D
+
+	_players_spawn_node.add_child(player_node)
+	_players_spawn_node.add_child(bot_node)
+
+	await get_tree().process_frame
+
+	_setup_tutorial_camera_and_hud(player_node)
+	_setup_bot_controller(bot_node, player_node)
+	
+	var stats = player_node.get_node_or_null("StatsComponent")
+	
+	if stats != null:
+		stats.deadgeLol.connect(_on_player_died.bind(player_id))
+	
+	stats = bot_node.get_node_or_null("StatsComponent")
+	
+	if stats != null:
+		stats.deadgeLol.connect(_on_player_died.bind(bot_id))
+
+	print("[BOT MATCH] ready")
 
 func _start_tutorial():
 	var character = Util.Character.Hekaset
@@ -315,12 +380,21 @@ func _spawn_player_from_data(data: Dictionary) -> Node:
 	# The owning client controls its input synchronizer.
 	var input_sync = player_node.get_node_or_null("InputSynchronizer")
 	if input_sync != null:
-		input_sync.set_multiplayer_authority(data["id"])
-	else:
-		push_warning("Missing InputSynchronizer on spawned player: " + str(player_node.name))
+		if data.get("is_bot", false):
+			input_sync.process_mode = Node.PROCESS_MODE_DISABLED
+		else:
+			input_sync.set_multiplayer_authority(data["id"])
 
 	return player_node
+	
+func _setup_bot_controller(bot_node: Node2D, target_player: Node2D) -> void:
+	var bot_controller = bot_controller_script.new()
 
+	bot_node.add_child(bot_controller)
+	bot_controller.setup(bot_node, target_player, bot_node.player_id)
+
+	print("[BOT MATCH] bot controller attached")
+	
 func _setup_tutorial_camera_and_hud(player_node: Node2D) -> void:
 	var current_scene = get_tree().get_current_scene()
 

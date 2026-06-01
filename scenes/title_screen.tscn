@@ -45,6 +45,12 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_constants/separation = 20
 
+[node name="BotMatchButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=1209705026]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Play vs Bot"
+
 [node name="HostGameButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=75787454]
 unique_name_in_owner = true
 layout_mode = 2

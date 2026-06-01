@@ -1,5 +1,6 @@
 extends Node
 
+@onready var _bot_match_button: Button = %BotMatchButton
 @onready var _host_game_button: Button = %HostGameButton
 @onready var _join_game_button: Button = %JoinGameButton
 @onready var _tutorial_button: Button = %TutorialButton
@@ -21,6 +22,7 @@ extends Node
 #region Setup
 
 func _ready() -> void:
+	_bot_match_button.pressed.connect(_on_bot_match)
 	_host_game_button.pressed.connect(_on_host_game)
 	_join_game_button.pressed.connect(_on_join_game)
 	_tutorial_button.pressed.connect(_on_start_tutorial)
@@ -37,6 +39,9 @@ func _ready() -> void:
 #endregion
 
 #region Button Callbacks
+
+func _on_bot_match() -> void:
+	SceneManager.load_bot_match()
 
 # Creates a new game room
 # Switches to the character select screen

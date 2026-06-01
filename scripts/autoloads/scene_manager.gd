@@ -19,7 +19,17 @@ func load_arena():
 	await get_tree().process_frame
 
 	MultiplayerManager._start_game()
-	
+
+func load_bot_match():
+	var tree = get_tree()
+	tree.change_scene_to_file("res://scenes/arena.tscn")
+
+	await tree.root.child_entered_tree
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	MultiplayerManager._start_bot_match()
+
 func load_tutorial():
 	var tree = get_tree()
 	tree.change_scene_to_file("res://scenes/tutorial/tutorial_arena.tscn")
