@@ -20,9 +20,9 @@ var objective_state := ObjectiveState.INACTIVE
 
 func _ready() -> void:
 	visible = false
-	monitoring = false
-	monitorable = false
 	collision_shape.set_deferred("disabled", true)
+	collision_shape.set_deferred("monitoring", false)
+	collision_shape.set_deferred("monitorable", false)
 
 	print("[LIGHT OBJECTIVE] spawned")
 
@@ -73,8 +73,8 @@ func _complete_objective() -> void:
 	print("[LIGHT OBJECTIVE] hit by Light magic.")
 
 	collision_shape.set_deferred("disabled", true)
-	monitoring = false
-	monitorable = false
+	collision_shape.set_deferred("monitoring", false)
+	collision_shape.set_deferred("monitorable", false)
 
 	completed.emit()
 	_play_complete_vfx()

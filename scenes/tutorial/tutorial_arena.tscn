@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://digjynsntaqjj" path="res://scenes/tutorial/tutorial_ui.gd" id="13_dv6bh"]
 [ext_resource type="Script" uid="uid://ba6r18waxg2oa" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
 [ext_resource type="Script" uid="uid://cjvbmt3wac5x3" path="res://scenes/tutorial/light_objective.gd" id="16_251jp"]
+[ext_resource type="PackedScene" uid="uid://c0r53oj3cl6xr" path="res://scenes/tutorial/guiding_arrows.tscn" id="17_jd7ro"]
 [ext_resource type="Script" uid="uid://ds2yb0clljhcm" path="res://scenes/tutorial/shield_objective.gd" id="17_kgflf"]
 [ext_resource type="Script" uid="uid://dibjq8tkgx7bu" path="res://scenes/tutorial/final_objective.gd" id="17_vsbkj"]
 [ext_resource type="Script" uid="uid://cspddmpur1lme" path="res://scenes/tutorial/heavy_objective.gd" id="20_s2il2"]
@@ -310,40 +311,39 @@ required_transform = 1
 
 [node name="Walk Objective" parent="." unique_id=1568870816 instance=ExtResource("8_aqsec")]
 modulate = Color(0.5803922, 0.827451, 1, 1)
-position = Vector2(0, 850)
+position = Vector2(0, 723)
+
+[node name="GuidingArrows" parent="." unique_id=661504265 instance=ExtResource("17_jd7ro")]
+position = Vector2(0, 834)
 
 [node name="Final Objective" parent="." unique_id=771643546 instance=ExtResource("8_aqsec")]
 modulate = Color(0.5803922, 0.827451, 1, 1)
 position = Vector2(0, -547)
 script = ExtResource("17_vsbkj")
 
-[node name="Light Objective2" parent="." unique_id=1369179776 instance=ExtResource("8_aqsec")]
-modulate = Color(1, 0.18, 0.20733333, 1)
-z_index = 100
-position = Vector2(0, 180)
-script = ExtResource("16_251jp")
+[node name="Magic Ghost Indicator" parent="." unique_id=1212417562 instance=ExtResource("20_v5nxj")]
+position = Vector2(3, 1271)
 
 [node name="Shield Objective" type="Node2D" parent="." unique_id=517623823]
 position = Vector2(3, 1271)
 script = ExtResource("17_kgflf")
+shield_cell = Vector2i(0, 2)
 enemy_light_spawn_cell = Vector2i(0, -3)
-
-[node name="Magic Ghost Indicator" parent="Shield Objective" unique_id=1212417562 instance=ExtResource("20_v5nxj")]
 
 [node name="Heavy Objective3" type="Node2D" parent="." unique_id=368320722]
 position = Vector2(0, 1452)
 script = ExtResource("20_s2il2")
-shield_cell = Vector2i(1, -4)
+shield_cell = Vector2i(1, -2)
 
 [node name="Heavy Objective2" type="Node2D" parent="." unique_id=787671893]
 position = Vector2(0, 726)
 script = ExtResource("20_s2il2")
-shield_cell = Vector2i(-1, -4)
+shield_cell = Vector2i(-1, -2)
 
 [node name="Heavy Objective" type="Node2D" parent="." unique_id=2093036003]
 position = Vector2(0, 363)
 script = ExtResource("20_s2il2")
-shield_cell = Vector2i(0, -4)
+shield_cell = Vector2i(0, -2)
 
 [node name="Light Objective" parent="." unique_id=958320119 instance=ExtResource("8_aqsec")]
 modulate = Color(1, 0.18, 0.20733333, 1)

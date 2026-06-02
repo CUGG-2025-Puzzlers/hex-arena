@@ -83,7 +83,6 @@ func show_light_ghost() -> void:
 	base_alpha = ghost_alpha
 	modulate = Color(1, 1, 1, ghost_alpha)
 
-
 func _hide_all_visuals() -> void:
 	neutral_sprite.visible = false
 	shield_pattern.visible = false

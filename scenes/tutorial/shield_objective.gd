@@ -7,7 +7,7 @@ signal completed
 @export var enemy_light_spawn_cell: Vector2i = Vector2i(0, -4)
 @export var enemy_player_id := 999
 
-@onready var ghost_indicator: MagicGhostIndicator = $"Magic Ghost Indicator"
+@onready var ghost_indicator: MagicGhostIndicator = $"../Magic Ghost Indicator"
 @onready var hex_cells: HexCells = get_tree().current_scene.get_node("Path2D") as HexCells
 
 var active := false

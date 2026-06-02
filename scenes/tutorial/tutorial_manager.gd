@@ -4,8 +4,7 @@ extends Node2D
 
 @onready var walk_objective: Area2D = $"Walk Objective"
 @onready var place_magic_objective: Area2D = $"Place Magic Objective"
-@onready var light_objective1: Area2D = $"Light Objective"
-@onready var light_objective2: Area2D = $"Light Objective2"
+@onready var light_objective: Area2D = $"Light Objective"
 @onready var shield_objective: Node2D = $"Shield Objective"
 @onready var final_objective: Area2D = $"Final Objective"
 @onready var heavy_objectives: Array[Node2D] = [
@@ -13,6 +12,11 @@ extends Node2D
 	$"Heavy Objective2",
 	$"Heavy Objective3",
 ]
+const GUIDING_ARROWS = preload("res://scenes/tutorial/guiding_arrows.tscn")
+
+var active_arrows: Node2D = null
+var arrow_target: Node2D = null
+var arrow_offset := Vector2.ZERO
 
 @onready var hex_cells: HexCells = $"Path2D"
 
@@ -22,38 +26,38 @@ var task_text := {
 	"move": {
 		"step": 1,
 		"title": "Collect Mana Orb",
-		"description": "Walk to the glowing marker.",
-		"hint": "Use the \"WASD\" keys to move."
+		"description": "WASD to walk to the glowing marker.",
+		"hint": ""
 	},
 	"create_light": {
 		"step": 2,
 		"title": "Create Light Arrow",
-		"description": "Place Basic Magic, then transform it into a Light Arrow.",
-		"hint": "Click on the glowing marker to place magic, then press E to transform it into a Light Arrow"
+		"description": "Click on a hex to place Basic Magic.\nE to transform it into Light Arrow.",
+		"hint": ""
 	},
 	"fire_light": {
 		"step": 3,
 		"title": "Fire Light Arrow",
-		"description": "Fire Light Magic through both glowing targets. Aim at the targets with your mouse, then press Space to fire.",
-		"hint": "Targets hit: 0 / 2"
+		"description": "Aim with your mouse.\nSpace to fire.",
+		"hint": ""
 	},
 	"create_shield": {
 	"step": 4,
 	"title": "Create a Shield",
-	"description": "Place Basic Magic on the glowing marker, then transform it into a Shield.",
-	"hint": "Press \"Q\" to transform Basic Magic into a Shield."
+	"description": "Click on a hex to place Basic Magic. \nQ to transform it.",
+	"hint": ""
 	},
 	"break_shields": {
 		"step": 5,
 		"title": "Break a Shield",
-		"description": "Use Heavy Magic to destroy at least one enemy shield.",
-		"hint": "Press \"R\" to transform Basic Magic into a Heavy Orb."
+		"description": "Click on a hex to place Basic Magic. \nR to transform it.",
+		"hint": ""
 	},
 	"complete": {
 		"step": 6,
 		"title": "Tutorial Complete",
-		"description": "Good job! Now you can place, transform, and fire magic.",
-		"hint": "Next: prepare for a real duel."
+		"description": "Good job! Now prepare for a real duel",
+		"hint": ""
 	}
 }
 
@@ -69,8 +73,7 @@ func _ready() -> void:
 	walk_objective.completed.connect(_on_walk_objective_completed)
 	place_magic_objective.completed.connect(_on_place_magic_objective_completed)
 
-	light_objective1.completed.connect(_on_light_objective_completed)
-	light_objective2.completed.connect(_on_light_objective_completed)
+	light_objective.completed.connect(_on_light_objective_completed)
 	
 	shield_objective.completed.connect(_on_shield_objective_completed)
 	
@@ -102,25 +105,14 @@ func _on_place_magic_objective_completed() -> void:
 	print("[TUTORIAL] Light magic created. Activating light targets.")
 	_show_task("fire_light")
 
-	light_objective1.activate()
-	light_objective2.activate()
+	light_objective.activate()
 
 
 func _on_light_objective_completed() -> void:
-	print("[TUTORIAL] A light objective was hit.")
-	light_count += 1
+	print("[TUTORIAL] Activating shield objective.")
 	
-	tutorial_ui.set_task(
-	"Fire Light Magic",
-	"Fire Light Magic through both glowing targets.",
-	"Targets hit: %d / 2" % light_count
-	)
-
-	if light_count == 2:
-		print("[TUTORIAL] Activating shielad objective.")
-		
-		_show_task("create_shield")
-		shield_objective.activate()
+	_show_task("create_shield")
+	shield_objective.activate()
 
 func _on_shield_objective_completed() -> void:
 	if shield_objective_completed:

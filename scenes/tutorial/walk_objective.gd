@@ -34,18 +34,9 @@ signal completed
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 var complete := false
-var arrow_time := 0.0
 
 var movement_input_detected := false
 var movement_popup: PanelContainer = null
-
-var _arrow_fade_alpha := 1.0
-var arrow_fade_alpha: float:
-	get:
-		return _arrow_fade_alpha
-	set(value):
-		_arrow_fade_alpha = value
-		queue_redraw()
 
 
 func _ready() -> void:
@@ -58,96 +49,11 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if complete and arrow_fade_alpha <= 0.01:
-		return
-
-	arrow_time += delta
-
 	if not movement_input_detected and _is_movement_pressed():
 		movement_input_detected = true
 		_hide_movement_popup()
 
 	queue_redraw()
-
-func _draw() -> void:
-	if complete and arrow_fade_alpha <= 0.01:
-		return
-
-	_draw_guiding_arrows()
-
-
-func _draw_guiding_arrows() -> void:
-	var sequence_duration = arrow_pulse_interval * max(arrow_count - 1, 0) + arrow_pulse_duration
-	var cycle_duration = sequence_duration + arrow_cycle_pause
-	var cycle_pos := fposmod(arrow_time, cycle_duration)
-
-	for i in range(arrow_count):
-		# i = 0 is the arrow closest to the objective.
-		# We want the sequence to light bottom -> middle -> top.
-		var order_index := arrow_count - 1 - i
-		var start_time = float(order_index) * arrow_pulse_interval
-
-		var lit_strength := _get_pulse_strength(cycle_pos, start_time, arrow_pulse_duration)
-		var alpha := lerpf(arrow_base_alpha, arrow_lit_alpha, lit_strength) * arrow_fade_alpha
-
-		var offset := arrow_start_offset + Vector2(0, i * arrow_spacing)
-		_draw_single_arrow(offset, arrow_scale, alpha, lit_strength)
-
-
-func _get_pulse_strength(time_pos: float, start_time: float, duration: float) -> float:
-	var local_time := time_pos - start_time
-
-	if local_time < 0.0 or local_time > duration:
-		return 0.0
-
-	var t := local_time / duration
-	return sin(t * PI)
-
-
-func _draw_single_arrow(offset: Vector2, scale_value: float, alpha: float, lit_strength: float) -> void:
-	var points := PackedVector2Array([
-		Vector2(-44, 26),
-		Vector2(-44, -2),
-		Vector2(0, -34),
-		Vector2(44, -2),
-		Vector2(44, 26),
-		Vector2(0, 10),
-		Vector2(-44, 26),
-	])
-
-	for i in range(points.size()):
-		points[i] = points[i] * scale_value + offset
-
-	var glow_strength := lerpf(0.8, 1.35, lit_strength)
-
-	draw_polyline(
-		points,
-		Color(arrow_glow_color.r, arrow_glow_color.g, arrow_glow_color.b, alpha * 0.18),
-		20.0 * scale_value * glow_strength,
-		true
-	)
-
-	draw_polyline(
-		points,
-		Color(arrow_glow_color.r, arrow_glow_color.g, arrow_glow_color.b, alpha * 0.35),
-		10.0 * scale_value * glow_strength,
-		true
-	)
-
-	draw_polyline(
-		points,
-		Color(arrow_color.r, arrow_color.g, arrow_color.b, alpha),
-		4.0 * scale_value,
-		true
-	)
-
-	if lit_strength > 0.2:
-		draw_polyline(
-			points,
-			Color(1.0, 1.0, 1.0, alpha * 0.45 * lit_strength),
-			1.5 * scale_value,
-			true
-		)
 
 func _create_movement_popup() -> void:
 	movement_popup = PanelContainer.new()
@@ -275,8 +181,8 @@ func _complete_objective() -> void:
 	print("[WALK OBJECTIVE] objective complete")
 
 	collision_shape.set_deferred("disabled", true)
-	monitoring = false
-	monitorable = false
+	collision_shape.set_deferred("monitoring", false)
+	collision_shape.set_deferred("monitorable", false)
 
 	_hide_movement_popup()
 	
