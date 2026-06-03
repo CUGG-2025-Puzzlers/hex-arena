@@ -16,6 +16,7 @@ const ATTR_BUILD := "BUILD"
 const ATTR_HOST_IP := "HOST_IP"
 const ATTR_HOST_PORT := "HOST_PORT"
 const ATTR_HOST_NAME := "HOST_NAME"
+const ATTR_SOCKET_NAME := "SOCKET_NAME"
 
 var current_lobby: HLobby
 var is_host := false
@@ -64,6 +65,13 @@ func _ensure_eos_ready(player_name: String) -> bool:
 		var login_success := await HAuth.login_anonymous_async(player_name)
 		if not login_success:
 			return false
+	if not HAuth.product_user_id:
+		lobby_action_failed.emit("EOS login succeeded but product user id is missing")
+		return false
+	if not EOSGMultiplayerPeer.get_local_user_id():
+		return false
+	print("HAuth.product_user_id: ", HAuth.product_user_id)
+	print("EOSG local user id: ", EOSGMultiplayerPeer.get_local_user_id())
 	
 	_eos_ready = true
 	return true
@@ -103,9 +111,20 @@ func create_lobby(player_name: String) -> bool:
 		lobby_action_failed.emit("Failed to add lobby attributes")
 		return false
 	
-	var connection_attributes_added := await _add_connection_attributes(lobby)
-	if not connection_attributes_added:
-		await lobby.destroy_async() # Destroy lobby if failed
+	# For ENET
+	#var connection_attributes_added := await _add_connection_attributes(lobby)
+	#if not connection_attributes_added:
+		#await lobby.destroy_async() # Destroy lobby if failed
+		#_is_busy = false
+		#lobby_action_failed.emit("Failed to add connection attributes")
+		#return false
+	
+	# For EOSG
+	print("Product User ID before EOS server: ", HAuth.product_user_id)
+	print("EOSG local user id: ", EOSGMultiplayerPeer.get_local_user_id())
+	var game_created := MultiplayerManager.create_eos_game(player_name)
+	if not game_created:
+		await lobby.destroy_async()
 		_is_busy = false
 		lobby_action_failed.emit("Failed to add connection attributes")
 		return false
@@ -123,9 +142,10 @@ func _add_lobby_attributes(lobby: HLobby, player_name: String) -> bool:
 	if not lobby or not lobby.is_valid() or clean_name.is_empty():
 		return false
 	
-	lobby.add_attribute(ATTR_HOST_NAME, player_name)
+	lobby.add_attribute(ATTR_HOST_NAME, clean_name)
 	lobby.add_attribute(ATTR_MODE, MODE)
 	lobby.add_attribute(ATTR_BUILD, DEFAULT_BUILD)
+	lobby.add_attribute(ATTR_SOCKET_NAME, MultiplayerManager.EOS_SOCKET_NAME)
 	
 	var result := await lobby.update_async()
 	return result
@@ -152,19 +172,20 @@ func _is_usable_host_ip(ip: String) -> bool:
 		return false
 	return true
 	
-func _add_connection_attributes(lobby: HLobby) -> bool:
-	if not lobby or not lobby.is_valid():
-		return false
-		
-	var ip := _get_host_ip()
-	if ip == "":
-		return false
-	
-	lobby.add_attribute(ATTR_HOST_IP, ip)
-	lobby.add_attribute(ATTR_HOST_PORT, str(MultiplayerManager.DEFAULT_PORT))
-	
-	var result := await lobby.update_async()
-	return result
+# For ENET
+#func _add_connection_attributes(lobby: HLobby) -> bool:
+	#if not lobby or not lobby.is_valid():
+		#return false
+		#
+	#var ip := _get_host_ip()
+	#if ip == "":
+		#return false
+	#
+	#lobby.add_attribute(ATTR_HOST_IP, ip)
+	#lobby.add_attribute(ATTR_HOST_PORT, str(MultiplayerManager.DEFAULT_PORT))
+	#
+	#var result := await lobby.update_async()
+	#return result
 
 func find_lobbies(player_name: String) -> Array[HLobby]:
 	if _is_busy:
@@ -217,9 +238,13 @@ func _filter_joinable_lobbies(lobbies: Array) -> Array[HLobby]:
 		
 		if not _lobby_attribute_matches(lobby, ATTR_BUILD, build):
 			continue
-
-		if not _has_valid_endpoint(lobby):
+		
+		if not _lobby_attribute_matches(lobby, ATTR_SOCKET_NAME, MultiplayerManager.EOS_SOCKET_NAME):
 			continue
+		
+		# For ENET
+		#if not _has_valid_endpoint(lobby):
+			#continue
 		
 		joinable.append(lobby)
 	return joinable
@@ -228,17 +253,18 @@ func _lobby_attribute_matches(lobby: HLobby, key: String, expected: String) -> b
 	var attr = lobby.get_attribute(key)
 	return attr and str(attr.value) == expected
 	
-func _has_valid_endpoint(lobby: HLobby) -> bool:
-	var host_ip_attr = lobby.get_attribute(ATTR_HOST_IP)
-	var host_port_attr = lobby.get_attribute(ATTR_HOST_PORT)
-
-	if not host_ip_attr or not host_port_attr:
-		return false
-
-	var host_ip := str(host_ip_attr.value)
-	var host_port := str(host_port_attr.value).to_int()
-
-	return _is_usable_host_ip(host_ip) and host_port > 0 and host_port <= 65535
+# For ENET
+#func _has_valid_endpoint(lobby: HLobby) -> bool:
+	#var host_ip_attr = lobby.get_attribute(ATTR_HOST_IP)
+	#var host_port_attr = lobby.get_attribute(ATTR_HOST_PORT)
+#
+	#if not host_ip_attr or not host_port_attr:
+		#return false
+#
+	#var host_ip := str(host_ip_attr.value)
+	#var host_port := str(host_port_attr.value).to_int()
+#
+	#return _is_usable_host_ip(host_ip) and host_port > 0 and host_port <= 65535
 
 func join_lobby(lobby: HLobby, player_name: String) -> bool:
 	if _is_busy == true:
@@ -255,20 +281,27 @@ func join_lobby(lobby: HLobby, player_name: String) -> bool:
 		lobby_action_failed.emit("EOS setup or login failed")
 		return false
 	
-	var host_ip_attr = lobby.get_attribute(ATTR_HOST_IP)
-	var host_port_attr = lobby.get_attribute(ATTR_HOST_PORT)
+	# For ENET
+	#var host_ip_attr = lobby.get_attribute(ATTR_HOST_IP)
+	#var host_port_attr = lobby.get_attribute(ATTR_HOST_PORT)
+	#
+	#if not host_ip_attr or not host_port_attr:
+		#_is_busy = false
+		#lobby_action_failed.emit("Lobby is missing connection info")
+		#return false
+	#
+	#var host_ip := str(host_ip_attr.value)
+	#var host_port := str(host_port_attr.value).to_int()
+	#
+	#if not _is_usable_host_ip(host_ip) or host_port <= 0 or host_port > 65535:
+		#_is_busy = false
+		#lobby_action_failed.emit("Lobby has invalid connection info")
+		#return false
 	
-	if not host_ip_attr or not host_port_attr:
+	var host_product_user_id = lobby.owner_product_user_id
+	if not host_product_user_id:
 		_is_busy = false
-		lobby_action_failed.emit("Lobby is missing connection info")
-		return false
-	
-	var host_ip := str(host_ip_attr.value)
-	var host_port := str(host_port_attr.value).to_int()
-	
-	if not _is_usable_host_ip(host_ip) or host_port <= 0 or host_port > 65535:
-		_is_busy = false
-		lobby_action_failed.emit("Lobby has invalid connection info")
+		lobby_action_failed.emit("Lobby is missing host user id")
 		return false
 	
 	var joined_lobby: HLobby = await HLobbies.join_async(lobby)
@@ -279,10 +312,20 @@ func join_lobby(lobby: HLobby, player_name: String) -> bool:
 
 	current_lobby = joined_lobby
 	is_host = false
+	
+
+	# For ENET
+	# MultiplayerManager.join_game(player_name, host_ip, host_port)
+	var game_joined := MultiplayerManager.join_eos_game(player_name, host_product_user_id)
+	if not game_joined:
+		await joined_lobby.leave_async()
+		current_lobby = null
+		_is_busy = false
+		is_host = false
+		lobby_action_failed.emit("Failed to join EOS game")
+		return false
+	
 	lobby_joined.emit(joined_lobby)
-
-	MultiplayerManager.join_game(player_name, host_ip, host_port)
-
 	_is_busy = false
 	return true
 
@@ -325,10 +368,22 @@ func get_lobby_host_name(lobby: HLobby) -> String:
 	return "Unknown"
 
 func get_lobby_endpoint(lobby: HLobby) -> String:
-	var host_ip_attr = lobby.get_attribute(ATTR_HOST_IP)
-	var host_port_attr = lobby.get_attribute(ATTR_HOST_PORT)
-
-	if not host_ip_attr or not host_port_attr:
+	if not lobby or not lobby.is_valid():
 		return "Unknown"
 
-	return "%s:%s" % [host_ip_attr.value, host_port_attr.value]
+	var host_product_user_id = lobby.owner_product_user_id
+	if not host_product_user_id:
+		return "EOS P2P"
+
+	return "EOS P2P / %s" % str(host_product_user_id)
+
+
+# For ENET
+#func get_lobby_endpoint(lobby: HLobby) -> String:
+	#var host_ip_attr = lobby.get_attribute(ATTR_HOST_IP)
+	#var host_port_attr = lobby.get_attribute(ATTR_HOST_PORT)
+#
+	#if not host_ip_attr or not host_port_attr:
+		#return "Unknown"
+#
+	#return "%s:%s" % [host_ip_attr.value, host_port_attr.value]

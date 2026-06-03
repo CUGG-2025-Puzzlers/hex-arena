@@ -23,6 +23,7 @@ var player_info = {
 
 # Port can be changed to be retrieved from some settings json
 const DEFAULT_PORT = 6769
+const EOS_SOCKET_NAME = "HexArenaDuel"
 const SERVER_IP = "127.0.0.1"
 
 var local_ip: String
@@ -63,6 +64,29 @@ func create_game(player_name: String):
 	
 	SceneManager.load_character_select()
 
+# EOS version of create_game
+func create_eos_game(player_name: String) -> bool:
+	print("Creating game...")
+	var server_peer = EOSGMultiplayerPeer.new()
+	
+	if not HAuth.product_user_id:
+		print("Cannot create EOS game: missing product user id")
+		return false
+		
+	var result := server_peer.create_server(EOS_SOCKET_NAME)
+	if result != OK:
+		print("Failed to create EOS server: ", result)
+		return false
+		
+	multiplayer.multiplayer_peer = server_peer
+	
+	player_info["name"] = player_name
+	players[1] = player_info
+	player_connected.emit(1, player_info)
+	SceneManager.load_character_select()
+	
+	return true
+	
 # Joins a game
 # Attempts to connect to the server using the specified name, ip, and port
 func join_game(player_name: String, ip: String, port: int):
@@ -76,6 +100,20 @@ func join_game(player_name: String, ip: String, port: int):
 	
 	player_info["name"] = player_name
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
+	
+# EOS version of join_game
+func join_eos_game(player_name: String, host_product_user_id) -> bool:
+	var client_peer = EOSGMultiplayerPeer.new()
+	var result = client_peer.create_client(EOS_SOCKET_NAME, host_product_user_id)
+	if result != OK:
+		print("Failed to create client: %s" % result)
+		return false
+	
+	multiplayer.multiplayer_peer = client_peer
+	player_info["name"] = player_name
+	print("Attempting EOS P2P connection to host %s using socket %s as %s" % [str(host_product_user_id), EOS_SOCKET_NAME, player_name])
+	
+	return true
 
 func setup_upnp(_port: int):
 	var result = ""
