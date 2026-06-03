@@ -7,6 +7,7 @@ extends Node
 @onready var _connect_button: Button = %ConnectButton
 @onready var _back_button: Button = %BackButton
 @onready var _lobbies_back_button: Button = %LobbiesBackButton
+@onready var _refresh_button: Button = %RefreshButton
 
 @onready var _main_panel: Panel = %MainPanel
 @onready var _join_container: Container = %JoinContainer
@@ -31,6 +32,7 @@ func _ready() -> void:
 	_connect_button.pressed.connect(_on_connect)
 	_back_button.pressed.connect(_on_back)
 	_lobbies_back_button.pressed.connect(_on_lobbies_back)
+	_refresh_button.pressed.connect(_on_find_lobbies)
 	
 	_set_join_menu(false)
 	_set_lobbies_menu(false)

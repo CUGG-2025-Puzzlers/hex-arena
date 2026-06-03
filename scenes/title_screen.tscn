@@ -342,10 +342,19 @@ layout_mode = 2
 text = "Action"
 metadata/header = true
 
-[node name="LobbiesBackButton" type="Button" parent="LobbiesContainer/LobbiesPanel/VBoxContainer" unique_id=1087576638]
+[node name="HBoxContainer" type="HBoxContainer" parent="LobbiesContainer/LobbiesPanel/VBoxContainer" unique_id=1301187491]
+layout_mode = 2
+
+[node name="LobbiesBackButton" type="Button" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/HBoxContainer" unique_id=1087576638]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 35
 text = " Back "
+
+[node name="RefreshButton" type="Button" parent="LobbiesContainer/LobbiesPanel/VBoxContainer/HBoxContainer" unique_id=1468721270]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Refresh"
 
 [connection signal="pressed" from="MainPanel/CenterContainer/VBoxContainer/CreateLobbyButton" to="." method="_on_create_lobby_button_pressed"]
