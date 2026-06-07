@@ -5,10 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://bgkrluc4yfisl" path="res://assets/textures/shield-pattern1.png" id="2_jgofq"]
 [ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="3_1cuk4"]
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_n7l14"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_jgofq"]
 blend_mode = 3
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_pbyeq"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_1cuk4"]
 blend_mode = 1
 
 [node name="MagicShield" unique_id=627565832 instance=ExtResource("1_m6aav")]
@@ -20,21 +20,24 @@ own_health = 80.0
 damage = 30.0
 collides_w_own = true
 
-[node name="Shield Pattern" type="Polygon2D" parent="." index="0" unique_id=1079768993]
+[node name="Shield Pattern" type="Polygon2D" parent="." index="0" unique_id=1691129276]
 clip_children = 2
 texture_repeat = 3
-material = SubResource("CanvasItemMaterial_n7l14")
+material = SubResource("CanvasItemMaterial_jgofq")
 texture = ExtResource("2_jgofq")
 texture_scale = Vector2(15, 15)
-polygon = PackedVector2Array(-7, -88, 97, -25, 94, 54, -2, 99, -99, 46, -101, -30)
+polygon = PackedVector2Array(-7, -88, 97, -25, 95.55556, 60.000004, 0, 103.333336, -100.00001, 54.444447, -101, -30)
 
-[node name="Shield Glow" type="Polygon2D" parent="Shield Pattern" index="0" unique_id=456092513]
+[node name="Shield Glow" type="Polygon2D" parent="Shield Pattern" index="0" unique_id=1681244540]
 texture_repeat = 3
-material = SubResource("CanvasItemMaterial_pbyeq")
+material = SubResource("CanvasItemMaterial_1cuk4")
 texture = ExtResource("3_1cuk4")
-polygon = PackedVector2Array(-7, -88, 97, -25, 94, 54, -2, 99, -99, 46, -101, -30)
+polygon = PackedVector2Array(-7, -88, 97, -25, 95.55556, 60.000004, 0, 103.333336, -100.00001, 54.444447, -101, -30)
 
 [node name="MainSprite" parent="." index="1" unique_id=415175278]
 visible = false
+
+[node name="CollisionShape" parent="." index="2" unique_id=29718005]
+shape = null
 
 [node name="ShieldBody" type="StaticBody2D" parent="." index="5" unique_id=903408045]
