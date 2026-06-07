@@ -34,8 +34,6 @@ var self_cell: Vector2i
 
 @onready var magic_particles_instance : CPUParticles2D = $FizzleParticles
 
-var animation_timers : Array[float]
-var animation_total_times : Array[float]
 
 var process_callables : Array[Callable]
 
@@ -150,12 +148,6 @@ func _advance_rolling(delta: float):
 		if not screen.has_point(global_position):
 			fizzle()
 
-# Callable for advancing animation timers
-func _advance_animation_timers(delta: float):
-	for i in range(len(animation_timers)):
-		animation_timers[i]+=randfn(delta/animation_total_times[i],delta/animation_total_times[i]*0.3)#+randfn(0,animation_timers[i]/3.)
-		if animation_timers[i]>=1 or animation_timers[i]<0:
-			animation_timers[i]=fposmod(animation_timers[i], 1)
 
 
 # Update each callable function in process_callables every frame
