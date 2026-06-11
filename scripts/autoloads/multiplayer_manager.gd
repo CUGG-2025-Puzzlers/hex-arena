@@ -104,9 +104,9 @@ func setup_upnp(_port: int):
 	var map_result_tcp = upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "godot_tcp", "UDP", 0)
 	
 	if not map_result_udp == UPNP.UPNP_RESULT_SUCCESS:
-		upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
+		upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
 	if not map_result_tcp == UPNP.UPNP_RESULT_SUCCESS:
-		upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
+		upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
 	
 	print("UPNP Port Forwarding succeeded")
 	return upnp.query_external_address()
