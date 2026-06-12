@@ -3,14 +3,12 @@
 [ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_t1fjm"]
 [ext_resource type="Script" uid="uid://m3x6a7cxdri8" path="res://scripts/magic_scripts/magic_neutral.gd" id="2_3557j"]
 [ext_resource type="Texture2D" uid="uid://dcm8pb6gd3088" path="res://assets/textures/neutral_magic.tres" id="2_yo6m6"]
-[ext_resource type="Resource" uid="uid://cy2px4e11vllv" path="res://presets/magic_types/NEUTRAL_stats.tres" id="3_o24bp"]
 
 [node name="MagicNeutral" unique_id=627565832 instance=ExtResource("1_t1fjm")]
 script = ExtResource("2_3557j")
 animation_cycles = Array[float]([3.141592653589793, 3.0])
 dists = Array[Vector2]([Vector2(0, -6), Vector2(20, 0)])
 state = 1
-stats = ExtResource("3_o24bp")
 own_cost = 5.0
 own_health = 25.0
 

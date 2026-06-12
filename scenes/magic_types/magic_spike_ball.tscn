@@ -3,12 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_q3pj0"]
 [ext_resource type="Script" uid="uid://b62r75i1hueoi" path="res://scripts/magic_scripts/magic_spike_ball.gd" id="2_6ptrt"]
 [ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="3_1gar6"]
-[ext_resource type="Resource" uid="uid://dcj8cuplvvu3y" path="res://presets/magic_types/SPIKE_BALL_stats.tres" id="4_stats"]
 
 [node name="MagicSpikeBall" unique_id=627565832 instance=ExtResource("1_q3pj0")]
 script = ExtResource("2_6ptrt")
 state = 3
-stats = ExtResource("4_stats")
 own_cost = 10.0
 own_health = 40.0
 damage = 100.0

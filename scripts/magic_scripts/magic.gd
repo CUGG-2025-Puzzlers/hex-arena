@@ -23,14 +23,6 @@ var self_cell: Vector2i
 var player_owner : Player
 var player_id : int = -1
 
-@export var stats: MagicStats
-
-static var cost_dict: Dictionary[MagicType, float] = {
-	MagicType.NEUTRAL: 5,
-	MagicType.LIGHT: 5,
-	MagicType.HEAVY: 10,
-	MagicType.PASSIVE: 5
-}
 
 @export var own_cost: float
 @export var own_health: float
@@ -70,8 +62,7 @@ func setup():
 		screen.position=-0.5*screen.size
 
 func reset_stats():
-	if stats == null:
-		push_error('MagicStats resource missing!')
+	var stats : MagicStats = player_owner.stats.magics[state]
 	
 	state = stats.type
 	own_cost = stats.cost

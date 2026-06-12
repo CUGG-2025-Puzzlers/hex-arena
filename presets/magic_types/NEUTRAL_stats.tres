@@ -1,10 +1,13 @@
 [gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://cy2px4e11vllv"]
 
+[ext_resource type="PackedScene" uid="uid://bfvg4nm7yvdcm" path="res://scenes/magic_types/magic_neutral.tscn" id="1_aqi5d"]
 [ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="1_typvh"]
 
 [resource]
 script = ExtResource("1_typvh")
 type = 1
-cost = 5
-health = 25
+magic_name = "Neutral"
+cost = 5.0
+scene = ExtResource("1_aqi5d")
+health = 25.0
 metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

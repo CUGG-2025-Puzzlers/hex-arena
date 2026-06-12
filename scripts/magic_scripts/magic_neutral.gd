@@ -18,8 +18,7 @@ func change_state(new_state: MagicType):
 	if new_state == state:
 		return
 	
-	var available_states: Dictionary[Magic.MagicType, PackedScene] = player_owner.stats.magics
-	replace_with(available_states[new_state])
+	replace_with(player_owner.stats.magics[new_state].scene)
 
 # Update XP
 func cycle_complete(iteration: int):

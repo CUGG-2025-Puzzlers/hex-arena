@@ -12,7 +12,7 @@ class_name CharacterStats
 @export var radius_cells: Array[Vector2i]
 
 
-@export var magics: Dictionary[Magic.MagicType, PackedScene] = {
+@export var magics: Dictionary[Magic.MagicType, MagicStats] = {
 	Magic.MagicType.NEUTRAL: null,
 	Magic.MagicType.LIGHT: null,
 	Magic.MagicType.HEAVY: null,

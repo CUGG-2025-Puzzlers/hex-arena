@@ -3,7 +3,11 @@ class_name MagicStats
 
 @export var type: Magic.MagicType = Magic.MagicType.NONE
 
+@export var magic_name : String = ""
+
 @export var cost: float = 0.
+
+@export var scene: PackedScene = null
 
 @export var health: float = 0.
 @export var damage: float = 0.

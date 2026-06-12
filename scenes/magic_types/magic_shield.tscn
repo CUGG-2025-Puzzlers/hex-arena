@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://cgxvc6jo5301v" path="res://scripts/magic_scripts/magic_shield.gd" id="2_1cuk4"]
 [ext_resource type="Texture2D" uid="uid://bgkrluc4yfisl" path="res://assets/textures/shield-pattern1.png" id="3_jgofq"]
 [ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="4_1cuk4"]
-[ext_resource type="Resource" uid="uid://86i7f2p7uljq" path="res://presets/magic_types/SHIELD_stats.tres" id="5_stats"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_jgofq"]
 blend_mode = 3
@@ -17,7 +16,6 @@ scale = Vector2(0.9, 0.9)
 script = ExtResource("2_1cuk4")
 lifetime = 5.0
 state = 4
-stats = ExtResource("5_stats")
 own_cost = 5.0
 own_health = 80.0
 damage = 30.0

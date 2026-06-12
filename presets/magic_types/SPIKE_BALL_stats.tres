@@ -1,12 +1,15 @@
 [gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://dcj8cuplvvu3y"]
 
+[ext_resource type="PackedScene" uid="uid://djk6uir57xmac" path="res://scenes/magic_types/magic_spike_ball.tscn" id="1_lnpw5"]
 [ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="1_typvh"]
 
 [resource]
 script = ExtResource("1_typvh")
 type = 3
-cost = 10
-health = 40
-damage = 100
-speed = 270
+magic_name = "Spikes"
+cost = 10.0
+scene = ExtResource("1_lnpw5")
+health = 40.0
+damage = 100.0
+speed = 270.0
 metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

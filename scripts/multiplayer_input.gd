@@ -47,22 +47,22 @@ func _unhandled_input(event: InputEvent) -> void:
 					HexCells.player_unique_instance.rpc("launch_magic_in_cell", magic_cell, points, player_id)
 	
 	if Input.is_action_pressed("place_magic")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.NEUTRAL]:
+	and own_stats.current_mana>= own_stats.magics[Magic.MagicType.NEUTRAL].cost:
 		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
 		HexCells.player_unique_instance.rpc_id(1, "place_magic_in_cell_check", global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
 	
 	var possible_states = []
 	if Input.is_action_just_pressed("turn_pure_to_heavy")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.HEAVY]:
+	and own_stats.current_mana>=own_stats.magics[Magic.MagicType.HEAVY].cost:
 		possible_states.append(Magic.MagicType.HEAVY)
 	if Input.is_action_just_pressed("turn_pure_to_light")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.LIGHT]:
+	and own_stats.current_mana>=own_stats.magics[Magic.MagicType.LIGHT].cost:
 		possible_states.append(Magic.MagicType.LIGHT)
-	if Input.is_action_just_pressed("turn_pure_to_shield")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.PASSIVE]:
+	if Input.is_action_just_pressed("turn_pure_to_passive")\
+	and own_stats.current_mana>=own_stats.magics[Magic.MagicType.PASSIVE].cost:
 		possible_states.append(Magic.MagicType.PASSIVE)
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
 		var pos = get_parent().get_node("CollisionShape2D").global_position
-		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius_cells, state, player_id, own_stats, floori(own_stats.current_mana*1./Magic.cost_dict[state]))#randi()
+		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius_cells, state, player_id, floori(own_stats.current_mana*1./own_stats.magics[state].cost))#randi()
 		#HexCells.player_unique_instance.change_magic(pos, get_parent().radius_cells, state,player_id)
