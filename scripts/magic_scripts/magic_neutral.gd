@@ -15,13 +15,11 @@ func _ready() -> void:
 	create_and_start_animation()
 
 func change_state(new_state: MagicType):
-	match (new_state):
-		MagicType.LIGHT_ARROW:
-			replace_with(preload("res://scenes/magic_types/magic_light_arrow.tscn"))
-		MagicType.SHIELD:
-			replace_with(preload("res://scenes/magic_types/magic_shield.tscn"))
-		MagicType.SPIKE_BALL:
-			replace_with(preload("res://scenes/magic_types/magic_spike_ball.tscn"))
+	if new_state == state:
+		return
+	
+	var available_states: Dictionary[Magic.MagicType, PackedScene] = player_owner.stats.magics
+	replace_with(available_states[new_state])
 
 # Update XP
 func cycle_complete(iteration: int):

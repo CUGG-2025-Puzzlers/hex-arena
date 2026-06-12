@@ -3,7 +3,9 @@ extends Path2D
 class_name HexCells
 
 
-@onready var text = get_node("Coordinates")
+@onready var text = $Coordinates
+@onready var last_magic = $LastMagic
+
 # Radius == side
 @export var r: float = 60.:
 	set(new_r):
@@ -132,7 +134,7 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 			
 			if magic_instance.state == Magic.MagicType.NEUTRAL \
 			and magic_instance.player_id == player_id \
-			and not (cell_to_check in player_cells and new_state==Magic.MagicType.SHIELD):
+			and not (cell_to_check in player_cells and new_state==Magic.MagicType.PASSIVE):
 				if counter<how_many:
 					magic_instance.change_state(new_state)
 					counter+=1
@@ -180,27 +182,18 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 	if is_instance_valid(cell_dict[cell]):
 		cell_dict[cell].queue_free()
 	
-	var magic_instance : Magic = preload("res://scenes/magic_types/magic_neutral.tscn").instantiate()
-		
-	magic_instance.position = map_to_local(cell)
-	magic_instance.self_cell = cell
-	cell_dict[cell]=magic_instance
+	var player_owner: Player = get_node("../Players/"+str(player_id))
+	if player_owner == null or player_owner.player_id!=player_id:
+		push_error('Unable to get the player who placed the magic')
 	
-	magic_instance.player_id = player_id
+	var magic_instance: Magic = player_owner.stats.magics[Magic.MagicType.NEUTRAL].instantiate()
 	
-	add_child(magic_instance, true)
-	magic_instance.name = "Magic"
-	magic_instance.add_to_group('magic')
-		
-	if player_id!=multiplayer.get_unique_id():
-		magic_instance.modulate = Color(0.819, 0.205, 0.204, 1.0)
-	else:
-		Magic.last_placed_cell=cell
-		get_node("LastMagic").global_position=map_to_local(cell)
-		get_node("LastMagic").visible = true
-		
-		var player_stats: StatsComponent = get_node("../Players/"+str(player_id)+"/StatsComponent")
-		player_stats.use_mana(Magic.cost_dict[Magic.MagicType.NEUTRAL])
+	magic_instance.place_instance(cell, player_owner)
+	
+	if player_id == multiplayer.get_unique_id():
+		Magic.last_placed_cell = cell
+		last_magic.position = map_to_local(cell)
+		last_magic.visible = true
 
 @rpc("call_local","any_peer","reliable")
 func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array, player_id: int):

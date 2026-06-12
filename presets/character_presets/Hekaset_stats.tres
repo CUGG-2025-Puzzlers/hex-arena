@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterStats" format=3 uid="uid://dqvg2cotkg854"]
+
+[ext_resource type="PackedScene" uid="uid://bfvg4nm7yvdcm" path="res://scenes/magic_types/magic_neutral.tscn" id="1_dfc56"]
+[ext_resource type="PackedScene" uid="uid://doxqxqp6om1jw" path="res://scenes/magic_types/magic_light_arrow.tscn" id="2_1l7e5"]
+[ext_resource type="PackedScene" uid="uid://djk6uir57xmac" path="res://scenes/magic_types/magic_spike_ball.tscn" id="3_80ppx"]
+[ext_resource type="PackedScene" uid="uid://bqbyo5dg52x0a" path="res://scenes/magic_types/magic_shield.tscn" id="4_3eaop"]
+[ext_resource type="Script" uid="uid://prs3ewngemc7" path="res://scripts/resources/character_stats.gd" id="5_ypa77"]
+
+[resource]
+script = ExtResource("5_ypa77")
+magics = Dictionary[int, PackedScene]({
+1: ExtResource("1_dfc56"),
+2: ExtResource("2_1l7e5"),
+3: ExtResource("3_80ppx"),
+4: ExtResource("4_3eaop")
+})
+metadata/_custom_type_script = "uid://prs3ewngemc7"

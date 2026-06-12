@@ -27,13 +27,13 @@ func _ready() -> void:
 	var light_button : InputEventKey = InputMap.action_get_events("turn_pure_to_light")[0]
 	var heavy_button : InputEventKey = InputMap.action_get_events("turn_pure_to_heavy")[0]
 
-	shield_label.text = OS.get_keycode_string(shield_button.physical_keycode)+'\nShield\n'+str(Magic.cost_dict[Magic.MagicType.SHIELD])+' Mana'
-	light_magic_label.text = OS.get_keycode_string(light_button.physical_keycode)+'\nLight\n'+str(Magic.cost_dict[Magic.MagicType.LIGHT_ARROW])+' Mana'
-	heavy_magic_label.text = OS.get_keycode_string(heavy_button.physical_keycode)+'\nHeavy\n'+str(Magic.cost_dict[Magic.MagicType.SPIKE_BALL])+' Mana'
+	shield_label.text = OS.get_keycode_string(shield_button.physical_keycode)+'\nShield\n'+str(Magic.cost_dict[Magic.MagicType.PASSIVE])+' Mana'
+	light_magic_label.text = OS.get_keycode_string(light_button.physical_keycode)+'\nLight\n'+str(Magic.cost_dict[Magic.MagicType.LIGHT])+' Mana'
+	heavy_magic_label.text = OS.get_keycode_string(heavy_button.physical_keycode)+'\nHeavy\n'+str(Magic.cost_dict[Magic.MagicType.HEAVY])+' Mana'
 
-func connect_to_player(p: CharacterBody2D) -> void:
+func connect_to_player(p: Player) -> void:
 	player = p
-	var stats: StatsComponent = player.get_node("StatsComponent")
+	var stats: CharacterStats = player.stats
 	stats.health_changed.connect(_on_health_changed)
 	stats.mana_changed.connect(_on_mana_changed)
 	

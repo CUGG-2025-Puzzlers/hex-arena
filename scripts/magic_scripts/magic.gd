@@ -1,10 +1,10 @@
 extends Area2D
 class_name Magic
 
-enum MagicType {NEUTRAL, LIGHT_ARROW, SPIKE_BALL, SHIELD}
-@export var state : MagicType
+enum MagicType {NONE, NEUTRAL, LIGHT, HEAVY, PASSIVE}
+@export var state : MagicType = MagicType.NONE
 
-@export var replace_from_dict : bool = true
+@export var read_stats : bool = true
 
 static var last_placed_cell : Vector2i
 
@@ -13,12 +13,6 @@ const RANDOM_PATHS = true
 # Set between 1 (fully random) and 0 (fully corrected with snapping)
 static var path_randomness_ratio : float = 0.4
 
-static var cost_dict : Dictionary
-static var health_dict : Dictionary
-static var damage_dict : Dictionary
-static var speed_dict : Dictionary
-static var collide_w_own_dict : Dictionary
-
 const BULLET_DISTANCE : float = 800
 
 var rolling : bool = false
@@ -26,7 +20,19 @@ var rolling_dir : Vector2
 var rolling_pathfollow : PathFollow2D
 
 var self_cell: Vector2i
+var player_owner : Player
+var player_id : int = -1
 
+@export var stats: MagicStats
+
+static var cost_dict: Dictionary[MagicType, float] = {
+	MagicType.NEUTRAL: 5,
+	MagicType.LIGHT: 5,
+	MagicType.HEAVY: 10,
+	MagicType.PASSIVE: 5
+}
+
+@export var own_cost: float
 @export var own_health: float
 @export var damage: float
 @export var roll_speed: float
@@ -39,16 +45,14 @@ var process_callables : Array[Callable]
 
 var screen : Rect2
 
-var player_id : int
-
 signal started_rolling
 
 
 # By default, reads @export stats from static dictionaries (JSON)
 # Take up own cell, calculate screen size
 func setup():
-	if replace_from_dict:
-		read_stats_from_dict()
+	if read_stats:
+		reset_stats()
 	
 	if is_instance_valid(HexCells.player_unique_instance):
 		
@@ -65,11 +69,37 @@ func setup():
 		screen.size*=1.33
 		screen.position=-0.5*screen.size
 
-func read_stats_from_dict():
-	own_health = Magic.health_dict[state]
-	damage = Magic.damage_dict[state]
-	roll_speed = Magic.speed_dict[state]
-	collides_w_own = Magic.collide_w_own_dict[state]
+func reset_stats():
+	if stats == null:
+		push_error('MagicStats resource missing!')
+	
+	state = stats.type
+	own_cost = stats.cost
+	own_health = stats.health
+	damage = stats.damage
+	roll_speed = stats.speed
+	collides_w_own = stats.collide_w_own
+
+
+func place_instance(cell: Vector2i, _player_owner: Player) -> void:
+	var hex_cells: HexCells = HexCells.player_unique_instance
+	
+	position = HexCells.map_to_local(cell)
+	self_cell = cell
+	
+	player_owner = _player_owner
+	HexCells.cell_dict[cell] = self
+	
+	player_id = _player_owner.player_id
+	
+	hex_cells.add_child(self, true)
+	name = "Magic"
+	add_to_group('magic')
+		
+	if player_id!=multiplayer.get_unique_id():
+		modulate = Color(0.819, 0.205, 0.204, 1.0)
+	
+	player_owner.stats.use_mana(own_cost)
 
 # Create and start moving along provided path
 func start_rolling(wiggly_path: PackedVector2Array):
@@ -119,17 +149,7 @@ func replace_with(new_magic_scene : PackedScene):
 	
 	var new_magic : Magic = new_magic_scene.instantiate()
 	
-	new_magic.position = position
-	new_magic.self_cell = self_cell
-	
-	new_magic.modulate = modulate
-	
-	HexCells.cell_dict[self_cell] = new_magic
-	
-	new_magic.player_id = player_id
-	
-	add_sibling(new_magic)
-	
+	new_magic.place_instance(self_cell, player_owner)
 	
 	queue_free()
 

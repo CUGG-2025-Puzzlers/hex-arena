@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://bvdkuf6c1gdxs"]
 
-[ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_dmjat"]
-[ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="2_hkro6"]
-[ext_resource type="Texture2D" uid="uid://cuk2faeygjffr" path="res://assets/textures/sprite_sheet 3.png" id="3_dmjat"]
-[ext_resource type="Script" uid="uid://c1fx17yoxje1h" path="res://scripts/hpManaStats.gd" id="4_uajpi"]
-[ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="7_n5ll0"]
-[ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="8_b15l6"]
-[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="9_sniku"]
-[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="10_hkro6"]
+[ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_i5orq"]
+[ext_resource type="Resource" uid="uid://dqvg2cotkg854" path="res://presets/character_presets/Hekaset_stats.tres" id="2_wvd3y"]
+[ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="3_aouqn"]
+[ext_resource type="Texture2D" uid="uid://cuk2faeygjffr" path="res://assets/textures/sprite_sheet 3.png" id="4_qs17t"]
+[ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="5_yj2uh"]
+[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="6_3q4dn"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="7_tpk3q"]
+[ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="8_y05qp"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
 properties/0/path = NodePath(".:player_id")
@@ -310,14 +310,15 @@ colors = PackedColorArray(1, 0.06999999, 0.06999999, 1, 2.2848396, 2.2848396, 2.
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_b15l6"]
 load_path = "res://.godot/imported/Aztec_walk_draft.png-ca31bbd12d930f750257669e38fcd888.ctex"
 
-[node name="Player2" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
+[node name="Hekaset" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
 collision_layer = 2
 collision_mask = 7
-script = ExtResource("1_dmjat")
+script = ExtResource("1_i5orq")
 base_speed = 250.0
 animation_tree = NodePath("AnimationTree")
 animation_player = NodePath("AnimationPlayer2")
 radius = 2
+stats = ExtResource("2_wvd3y")
 
 [node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=8959142]
 replication_config = SubResource("SceneReplicationConfig_smehm")
@@ -325,7 +326,7 @@ replication_config = SubResource("SceneReplicationConfig_smehm")
 [node name="InputSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=638878176]
 unique_name_in_owner = true
 replication_config = SubResource("SceneReplicationConfig_ur7pv")
-script = ExtResource("2_hkro6")
+script = ExtResource("3_aouqn")
 
 [node name="NameLabel" type="Label" parent="." unique_id=123225415]
 unique_name_in_owner = true
@@ -344,15 +345,11 @@ shape = SubResource("RectangleShape2D_g2els")
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1328122983]
 position = Vector2(-0.41500115, -45.572887)
 scale = Vector2(0.06510082, 0.06510082)
-texture = ExtResource("3_dmjat")
+texture = ExtResource("4_qs17t")
 hframes = 7
 vframes = 6
 region_enabled = true
 region_rect = Rect2(1458.6145, 19.482422, 9376.86, 10761.685)
-
-[node name="StatsComponent" type="Node" parent="." unique_id=20242128]
-script = ExtResource("4_uajpi")
-metadata/_custom_type_script = "uid://c1fx17yoxje1h"
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=1235461056]
 tree_root = SubResource("AnimationNodeStateMachine_3v2ag")
@@ -365,7 +362,7 @@ libraries/ = SubResource("AnimationLibrary_hkro6")
 
 [node name="Ability" type="Node" parent="." unique_id=679062097]
 unique_name_in_owner = true
-script = ExtResource("7_n5ll0")
+script = ExtResource("5_yj2uh")
 metadata/_custom_type_script = "uid://cciheadly5brc"
 
 [node name="FlashAnimation" type="GPUParticles2D" parent="." unique_id=409151462]
@@ -380,7 +377,7 @@ process_material = SubResource("ParticleProcessMaterial_fjrip")
 
 [node name="Drawing range" type="Node2D" parent="." unique_id=771124319]
 show_behind_parent = true
-script = ExtResource("9_sniku")
+script = ExtResource("6_3q4dn")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1304947050]
 
@@ -393,7 +390,7 @@ modulate = Color(0.6, 0.13333334, 0.13333334, 1)
 position = Vector2(0, -40)
 emitting = false
 amount = 15
-texture = ExtResource("10_hkro6")
+texture = ExtResource("7_tpk3q")
 lifetime = 0.52
 one_shot = true
 explosiveness = 0.71
@@ -407,7 +404,7 @@ initial_velocity_min = 56.66
 initial_velocity_max = 178.47
 color_ramp = SubResource("Gradient_b15l6")
 
-[node name="OverheadHp" parent="." unique_id=1343235313 instance=ExtResource("8_b15l6")]
+[node name="OverheadHp" parent="." unique_id=1343235313 instance=ExtResource("8_y05qp")]
 offset_left = -50.0
 offset_top = -105.0
 offset_right = 50.0

@@ -7,7 +7,7 @@ var mouse_pos: Vector2
 
 var player_id: int
 
-@onready var own_stats: StatsComponent = get_parent().get_node("StatsComponent")
+@onready var own_stats: CharacterStats = get_parent().stats
 
 func _ready() -> void:
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
@@ -34,14 +34,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			rolling_dir = rolling_dir.normalized()
 			
 			for magic_instance in get_tree().get_nodes_in_group("magic"):
-				if magic_instance.player_id==player_id and magic_instance.state in [Magic.MagicType.LIGHT_ARROW, Magic.MagicType.SPIKE_BALL]:
+				if magic_instance.player_id==player_id and magic_instance.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY]:
 					var magic_cell : Vector2i = magic_instance.self_cell
 				
 					var points : PackedVector2Array = []
 					match magic_instance.state:
-						Magic.MagicType.SPIKE_BALL:
+						Magic.MagicType.HEAVY:
 							points.append_array(Magic.create_wiggly_path(rolling_dir, Magic.BULLET_DISTANCE*randf_range(1,2)))
-						Magic.MagicType.LIGHT_ARROW:
+						Magic.MagicType.LIGHT:
 							points.append_array(Magic.create_wiggly_path(rolling_dir, Magic.BULLET_DISTANCE*randf_range(0.5,1)))
 					
 					HexCells.player_unique_instance.rpc("launch_magic_in_cell", magic_cell, points, player_id)
@@ -53,14 +53,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	var possible_states = []
 	if Input.is_action_just_pressed("turn_pure_to_heavy")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.SPIKE_BALL]:
-		possible_states.append(Magic.MagicType.SPIKE_BALL)
+	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.HEAVY]:
+		possible_states.append(Magic.MagicType.HEAVY)
 	if Input.is_action_just_pressed("turn_pure_to_light")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.LIGHT_ARROW]:
-		possible_states.append(Magic.MagicType.LIGHT_ARROW)
+	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.LIGHT]:
+		possible_states.append(Magic.MagicType.LIGHT)
 	if Input.is_action_just_pressed("turn_pure_to_shield")\
-	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.SHIELD]:
-		possible_states.append(Magic.MagicType.SHIELD)
+	and own_stats.current_mana>=Magic.cost_dict[Magic.MagicType.PASSIVE]:
+		possible_states.append(Magic.MagicType.PASSIVE)
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
 		var pos = get_parent().get_node("CollisionShape2D").global_position

@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name Player
 
 @export var base_speed : float = 135.0
 @export var animation_tree : AnimationTree
@@ -6,7 +7,6 @@ extends CharacterBody2D
 
 @onready var _input: MultiplayerInput = %InputSynchronizer
 @onready var OverheadHp : ProgressBar = $OverheadHp
-@onready var stats : StatsComponent = $StatsComponent
 @onready var _ability : AbilityBase = %Ability
 
 var do_ability : String
@@ -18,12 +18,19 @@ var playback : AnimationNodeStateMachinePlayback
 var radius_cells : Array
 var cell : Vector2i
 
+@export var stats: CharacterStats
+
 var player_id: int:
 	set(value):
 		player_id = value
 		%InputSynchronizer.set_multiplayer_authority(value)
 
 func _ready() -> void:
+	
+	stats.current_health = stats.max_health
+	stats.current_mana = stats.max_mana
+	
+	
 	playback = animation_tree["parameters/playback"]
 	
 	# collision with environment is layer 1 and ignore other players
@@ -39,6 +46,8 @@ func _ready() -> void:
 	_on_overhead_hp_changed.call_deferred(stats.current_health, stats.max_health)
 
 func _process(_delta: float) -> void:
+	stats._process(_delta)
+	
 	if multiplayer.is_server():
 		_reconcile_pos.rpc(position)
 
@@ -95,7 +104,7 @@ func _on_overhead_hp_changed(current: float, maximum: float) -> void:
 	OverheadHp.max_value = maximum
 	OverheadHp.value = current
 
-func get_stats() -> StatsComponent:
+func get_stats() -> CharacterStats:
 	return stats
 	
 func is_channeling() -> bool:
@@ -123,7 +132,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_area_entered(area: Area2D) -> void:
-	if area is Magic and area.state in [Magic.MagicType.LIGHT_ARROW, Magic.MagicType.SPIKE_BALL] and area.player_id != player_id:
+	if area is Magic and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] and area.player_id != player_id:
 		area.call_deferred("fizzle")
 		var blood: CPUParticles2D = get_node("Area2D/CPUParticles2D")
 		blood.restart()

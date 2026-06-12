@@ -2,7 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_hy8at"]
 [ext_resource type="Script" uid="uid://ia5bsvnn30o0" path="res://scripts/magic_scripts/magic_light_arrow.gd" id="2_0srqf"]
-[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="2_7u3xm"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="3_2y3xm"]
+[ext_resource type="Resource" uid="uid://b6sve0jqnar7" path="res://presets/magic_types/LIGHT_ARROW_stats.tres" id="4_stats"]
 
 [sub_resource type="Curve" id="Curve_0srqf"]
 _limits = [0.0, 2.0, 0.0, 1.0]
@@ -22,20 +23,23 @@ point_count = 4
 
 [node name="MagicLightArrow" unique_id=627565832 instance=ExtResource("1_hy8at")]
 script = ExtResource("2_0srqf")
-state = 1
+state = 2
+stats = ExtResource("4_stats")
+own_cost = 5.0
 own_health = 30.0
+damage = 40.0
+roll_speed = 540.0
 
 [node name="MainSprite" parent="." index="0" unique_id=415175278]
 visible = false
 
 [node name="ArrowParticles" type="Node2D" parent="." index="3" unique_id=1827010313]
-rotation = 5.30927
 
 [node name="ArrowL" type="CPUParticles2D" parent="ArrowParticles" index="0" unique_id=41472523]
 position = Vector2(8, 0)
 scale = Vector2(0.25, 0.25)
 amount = 30
-texture = ExtResource("2_7u3xm")
+texture = ExtResource("3_2y3xm")
 local_coords = true
 direction = Vector2(-0.94, -0.342)
 spread = 0.0
@@ -51,7 +55,7 @@ color_ramp = SubResource("Gradient_kuvl6")
 position = Vector2(8, 0)
 scale = Vector2(0.25, 0.25)
 amount = 30
-texture = ExtResource("2_7u3xm")
+texture = ExtResource("3_2y3xm")
 local_coords = true
 direction = Vector2(-0.94, 0.342)
 spread = 0.0
@@ -70,7 +74,7 @@ material = SubResource("CanvasItemMaterial_eini4")
 position = Vector2(8, 0)
 scale = Vector2(0.25, 0.25)
 amount = 40
-texture = ExtResource("2_7u3xm")
+texture = ExtResource("3_2y3xm")
 local_coords = true
 direction = Vector2(-1, 0)
 spread = 0.0
