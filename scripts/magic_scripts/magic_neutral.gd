@@ -18,7 +18,7 @@ func change_state(new_state: MagicType):
 	if new_state == state:
 		return
 	
-	replace_with(player_owner.stats.magics[new_state].scene)
+	replace_with(player_owner.preset.magics[new_state].scene)
 
 # Update XP
 func cycle_complete(iteration: int):

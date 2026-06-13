@@ -143,8 +143,8 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 					magic_instance.change_state(new_state)
 					counter+=1
 					if owned:
-						var player_stats : CharacterStats = player_owner.stats
-						player_stats.use_mana(player_stats.magics[new_state].cost)
+						var player_preset : CharacterStats = player_owner.preset
+						player_owner.stats_update.use_mana(player_preset.magics[new_state].cost)
 				else:
 					break
 
@@ -191,7 +191,7 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 	if player_owner == null or player_owner.player_id!=player_id:
 		push_error('Unable to get the player who placed the magic')
 	
-	var magic_instance: Magic = player_owner.stats.magics[Magic.MagicType.NEUTRAL].scene.instantiate()
+	var magic_instance: Magic = player_owner.preset.magics[Magic.MagicType.NEUTRAL].scene.instantiate()
 	
 	magic_instance.place_instance(cell, player_owner)
 	

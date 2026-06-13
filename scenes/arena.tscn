@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://cei521iq1xrb2"]
 
-[ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="1_gubwe"]
+[ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/Hex-Cells.gd" id="1_gubwe"]
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_wl4x5"]
 [ext_resource type="Texture2D" uid="uid://bnv70x432w8c1" path="res://assets/textures/select_bubble_texture.tres" id="3_7ft05"]
 [ext_resource type="PackedScene" uid="uid://dkis3bnrh1b7d" path="res://scenes/hud.tscn" id="3_olpmc"]
@@ -26,8 +26,6 @@ tile_layout = 2
 tile_size = Vector2i(104, 120)
 sources/0 = SubResource("TileSetAtlasSource_wl4x5")
 
-[sub_resource type="Curve2D" id="Curve2D_eejgt"]
-
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4ag8t"]
 distance = -650.0
 
@@ -52,7 +50,6 @@ tile_map_data = PackedByteArray("AADz/+//AAABAAAAAAD0//D/AAABAAEAAADz//H/AAABAAI
 tile_set = SubResource("TileSet_wl4x5")
 
 [node name="Path2D" type="Path2D" parent="." unique_id=513764908]
-curve = SubResource("Curve2D_eejgt")
 script = ExtResource("1_gubwe")
 
 [node name="LazyFollow" type="Sprite2D" parent="Path2D" unique_id=954999697]

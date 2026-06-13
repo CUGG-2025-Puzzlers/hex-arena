@@ -42,14 +42,16 @@ func update_cost_and_button_labels(magics: Dictionary) -> void:
 
 func connect_to_player(p: Player) -> void:
 	player = p
-	var stats: CharacterStats = player.stats
-	stats.health_changed.connect(_on_health_changed)
-	stats.mana_changed.connect(_on_mana_changed)
+	var player_preset: CharacterStats = player.preset
+	var stats_update: StatsUpdate = player.stats_update
 	
-	update_cost_and_button_labels(stats.magics)
+	stats_update.health_changed.connect(_on_health_changed)
+	stats_update.mana_changed.connect(_on_mana_changed)
 	
-	_on_health_changed(stats.current_health, stats.max_health)
-	_on_mana_changed(stats.current_mana, stats.max_mana)
+	update_cost_and_button_labels(player_preset.magics)
+	
+	_on_health_changed(stats_update.current_health, stats_update.max_health)
+	_on_mana_changed(stats_update.current_mana, stats_update.max_mana)
 	
 	# connect movement ability
 	var ability: AbilityBase = player.get_node("Ability")

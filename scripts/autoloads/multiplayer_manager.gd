@@ -7,8 +7,8 @@ signal server_disconnected
 # Dictionary of players using IDs as keys
 var players = {}
 
-var zilo = preload("res://scenes/Zilo.tscn")
-var hekaset = preload("res://scenes/Hekaset.tscn")
+var zilo = preload("res://scenes/characters/Zilo.tscn")
+var hekaset = preload("res://scenes/characters/Hekaset.tscn")
 
 var _players_spawn_node
 
@@ -242,4 +242,4 @@ func _start_game():
 			hud.connect_to_player(player_node)
 			#hud.connect_to_player.call_deferred(player_node)
 		
-		player_node.stats.deadgeLol.connect(_on_player_died.bind(player))
+		player_node.stats_update.deadgeLol.connect(_on_player_died.bind(player))

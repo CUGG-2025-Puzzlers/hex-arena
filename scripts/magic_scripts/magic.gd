@@ -62,7 +62,7 @@ func setup():
 		screen.position=-0.5*screen.size
 
 func reset_stats():
-	var stats : MagicStats = player_owner.stats.magics[state]
+	var stats : MagicStats = player_owner.preset.magics[state]
 	
 	state = stats.type
 	own_cost = stats.cost
@@ -90,7 +90,7 @@ func place_instance(cell: Vector2i, _player_owner: Player) -> void:
 	if player_id!=multiplayer.get_unique_id():
 		modulate = Color(0.819, 0.205, 0.204, 1.0)
 	
-	player_owner.stats.use_mana(own_cost)
+	player_owner.stats_update.use_mana(own_cost)
 
 # Create and start moving along provided path
 func start_rolling(wiggly_path: PackedVector2Array):

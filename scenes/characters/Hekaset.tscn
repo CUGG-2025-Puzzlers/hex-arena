@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://bvdkuf6c1gdxs"]
 
-[ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scenes/player.gd" id="1_i5orq"]
+[ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scripts/characters/player.gd" id="1_i5orq"]
 [ext_resource type="Resource" uid="uid://dqvg2cotkg854" path="res://presets/character_presets/Hekaset_stats.tres" id="2_wvd3y"]
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="3_aouqn"]
 [ext_resource type="Texture2D" uid="uid://cuk2faeygjffr" path="res://assets/textures/sprite_sheet 3.png" id="4_qs17t"]
+[ext_resource type="PackedScene" uid="uid://g25v82bkmahc" path="res://scenes/character_scenes/stats_component_scene.tscn" id="5_i5orq"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="5_yj2uh"]
 [ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="6_3q4dn"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="7_tpk3q"]
-[ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/overhead_hp.tscn" id="8_y05qp"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
 properties/0/path = NodePath(".:player_id")
@@ -310,7 +310,7 @@ colors = PackedColorArray(1, 0.06999999, 0.06999999, 1, 2.2848396, 2.2848396, 2.
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_b15l6"]
 load_path = "res://.godot/imported/Aztec_walk_draft.png-ca31bbd12d930f750257669e38fcd888.ctex"
 
-[node name="Hekaset" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player")]
+[node name="Hekaset" type="CharacterBody2D" unique_id=398475662 node_paths=PackedStringArray("animation_tree", "animation_player", "stats_update")]
 collision_layer = 2
 collision_mask = 7
 script = ExtResource("1_i5orq")
@@ -318,7 +318,8 @@ base_speed = 250.0
 animation_tree = NodePath("AnimationTree")
 animation_player = NodePath("AnimationPlayer2")
 radius = 2
-stats = ExtResource("2_wvd3y")
+preset = ExtResource("2_wvd3y")
+stats_update = NodePath("StatsComponent")
 
 [node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=8959142]
 replication_config = SubResource("SceneReplicationConfig_smehm")
@@ -327,16 +328,6 @@ replication_config = SubResource("SceneReplicationConfig_smehm")
 unique_name_in_owner = true
 replication_config = SubResource("SceneReplicationConfig_ur7pv")
 script = ExtResource("3_aouqn")
-
-[node name="NameLabel" type="Label" parent="." unique_id=123225415]
-unique_name_in_owner = true
-offset_left = -75.0
-offset_top = -135.0
-offset_right = 75.0
-offset_bottom = -112.0
-pivot_offset_ratio = Vector2(0.5, 0.5)
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=529297323]
 position = Vector2(0.5, 0)
@@ -350,6 +341,11 @@ hframes = 7
 vframes = 6
 region_enabled = true
 region_rect = Rect2(1458.6145, 19.482422, 9376.86, 10761.685)
+
+[node name="StatsComponent" parent="." unique_id=446455754 instance=ExtResource("5_i5orq")]
+
+[node name="MarginContainer" parent="StatsComponent" index="0" unique_id=739327049]
+theme_override_constants/margin_bottom = 95
 
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=1235461056]
 tree_root = SubResource("AnimationNodeStateMachine_3v2ag")
@@ -404,12 +400,6 @@ initial_velocity_min = 56.66
 initial_velocity_max = 178.47
 color_ramp = SubResource("Gradient_b15l6")
 
-[node name="OverheadHp" parent="." unique_id=1343235313 instance=ExtResource("8_y05qp")]
-offset_left = -50.0
-offset_top = -105.0
-offset_right = 50.0
-offset_bottom = -96.0
-
 [node name="SizeRef" type="Sprite2D" parent="." unique_id=981245314]
 visible = false
 position = Vector2(69.99999, -35)
@@ -419,3 +409,5 @@ hframes = 7
 vframes = 5
 region_enabled = true
 region_rect = Rect2(0, 640, 11210, 10640)
+
+[editable path="StatsComponent"]
