@@ -4,7 +4,6 @@ class_name Magic
 enum MagicType {NONE, NEUTRAL, LIGHT, HEAVY, PASSIVE}
 @export var state : MagicType = MagicType.NONE
 
-@export var read_stats : bool = true
 
 static var last_placed_cell : Vector2i
 
@@ -30,6 +29,13 @@ var player_id : int = -1
 @export var roll_speed: float
 @export var collides_w_own: bool
 
+@export var own_transforms: Dictionary[MagicType, MagicStats] = {
+	MagicType.NEUTRAL: null,
+	MagicType.LIGHT: null,
+	MagicType.HEAVY: null,
+	MagicType.PASSIVE: null
+}
+
 @onready var magic_particles_instance : CPUParticles2D = $FizzleParticles
 
 
@@ -43,9 +49,6 @@ signal started_rolling
 # By default, reads @export stats from static dictionaries (JSON)
 # Take up own cell, calculate screen size
 func setup():
-	if read_stats:
-		reset_stats()
-	
 	if is_instance_valid(HexCells.player_unique_instance):
 		
 		var owner_hexcells : HexCells = HexCells.player_unique_instance
@@ -61,36 +64,45 @@ func setup():
 		screen.size*=1.33
 		screen.position=-0.5*screen.size
 
-func reset_stats():
-	var stats : MagicStats = player_owner.preset.magics[state]
+func reset_stats(stats_reference: MagicStats):
+	state = stats_reference.type
+	own_cost = stats_reference.cost
+	own_health = stats_reference.health
+	damage = stats_reference.damage
+	roll_speed = stats_reference.speed
+	collides_w_own = stats_reference.collide_w_own
 	
-	state = stats.type
-	own_cost = stats.cost
-	own_health = stats.health
-	damage = stats.damage
-	roll_speed = stats.speed
-	collides_w_own = stats.collide_w_own
+	own_transforms.clear()
+	for key in stats_reference.transform_dict:
+		var resource_val = stats_reference.transform_dict[key]
+		own_transforms[key] = resource_val as MagicStats
 
 
-func place_instance(cell: Vector2i, _player_owner: Player) -> void:
+func place_instance_for_player(cell: Vector2i, _player_owner: Player = null, _stats_reference: MagicStats = null) -> void:
 	var hex_cells: HexCells = HexCells.player_unique_instance
+	
+	if is_instance_valid(HexCells.cell_dict[cell]):
+		HexCells.cell_dict[cell].queue_free()
 	
 	position = HexCells.map_to_local(cell)
 	self_cell = cell
-	
-	player_owner = _player_owner
 	HexCells.cell_dict[cell] = self
 	
-	player_id = _player_owner.player_id
+	player_owner = _player_owner
+	if _stats_reference:
+		reset_stats(_stats_reference)
+	
+	if player_owner:
+		player_id = _player_owner.player_id
+	else:
+		player_id = -1
 	
 	hex_cells.add_child(self, true)
 	name = "Magic"
 	add_to_group('magic')
-		
-	if player_id!=multiplayer.get_unique_id():
-		modulate = Color(0.819, 0.205, 0.204, 1.0)
 	
-	player_owner.stats_update.use_mana(own_cost)
+	if player_id > 0 and player_id != multiplayer.get_unique_id():
+		modulate = Color(0.819, 0.205, 0.204, 1.0)
 
 # Create and start moving along provided path
 func start_rolling(wiggly_path: PackedVector2Array):
@@ -129,18 +141,21 @@ func start_rolling(wiggly_path: PackedVector2Array):
 	
 	started_rolling.emit()
 
-# Dummy function to replace in neutral
-func change_state(_new_state: MagicType):
-	pass
+
+func change_state_cost(_new_state: MagicType) -> float:
+	if own_transforms.has(_new_state) and own_transforms[_new_state]:
+		return own_transforms[_new_state].cost
+	else:
+		return -1
 
 # Replace scene with a different magic scene
-func replace_with(new_magic_scene : PackedScene):
+func change_state_for_player(new_magic_state: MagicType, _player_owner: Player):
 	monitoring = false
 	monitorable = false
 	
-	var new_magic : Magic = new_magic_scene.instantiate()
+	var new_magic : Magic = own_transforms[new_magic_state].scene.instantiate()
 	
-	new_magic.place_instance(self_cell, player_owner)
+	new_magic.place_instance_for_player(self_cell, _player_owner, own_transforms[new_magic_state])
 	
 	queue_free()
 

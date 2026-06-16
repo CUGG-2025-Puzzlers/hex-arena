@@ -113,6 +113,10 @@ func _on_area_entered(area: Area2D) -> void:
 func _apply_damage(amount: float) -> void:
 	stats_update.take_damage(amount)
 
+@rpc("authority", "call_local", "reliable")
+func _use_mana(amount: float) -> void:
+	stats_update.use_mana(amount)
+
 #FORCE POSITION
 @rpc("authority", "call_local", "reliable")
 func _reconcile_pos(target_pos: Vector2) -> void:

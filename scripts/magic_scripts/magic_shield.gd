@@ -6,6 +6,7 @@ class_name MagicShield
 @onready var shield_static_body : StaticBody2D = $ShieldBody
 
 @export var lifetime : float = 5
+@export var expires : bool = true
 
 var glow_tween : Tween
 
@@ -15,7 +16,7 @@ func _ready() -> void:
 	recalculate_coll_shape()
 	create_and_start_glow()
 	
-	if HexCells.player_unique_instance:
+	if expires and HexCells.player_unique_instance:
 		start_lifetime_timer(lifetime)
 
 func start_lifetime_timer(time: float):
@@ -44,6 +45,7 @@ func create_and_start_glow():
 	, start_point, start_point+[-1.,1.].pick_random(), 5)
 
 func visualize_shield():
+	shield_animated_texture = find_child("Shield Glow").texture.duplicate()
 	find_child("Shield Glow").texture = shield_animated_texture
 	
 	if player_id!=multiplayer.get_unique_id():

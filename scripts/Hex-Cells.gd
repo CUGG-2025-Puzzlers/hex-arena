@@ -99,16 +99,20 @@ func _unhandled_input(event: InputEvent) -> void:
 		text.position = get_global_mouse_position()+Vector2(25,-5)
 
 @rpc("call_local","any_peer","reliable") 
-func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int, how_many:int): #rng_seed: int
+func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType, player_id: int, mana: float): #rng_seed: int
+	if not multiplayer.is_server():
+		return false
+	
 	var change_around_cell = local_to_map(pos)
 	
 	var player_owner: Player = null
-	var player_cells = []
+	var player_cell: Vector2i = local_to_map(pos)
+	var other_player_cells = []
 	for player in get_tree().current_scene.find_child("Players").get_children():
-		player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
-		
 		if player.player_id == player_id:
 			player_owner = player
+		else:
+			other_player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
 	
 	var surrounding_cells = radius_cells.duplicate()
 	for i in range(len(surrounding_cells)):
@@ -128,28 +132,43 @@ func change_magic(pos: Vector2, radius_cells: Array, new_state: Magic.MagicType,
 	"""
 	surrounding_cells.append(change_around_cell)
 	
-	var counter = 0
-	var owned = player_id == multiplayer.get_unique_id()
-	
 	while not surrounding_cells.is_empty():
 		var cell_to_check = surrounding_cells.pop_back()
 		if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]):
 			var magic_instance : Magic = cell_dict[cell_to_check]
 			
-			if magic_instance.state == Magic.MagicType.NEUTRAL \
-			and magic_instance.player_id == player_id \
-			and not (cell_to_check in player_cells and new_state==Magic.MagicType.PASSIVE):
-				if counter<how_many:
-					magic_instance.change_state(new_state)
-					counter+=1
-					if owned:
-						var player_preset : CharacterStats = player_owner.preset
-						player_owner.stats_update.use_mana(player_preset.magics[new_state].cost)
+			# Spawn logic: can turn unclaimed or own magic
+			# Cannot change any magic on opponents' cells
+			# Cannot create shield on own cell
+			if (magic_instance.player_id < 0 or magic_instance.player_id == player_id) \
+			and not (cell_to_check in other_player_cells) and \
+			not (cell_to_check==player_cell and new_state==Magic.MagicType.PASSIVE):
+				var cost = magic_instance.change_state_cost(new_state)
+				if cost>=0 and mana>=cost:
+					change_magic_in_cell_for_player.rpc(cell_to_check, new_state, player_id)
+					
+					player_owner._use_mana.rpc(cost)
+					mana-=cost
 				else:
-					break
+					continue
+
+@rpc("call_local", "authority", "reliable")
+func change_magic_in_cell_for_player(cell: Vector2i, new_state: Magic.MagicType, player_id: int):
+	if not (cell_dict.has(cell) and is_instance_valid(cell_dict[cell])):
+		push_error('Could not get the magic instance for changing')
+		return
+	
+	var player_owner: Player = get_node("../Players/"+str(player_id))
+	if player_owner == null or player_owner.player_id!=player_id:
+		push_error('Unable to get the player who changed the magic')
+	
+	var magic_instance: Magic = cell_dict[cell]
+	magic_instance.change_state_for_player(new_state, player_owner)
+
 
 @rpc("call_local", "any_peer", "reliable")
-func place_magic_in_cell_check(mouse_pos: Vector2, player_cell:Vector2i, radius_cells: Array, player_id: int):
+func try_place_magic_for_player(mouse_pos: Vector2, type: Magic.MagicType,
+player_cell:Vector2i, radius_cells: Array, _player_id: int):
 	if not multiplayer.is_server():
 		return false
 	
@@ -169,21 +188,21 @@ func place_magic_in_cell_check(mouse_pos: Vector2, player_cell:Vector2i, radius_
 	
 	"""
 	# Prevents placing magic on top of other player
-	# In turn can softlock both players inside a shield circle
+	# In turn, can softlock both players inside a shield circle
 	
 	var other_player_cells = []
 	for player in get_tree().current_scene.find_child("Players").get_children():
-		if int(player.name)!=player_id:
+		if int(player.name)!=_player_id:
 			other_player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
 	if cell_to_place in other_player_cells:
 		return false
 	"""
 	
-	place_magic_in_cell.rpc(cell_to_place, player_id)
+	place_magic_in_cell_for_player.rpc(cell_to_place, type, _player_id)
 	return true
 
-@rpc("call_local", "any_peer", "reliable")
-func place_magic_in_cell(cell: Vector2i, player_id: int):
+@rpc("call_local", "authority", "reliable")
+func place_magic_in_cell_for_player(cell: Vector2i, type: Magic.MagicType, player_id: int):
 	if is_instance_valid(cell_dict[cell]):
 		cell_dict[cell].queue_free()
 	
@@ -191,9 +210,12 @@ func place_magic_in_cell(cell: Vector2i, player_id: int):
 	if player_owner == null or player_owner.player_id!=player_id:
 		push_error('Unable to get the player who placed the magic')
 	
-	var magic_instance: Magic = player_owner.preset.magics[Magic.MagicType.NEUTRAL].scene.instantiate()
+	var magic_instance: Magic = player_owner.preset.magics[type].scene.instantiate()
 	
-	magic_instance.place_instance(cell, player_owner)
+	magic_instance.place_instance_for_player(cell, player_owner, player_owner.preset.magics[type])
+	
+	if multiplayer.is_server():
+		player_owner._use_mana.rpc(magic_instance.own_cost)
 	
 	if player_id == multiplayer.get_unique_id():
 		Magic.last_placed_cell = cell

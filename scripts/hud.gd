@@ -24,21 +24,21 @@ func _ready() -> void:
 	_style_bar(mana_bar, Color(0.2, 0.4, 0.9), Color(0.15, 0.15, 0.15))
 
 func update_cost_and_button_labels(magics: Dictionary) -> void:
-	var passive_button : InputEventKey = InputMap.action_get_events("turn_pure_to_passive")[0]
-	var light_button : InputEventKey = InputMap.action_get_events("turn_pure_to_light")[0]
-	var heavy_button : InputEventKey = InputMap.action_get_events("turn_pure_to_heavy")[0]
+	var passive_button : InputEventKey = InputMap.action_get_events("turn_to_passive")[0]
+	var light_button : InputEventKey = InputMap.action_get_events("turn_to_light")[0]
+	var heavy_button : InputEventKey = InputMap.action_get_events("turn_to_heavy")[0]
 
 	var passive_magic : MagicStats = magics[Magic.MagicType.PASSIVE]
-	passive_magic_label.text = "{0}\n{1}\n{2} Mana".format([OS.get_keycode_string(passive_button.physical_keycode),
-	passive_magic.magic_name, passive_magic.cost])
+	passive_magic_label.text = "%s\n%s\n%d Mana" % [OS.get_keycode_string(passive_button.physical_keycode),
+	passive_magic.magic_name, passive_magic.cost]
 	
 	var light_magic : MagicStats = magics[Magic.MagicType.LIGHT]
-	light_magic_label.text = "{0}\n{1}\n{2} Mana".format([OS.get_keycode_string(light_button.physical_keycode),
-	light_magic.magic_name, light_magic.cost])
+	light_magic_label.text = "%s\n%s\n%d Mana" % [OS.get_keycode_string(light_button.physical_keycode),
+	light_magic.magic_name, light_magic.cost]
 	
 	var heavy_magic : MagicStats = magics[Magic.MagicType.HEAVY]
-	heavy_magic_label.text = "{0}\n{1}\n{2} Mana".format([OS.get_keycode_string(heavy_button.physical_keycode),
-	heavy_magic.magic_name, heavy_magic.cost])
+	heavy_magic_label.text = "%s\n%s\n%d Mana" % [OS.get_keycode_string(heavy_button.physical_keycode),
+	heavy_magic.magic_name, heavy_magic.cost]
 
 func connect_to_player(p: Player) -> void:
 	player = p
