@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://bwvdthar585v4"]
+
+[ext_resource type="Script" uid="uid://b2xoe2fn7jbee" path="res://scripts/lobby_room_screen.gd" id="1_auptr"]
+
+[node name="LobbyRoomScreen" type="Control" unique_id=500601008]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_auptr")
+
+[node name="Background" type="ColorRect" parent="." unique_id=144335855]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.5202975, 0.42859074, 0.5130844, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="Background" unique_id=549345698]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/MarginContainer" unique_id=849446014]
+layout_mode = 2
+
+[node name="PlayerView" type="PanelContainer" parent="Background/MarginContainer/HBoxContainer" unique_id=958196778]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="RightPanel" type="PanelContainer" parent="Background/MarginContainer/HBoxContainer" unique_id=1031901736]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/MarginContainer/HBoxContainer/RightPanel" unique_id=1301851926]
+layout_mode = 2
+
+[node name="PlayerList" type="VBoxContainer" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer" unique_id=1002243328]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/PlayerList" unique_id=2064330737]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Player List"
+
+[node name="Chat" type="VBoxContainer" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer" unique_id=626530211]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="Label" type="Label" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/Chat" unique_id=53601658]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Chat"
+
+[node name="ChatScroll" type="ScrollContainer" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/Chat" unique_id=113545533]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 8.0
+
+[node name="ChatBox" type="RichTextLabel" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/Chat/ChatScroll" unique_id=15982285]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+fit_content = true
+
+[node name="ChatInputRow" type="HBoxContainer" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/Chat" unique_id=1832252503]
+layout_mode = 2
+
+[node name="ChatInput" type="LineEdit" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/Chat/ChatInputRow" unique_id=131303695]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="SendButton" type="Button" parent="Background/MarginContainer/HBoxContainer/RightPanel/VBoxContainer/Chat/ChatInputRow" unique_id=725797974]
+layout_mode = 2
+text = "Send"
