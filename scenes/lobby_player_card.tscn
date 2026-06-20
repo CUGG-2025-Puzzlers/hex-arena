@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://ckwv1eporf8qk"]
+
+[ext_resource type="Script" uid="uid://c5003wms4a6m6" path="res://scripts/lobby_player_card.gd" id="1_ndyhb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nom1k"]
+bg_color = Color(0.5047566, 0.6402495, 0.53730124, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.2089948, 0.5200269, 0.41823092, 1)
+
+[node name="LobbyPlayerCard" type="PanelContainer" unique_id=715285779]
+custom_minimum_size = Vector2(220, 280)
+offset_right = 546.0
+offset_bottom = 787.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_nom1k")
+script = ExtResource("1_ndyhb")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=222020342]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=536802847]
+layout_mode = 2
+
+[node name="Avatar" type="TextureRect" parent="MarginContainer/VBoxContainer" unique_id=569044694]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1230336325]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer/InfoContainer" unique_id=494969428]
+layout_mode = 2
+text = "Name"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/InfoContainer" unique_id=1230643061]
+layout_mode = 2
+text = "Status"
+horizontal_alignment = 1
+
+[node name="RoleLabel" type="Label" parent="MarginContainer/VBoxContainer/InfoContainer" unique_id=1826430874]
+layout_mode = 2
+text = "Role"
+horizontal_alignment = 1
