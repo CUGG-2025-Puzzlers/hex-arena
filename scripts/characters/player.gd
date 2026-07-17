@@ -20,13 +20,14 @@ var cell : Vector2i
 @export var preset: CharacterStats
 @export var stats_update: StatsUpdate
 
+var rooted_until_msec: int = 0
+
 var player_id: int:
 	set(value):
 		player_id = value
 		%InputSynchronizer.set_multiplayer_authority(value)
 
 func _ready() -> void:
-	
 	playback = animation_tree["parameters/playback"]
 	
 	# collision with environment is layer 1 and ignore other players
@@ -43,8 +44,18 @@ func _process(_delta: float) -> void:
 		_reconcile_pos.rpc(position)
 
 func _physics_process(delta: float) -> void:
+	# Root stops movement but does not disable MultiplayerInput, so the player
+	# can still place, transform, and fire magic.
+	if is_rooted():
+		velocity = Vector2.ZERO
+		move_and_slide()
+		playback.travel("Stop")
+		cell = HexCells.player_unique_instance.local_to_map(
+			get_node("CollisionShape2D").global_position
+		)
+		return
 
-	#no movement if dashing
+	# no movement if dashing
 	if _ability is DashAbility and _ability.is_controlling_movement():
 		return
 		
@@ -57,7 +68,9 @@ func _physics_process(delta: float) -> void:
 	select_animation()
 	update_animation_parameters()
 		
-	cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
+	cell = HexCells.player_unique_instance.local_to_map(
+		get_node("CollisionShape2D").global_position
+	)
 
 func select_animation():
 	if _input.direction == Vector2.ZERO:
@@ -87,7 +100,6 @@ func _handle_movement(_delta: float) -> void:
 func set_player_name(player_name: String):
 	stats_update.update_name(player_name) 
 
-
 func get_stats() -> StatsUpdate:
 	return stats_update
 	
@@ -97,9 +109,28 @@ func is_channeling() -> bool:
 func is_dashing() -> bool:
 	return _ability is DashAbility and _ability.is_dashing
 
+func is_rooted() -> bool:
+	return Time.get_ticks_msec() < rooted_until_msec
 
 func _on_area_entered(area: Area2D) -> void:
-	if area is Magic and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] and area.player_id != player_id:
+	if area is MagicRootHand:
+		var root_hand := area as MagicRootHand
+		if root_hand.player_id == player_id or not root_hand.try_consume_hit():
+			return
+
+		root_hand.call_deferred("fizzle")
+		var root_blood := get_node_or_null("Area2D/CPUParticles2D") as CPUParticles2D
+		if root_blood != null:
+			root_blood.restart()
+
+		if multiplayer.is_server():
+			_apply_root.rpc(root_hand.root_duration)
+		return
+
+	if area is Magic \
+	and not (area is MagicBurst) \
+	and area.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY] \
+	and area.player_id != player_id:
 		area.call_deferred("fizzle")
 		var blood: CPUParticles2D = get_node("Area2D/CPUParticles2D")
 		blood.restart()
@@ -108,6 +139,19 @@ func _on_area_entered(area: Area2D) -> void:
 		if multiplayer.is_server():
 			var damage_amount = area.damage / randf_range(3.3, 3.5)
 			_apply_damage.rpc(damage_amount)
+
+@rpc("authority", "call_local", "reliable")
+func _apply_root(duration: float) -> void:
+	rooted_until_msec = maxi(
+		rooted_until_msec,
+		Time.get_ticks_msec() + int(duration * 1000.0)
+	)
+	velocity = Vector2.ZERO
+
+	# DashAbility moves the player from its own _physics_process(), so it must
+	# be cancelled explicitly when a root lands.
+	if _ability is DashAbility:
+		(_ability as DashAbility).cancel_dash()
 
 @rpc("authority", "call_local", "reliable")
 func _apply_damage(amount: float) -> void:

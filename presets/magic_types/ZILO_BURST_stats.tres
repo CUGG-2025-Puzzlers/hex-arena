@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://csgygghei0p23"]
+
+[ext_resource type="PackedScene" path="res://scenes/magic_types/magic_burst.tscn" id="1_62d5b"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="2_lngms"]
+
+[resource]
+script = ExtResource("2_lngms")
+type = 2
+magic_name = "Burst"
+cost = 5.0
+scene = ExtResource("1_62d5b")
+health = 30.0
+damage = 120.0
+metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

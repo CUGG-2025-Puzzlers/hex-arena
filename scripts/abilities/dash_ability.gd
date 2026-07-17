@@ -47,6 +47,10 @@ func _end_dash() -> void:
 	player.velocity = Vector2.ZERO
 	ability_ended.emit()
 
+func cancel_dash() -> void:
+	if is_dashing:
+		_end_dash()
+
 # true if player is dashing
 func is_controlling_movement() -> bool:
 	return is_dashing

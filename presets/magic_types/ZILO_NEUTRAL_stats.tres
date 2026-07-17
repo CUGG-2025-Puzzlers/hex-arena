@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://4xq4k460mq7e"]
+
+[ext_resource type="PackedScene" uid="uid://bfvg4nm7yvdcm" path="res://scenes/magic_types/magic_neutral.tscn" id="1_f3s8t"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="2_etbtw"]
+[ext_resource type="Resource" uid="uid://csgygghei0p23" path="res://presets/magic_types/ZILO_BURST_stats.tres" id="3_f3s8t"]
+[ext_resource type="Resource" uid="uid://f5640rqap220" path="res://presets/magic_types/ZILO_HAND_stats.tres" id="4_etbtw"]
+[ext_resource type="Resource" uid="uid://86i7f2p7uljq" path="res://presets/magic_types/SHIELD_stats.tres" id="5_ic15h"]
+
+[resource]
+script = ExtResource("2_etbtw")
+type = 1
+magic_name = "Neutral"
+cost = 5.0
+scene = ExtResource("1_f3s8t")
+health = 25.0
+transform_dict = Dictionary[int, Resource]({
+1: null,
+2: ExtResource("3_f3s8t"),
+3: ExtResource("4_etbtw"),
+4: ExtResource("5_ic15h")
+})
+metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

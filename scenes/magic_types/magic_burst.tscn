@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://blgoctyjk2mb5"]
+
+[ext_resource type="Script" uid="uid://c6lb0lff1aonj" path="res://scripts/magic_burst.gd" id="1_burst"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_burst"]
+radius = 18.0
+
+[node name="MagicBurst" type="Area2D" unique_id=469247540]
+monitorable = false
+script = ExtResource("1_burst")
+expansion_time = 0.24
+visible_after_hit_time = 0.14
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2107800845]
+shape = SubResource("CircleShape2D_burst")
+
+[node name="FizzleParticles" type="CPUParticles2D" parent="." unique_id=562260465]
+emitting = false
+amount = 26
+lifetime = 0.45
+one_shot = true
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 20.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 70.0
+initial_velocity_max = 180.0
+scale_amount_min = 2.0
+scale_amount_max = 5.0
+color = Color(1, 0.04, 0.06, 1)
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
