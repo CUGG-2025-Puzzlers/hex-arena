@@ -160,7 +160,7 @@ func execute_action(action: BotAction) -> void:
 			_transform_neutral_magic(Magic.MagicType.HEAVY)
 
 		BotAction.TRANSFORM_SHIELD:
-			_transform_neutral_magic(Magic.MagicType.SHIELD)
+			_transform_neutral_magic(Magic.MagicType.PASSIVE)
 
 		BotAction.FIRE_AT_PLAYER:
 			_fire_light_at_player()
@@ -215,14 +215,19 @@ func _has_light_magic(magic_list: Array[Magic]) -> bool:
 
 func _enemy_has_shield(magic_list: Array[Magic]) -> bool:
 	for magic in magic_list:
-		if magic.state == Magic.MagicType.SHIELD:
+		if magic.state == Magic.MagicType.PASSIVE:
 			return true
 
 	return false
 	
 func _place_basic_magic() -> void:
 	var hex_cells := _get_hex_cells()
-	if hex_cells == null:
+	var bot := controlled_player as Player
+
+	if hex_cells == null or bot == null:
+		return
+
+	if bot.preset == null or bot.stats_update == null:
 		return
 
 	var cell := _get_bot_place_cell()
@@ -233,11 +238,36 @@ func _place_basic_magic() -> void:
 	if is_instance_valid(HexCells.cell_dict[cell]):
 		return
 
-	hex_cells.place_magic_in_cell(cell, bot_player_id)
+	var place_type: Magic.MagicType = bot.preset.default_state_to_place
+
+	if not bot.preset.magics.has(place_type):
+		push_warning("[BOT] Preset has no default magic type.")
+		return
+
+	var magic_stats: MagicStats = bot.preset.magics[place_type]
+
+	if magic_stats == null:
+		return
+
+	if bot.stats_update.current_mana < magic_stats.cost:
+		return
+
+	hex_cells.place_magic_in_cell_for_player.rpc(
+		cell,
+		place_type,
+		bot_player_id
+	)
 
 func _transform_neutral_magic(new_type: Magic.MagicType) -> void:
+	var hex_cells := _get_hex_cells()
+	var bot := controlled_player as Player
+
+	if hex_cells == null or bot == null or bot.stats_update == null:
+		return
+
 	for node in get_tree().get_nodes_in_group("magic"):
 		var magic := node as Magic
+
 		if magic == null:
 			continue
 
@@ -247,7 +277,23 @@ func _transform_neutral_magic(new_type: Magic.MagicType) -> void:
 		if magic.state != Magic.MagicType.NEUTRAL:
 			continue
 
-		magic.change_state(new_type)
+		var transform_cost := magic.change_state_cost(new_type)
+
+		# This particular Neutral cannot transform into the requested type.
+		if transform_cost < 0.0:
+			continue
+
+		if bot.stats_update.current_mana < transform_cost:
+			return
+
+		hex_cells.change_magic_in_cell_for_player.rpc(
+			magic.self_cell,
+			new_type,
+			bot_player_id
+		)
+
+		bot._use_mana.rpc(transform_cost)
+
 		print("[BOT] transformed magic to ", new_type)
 		return
 		
@@ -263,8 +309,11 @@ func _fire_light_at_player() -> void:
 	var direction := (target_player.global_position - magic.global_position).normalized()
 	var path := Magic.create_wiggly_path(direction, Magic.BULLET_DISTANCE)
 
-	hex_cells.launch_magic_in_cell(magic.self_cell, path, bot_player_id)
-
+	hex_cells.launch_magic_in_cell.rpc(
+		magic.self_cell,
+		path,
+		bot_player_id
+	)
 func _get_first_owned_magic_of_type(required_type: Magic.MagicType) -> Magic:
 	for node in get_tree().get_nodes_in_group("magic"):
 		var magic := node as Magic

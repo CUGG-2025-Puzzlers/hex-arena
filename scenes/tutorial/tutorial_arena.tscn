@@ -1,11 +1,11 @@
 [gd_scene format=4 uid="uid://cxbpmm1evcgtx"]
 
 [ext_resource type="Texture2D" uid="uid://rgj8d7c2onr6" path="res://assets/textures/lawn_texture.tres" id="1_fw8hh"]
-[ext_resource type="Script" uid="uid://7x41qpnjig0t" path="res://scenes/tutorial/tutorial_manager.gd" id="1_k1phl"]
-[ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/resources/Hex-Cells.gd" id="2_aqsec"]
+[ext_resource type="Script" uid="uid://dgtpbgo25exp6" path="res://scenes/tutorial/tutorial_manager.gd" id="1_k1phl"]
+[ext_resource type="Script" uid="uid://bqjdu3l5hd4x8" path="res://scripts/Hex-Cells.gd" id="2_aqsec"]
 [ext_resource type="Script" path="res://scripts/grid_outline.gd" id="3_755f1"]
 [ext_resource type="Texture2D" uid="uid://bnv70x432w8c1" path="res://assets/textures/select_bubble_texture.tres" id="3_h1xil"]
-[ext_resource type="Texture2D" uid="uid://c1b6o25oor3uk" path="res://assets/textures/radial_focus.tres" id="4_df88e"]
+[ext_resource type="Texture2D" uid="uid://476nrrrlllvf" path="res://assets/textures/radial_focus.tres" id="4_df88e"]
 [ext_resource type="Texture2D" uid="uid://bj6w7gcbfa8rt" path="res://assets/textures/last_pick_glare.tres" id="4_h4p41"]
 [ext_resource type="Script" path="res://scripts/shrinking_circle_outline.gd" id="5_k1phl"]
 [ext_resource type="Script" uid="uid://h0xsob0vo37b" path="res://scripts/camera_zoom.gd" id="5_mqr3e"]
@@ -14,13 +14,13 @@
 [ext_resource type="Texture2D" uid="uid://brrrp34agwiju" path="res://assets/textures/wall_voronoi.png" id="7_df88e"]
 [ext_resource type="PackedScene" uid="uid://c6wowp8fghmag" path="res://scenes/tutorial/walk_objective.tscn" id="8_aqsec"]
 [ext_resource type="Script" path="res://scripts/last_magic_direction.gd" id="9_df88e"]
-[ext_resource type="Script" uid="uid://digjynsntaqjj" path="res://scenes/tutorial/tutorial_ui.gd" id="13_dv6bh"]
-[ext_resource type="Script" uid="uid://ba6r18waxg2oa" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
-[ext_resource type="Script" uid="uid://cjvbmt3wac5x3" path="res://scenes/tutorial/light_objective.gd" id="16_251jp"]
+[ext_resource type="Script" uid="uid://be3vkh1vhfeio" path="res://scenes/tutorial/tutorial_ui.gd" id="13_dv6bh"]
+[ext_resource type="Script" uid="uid://bnknlpxmsloxk" path="res://scenes/tutorial/place_magic_objective.gd" id="15_17lip"]
+[ext_resource type="Script" uid="uid://7pacohn7vax8" path="res://scenes/tutorial/light_objective.gd" id="16_251jp"]
 [ext_resource type="PackedScene" uid="uid://c0r53oj3cl6xr" path="res://scenes/tutorial/guiding_arrows.tscn" id="17_jd7ro"]
-[ext_resource type="Script" uid="uid://ds2yb0clljhcm" path="res://scenes/tutorial/shield_objective.gd" id="17_kgflf"]
-[ext_resource type="Script" uid="uid://dibjq8tkgx7bu" path="res://scenes/tutorial/final_objective.gd" id="17_vsbkj"]
-[ext_resource type="Script" uid="uid://cspddmpur1lme" path="res://scenes/tutorial/heavy_objective.gd" id="20_s2il2"]
+[ext_resource type="Script" uid="uid://b3i4rwtqpfrcr" path="res://scenes/tutorial/shield_objective.gd" id="17_kgflf"]
+[ext_resource type="Script" uid="uid://b4mme8lgh13lv" path="res://scenes/tutorial/final_objective.gd" id="17_vsbkj"]
+[ext_resource type="Script" uid="uid://cxx0xjqfigsq7" path="res://scenes/tutorial/heavy_objective.gd" id="20_s2il2"]
 [ext_resource type="PackedScene" uid="uid://crlnrtl3r30t4" path="res://scenes/tutorial/magic_ghost_indicator.tscn" id="20_v5nxj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wl4x5"]
@@ -307,7 +307,8 @@ shape = SubResource("WorldBoundaryShape2D_olpmc")
 modulate = Color(1, 1, 1, 0.3254902)
 position = Vector2(0, 541)
 script = ExtResource("15_17lip")
-required_transform = 1
+required_transform = 2
+replacement_grace_time = 0.25
 
 [node name="Walk Objective" parent="." unique_id=1568870816 instance=ExtResource("8_aqsec")]
 modulate = Color(0.5803922, 0.827451, 1, 1)

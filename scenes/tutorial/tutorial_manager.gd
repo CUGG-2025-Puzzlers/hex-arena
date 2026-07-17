@@ -14,6 +14,10 @@ extends Node2D
 ]
 const GUIDING_ARROWS = preload("res://scenes/tutorial/guiding_arrows.tscn")
 
+const HEKASET_PRESET = preload(
+	"res://presets/character_presets/Hekaset_stats.tres"
+)
+
 var active_arrows: Node2D = null
 var arrow_target: Node2D = null
 var arrow_offset := Vector2.ZERO
@@ -149,25 +153,71 @@ func spawn_tutorial_magic(
 	magic_type: Magic.MagicType,
 	owner_id: int
 ) -> Magic:
-	var hex_cells := get_tree().current_scene.get_node("Path2D") as HexCells
-	if hex_cells == null:
-		push_error("Missing HexCells / Path2D")
+	var current_scene := get_tree().current_scene
+
+	if current_scene == null:
+		push_error("[TUTORIAL] Missing current scene.")
 		return null
 
-	var magic := preload("res://scenes/magic.tscn").instantiate() as Magic
+	var current_hex_cells := current_scene.get_node_or_null("Path2D") as HexCells
 
-	magic.self_cell = cell
-	magic.position = hex_cells.map_to_local(cell)
-	magic.add_to_group("magic")
+	if current_hex_cells == null:
+		push_error("[TUTORIAL] Missing HexCells / Path2D.")
+		return null
 
-	# Add first, because Magic._ready() needs self_cell and scene access.
-	hex_cells.add_child(magic, true)
+	if not HexCells.cell_dict.has(cell):
+		push_error(
+			"[TUTORIAL] Cannot spawn magic outside the grid at cell %s."
+			% cell
+		)
+		return null
 
-	# Set owner after add_child because Magic.gd has @onready player_id.
+	if HEKASET_PRESET == null:
+		push_error("[TUTORIAL] Hekaset preset failed to load.")
+		return null
+
+	if not HEKASET_PRESET.magics.has(magic_type):
+		push_error(
+			"[TUTORIAL] Hekaset preset has no magic for type %s."
+			% Magic.MagicType.keys()[magic_type]
+		)
+		return null
+
+	# Do not use `as MagicStats` here. The dictionary is already typed.
+	var magic_stats = HEKASET_PRESET.magics.get(magic_type)
+
+	if magic_stats == null:
+		push_error(
+			"[TUTORIAL] Missing magic stats for type %s."
+			% Magic.MagicType.keys()[magic_type]
+		)
+		return null
+
+	if magic_stats.scene == null:
+		push_error(
+			"[TUTORIAL] Magic stats has no scene for type %s."
+			% Magic.MagicType.keys()[magic_type]
+		)
+		return null
+
+	var magic := magic_stats.scene.instantiate() as Magic
+
+	if magic == null:
+		push_error(
+			"[TUTORIAL] Scene did not instantiate as Magic for type %s."
+			% Magic.MagicType.keys()[magic_type]
+		)
+		return null
+
+	magic.place_instance_for_player(
+		cell,
+		null,
+		magic_stats
+	)
+
+	# place_instance_for_player sets -1 because there is no Player owner.
+	# Override it with the tutorial's synthetic enemy ID.
 	magic.player_id = owner_id
-
-	# Apply final type after owner is correct.
-	magic.change_state(magic_type)
 
 	return magic
 
