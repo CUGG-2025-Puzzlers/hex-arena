@@ -16,6 +16,7 @@ var playback : AnimationNodeStateMachinePlayback
 @export var radius : int = 1
 var radius_cells : Array
 var cell : Vector2i
+signal changed_cell(player_ind: int, new_cell: Vector2i)
 
 @export var preset: CharacterStats
 @export var stats_update: StatsUpdate
@@ -26,38 +27,42 @@ var player_id: int:
 		%InputSynchronizer.set_multiplayer_authority(value)
 
 func _ready() -> void:
-	
+
 	playback = animation_tree["parameters/playback"]
-	
+
 	# collision with environment is layer 1 and ignore other players
 	set_collision_layer_value(2, true)   # player on layer 2
 	set_collision_mask_value(2, false)   # player cant collide with layer 2
-	
+
 	radius_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, radius)
 	get_node("Drawing range").draw_range(radius_cells)
-	
+
 	get_node("Area2D").area_entered.connect(_on_area_entered)
 
-func _process(_delta: float) -> void:
-	if multiplayer.is_server():
-		_reconcile_pos.rpc(position)
 
 func _physics_process(delta: float) -> void:
-
 	#no movement if dashing
 	if _ability is DashAbility and _ability.is_controlling_movement():
 		return
-		
+
 	if _ability is TeleportAbility and _ability.is_channeling:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
-	
+
 	_handle_movement(delta)
 	select_animation()
 	update_animation_parameters()
-		
-	cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
+
+	var temp_cell = HexCells.player_unique_instance.local_to_map(get_node("CollisionShape2D").global_position)
+	if temp_cell!=cell:
+		HexCells.players_cells[player_id]=temp_cell
+
+		# Don't call redraw from here
+		#GridOutline.player_unique_instance.queue_redraw()
+
+		changed_cell.emit(player_id, temp_cell)
+	cell = temp_cell
 
 func select_animation():
 	if _input.direction == Vector2.ZERO:
@@ -68,16 +73,16 @@ func select_animation():
 func update_animation_parameters():
 	if _input.direction == Vector2.ZERO:
 		return
-		
+
 	animation_tree["parameters/Walk/blend_position"] = _input.direction
 	animation_tree["parameters/Stop/blend_position"] = _input.direction
 
-func _handle_movement(_delta: float) -> void:	
+func _handle_movement(_delta: float) -> void:
 	# ghost speed multiplier when active
 	var speed = base_speed
 	if _ability is GhostAbility:
 		speed *= _ability.get_speed_multiplier()
-	
+
 	if _input.use_ability:
 		_ability.try_activate()
 
@@ -85,15 +90,15 @@ func _handle_movement(_delta: float) -> void:
 	move_and_slide()
 
 func set_player_name(player_name: String):
-	stats_update.update_name(player_name) 
+	stats_update.update_name(player_name)
 
 
 func get_stats() -> StatsUpdate:
 	return stats_update
-	
+
 func is_channeling() -> bool:
 	return _ability is TeleportAbility and _ability.is_channeling
-	
+
 func is_dashing() -> bool:
 	return _ability is DashAbility and _ability.is_dashing
 
