@@ -7,7 +7,8 @@ var mouse_pos: Vector2
 
 var player_id: int
 
-@onready var own_stats: StatsComponent = get_parent().get_node("StatsComponent")
+@onready var player_preset: CharacterStats = get_parent().preset
+@onready var stats_update: StatsUpdate = $"../StatsComponent"
 
 func _ready() -> void:
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
@@ -24,6 +25,7 @@ func _physics_process(_delta: float) -> void:
 	direction = Input.get_vector("left", "right", "up", "down")
 
 func _unhandled_input(event: InputEvent) -> void:
+	
 	mouse_pos = get_parent().get_global_mouse_position()
 	
 	use_ability = event.is_action_pressed("ability")
@@ -47,22 +49,21 @@ func _unhandled_input(event: InputEvent) -> void:
 					HexCells.player_unique_instance.rpc("launch_magic_in_cell", magic_cell, points, player_id)
 	
 	if Input.is_action_pressed("place_magic")\
-	and own_stats.current_mana>=Magic.cost[Magic.MagicType.NEUTRAL]:
+	and stats_update.current_mana >= player_preset.magics[player_preset.default_state_to_place].cost:
 		var global_mouse_pos : Vector2 = get_parent().get_global_mouse_position()
-		HexCells.player_unique_instance.rpc_id(1, "place_magic_in_cell_check", global_mouse_pos, get_parent().cell, get_parent().radius_cells, player_id)
+		HexCells.player_unique_instance.rpc_id(1, "try_place_magic_for_player", 
+		global_mouse_pos, player_preset.default_state_to_place, get_parent().cell, get_parent().radius_cells, player_id)
 	
 	var possible_states = []
-	if Input.is_action_just_pressed("turn_pure_to_heavy")\
-	and own_stats.current_mana>=Magic.cost[Magic.MagicType.HEAVY]:
+	if Input.is_action_just_pressed("turn_to_heavy"):
 		possible_states.append(Magic.MagicType.HEAVY)
-	if Input.is_action_just_pressed("turn_pure_to_light")\
-	and own_stats.current_mana>=Magic.cost[Magic.MagicType.LIGHT]:
+	if Input.is_action_just_pressed("turn_to_light"):
 		possible_states.append(Magic.MagicType.LIGHT)
-	if Input.is_action_just_pressed("turn_pure_to_shield")\
-	and own_stats.current_mana>=Magic.cost[Magic.MagicType.SHIELD]:
-		possible_states.append(Magic.MagicType.SHIELD)
+	if Input.is_action_just_pressed("turn_to_passive"):
+		possible_states.append(Magic.MagicType.PASSIVE)
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
 		var pos = get_parent().get_node("CollisionShape2D").global_position
-		HexCells.player_unique_instance.rpc("change_magic",pos, get_parent().radius_cells, state, player_id, own_stats, floori(own_stats.current_mana*1./Magic.cost[state]))#randi()
-		#HexCells.player_unique_instance.change_magic(pos, get_parent().radius_cells, state,player_id)
+		
+		HexCells.player_unique_instance.rpc_id(1, "try_and_change_magic_for_player", pos, 
+		get_parent().radius_cells, state, player_id, stats_update.current_mana)#randi()

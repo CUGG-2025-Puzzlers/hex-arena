@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://b6sve0jqnar7"]
+
+[ext_resource type="PackedScene" uid="uid://doxqxqp6om1jw" path="res://scenes/magic_types/magic_light_arrow.tscn" id="1_ohjj8"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="1_typvh"]
+
+[resource]
+script = ExtResource("1_typvh")
+type = 2
+magic_name = "Arrow"
+cost = 5.0
+scene = ExtResource("1_ohjj8")
+health = 30.0
+damage = 40.0
+speed = 540.0
+metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

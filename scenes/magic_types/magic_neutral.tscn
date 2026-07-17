@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bfvg4nm7yvdcm"]
+
+[ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_t1fjm"]
+[ext_resource type="Script" uid="uid://m3x6a7cxdri8" path="res://scripts/magic_scripts/magic_neutral.gd" id="2_3557j"]
+[ext_resource type="Texture2D" uid="uid://dcm8pb6gd3088" path="res://assets/textures/neutral_magic.tres" id="2_yo6m6"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="3_shivt"]
+[ext_resource type="Resource" uid="uid://b6sve0jqnar7" path="res://presets/magic_types/LIGHT_ARROW_stats.tres" id="4_lrusu"]
+[ext_resource type="Resource" uid="uid://dcj8cuplvvu3y" path="res://presets/magic_types/SPIKE_BALL_stats.tres" id="5_0afly"]
+[ext_resource type="Resource" uid="uid://86i7f2p7uljq" path="res://presets/magic_types/SHIELD_stats.tres" id="6_2bbpl"]
+
+[node name="MagicNeutral" unique_id=627565832 instance=ExtResource("1_t1fjm")]
+script = ExtResource("2_3557j")
+animation_cycles = Array[float]([3.141592653589793, 3.0])
+dists = Array[Vector2]([Vector2(0, -6), Vector2(20, 0)])
+state = 1
+own_cost = 5.0
+own_health = 25.0
+own_transforms = Dictionary[int, ExtResource("3_shivt")]({
+1: null,
+2: ExtResource("4_lrusu"),
+3: ExtResource("5_0afly"),
+4: ExtResource("6_2bbpl")
+})
+
+[node name="MainSprite" parent="." index="0" unique_id=415175278]
+texture = ExtResource("2_yo6m6")
+
+[node name="ChildLight1" type="Sprite2D" parent="MainSprite" index="0" unique_id=2075572260]
+texture_repeat = 3
+position = Vector2(20, 0)
+scale = Vector2(0.29999998, 0.29999998)
+texture = ExtResource("2_yo6m6")

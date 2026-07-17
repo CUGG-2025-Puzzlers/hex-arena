@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://djk6uir57xmac"]
+
+[ext_resource type="PackedScene" uid="uid://bysj7txxeooso" path="res://scenes/magic_types/magic-template.tscn" id="1_q3pj0"]
+[ext_resource type="Script" uid="uid://b62r75i1hueoi" path="res://scripts/magic_scripts/magic_spike_ball.gd" id="2_6ptrt"]
+[ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="3_1gar6"]
+
+[node name="MagicSpikeBall" unique_id=627565832 instance=ExtResource("1_q3pj0")]
+script = ExtResource("2_6ptrt")
+state = 3
+own_cost = 10.0
+own_health = 40.0
+damage = 100.0
+roll_speed = 270.0
+
+[node name="EyeSprite" type="Sprite2D" parent="." index="0" unique_id=1129613304]
+position = Vector2(2.5629997e-06, 1.4901161e-07)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("3_1gar6")
+
+[node name="MainSprite" parent="." index="1" unique_id=415175278]
+visible = false

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://86i7f2p7uljq"]
+
+[ext_resource type="PackedScene" uid="uid://bqbyo5dg52x0a" path="res://scenes/magic_types/magic_shield.tscn" id="1_q7rcu"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="1_typvh"]
+
+[resource]
+script = ExtResource("1_typvh")
+type = 4
+magic_name = "Shield"
+cost = 5.0
+scene = ExtResource("1_q7rcu")
+health = 80.0
+damage = 30.0
+collide_w_own = true
+metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

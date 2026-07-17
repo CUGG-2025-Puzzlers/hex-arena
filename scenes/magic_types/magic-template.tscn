@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://bysj7txxeooso"]
+
+[ext_resource type="Script" uid="uid://ctlyb71wdlps0" path="res://scripts/magic_scripts/magic.gd" id="1_vdrdq"]
+[ext_resource type="Texture2D" uid="uid://fs4nj03e7j1t" path="res://assets/textures/magic.tres" id="2_qrv16"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_vsqts"]
+size = Vector2(64, 64)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
+radius = 18.0
+
+[sub_resource type="Gradient" id="Gradient_wwhys"]
+offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 0.5543131, 0.5942492, 0.6645367, 0.74440897)
+colors = PackedColorArray(1.3025239, 2.037959, 2.7259471, 1, 1.8759707, 1.4488999, 0, 1, 0, 0, 0, 0, 0.97, 0, 0.87299967, 0.6627451, 0.46199986, 0, 0.63, 1, 0.608, 0.95, 0.8246, 1, 0.9215, 0.95, 0.93955, 0.9843137)
+
+[node name="MagicTemplate" type="Area2D" unique_id=627565832 groups=["magic"]]
+script = ExtResource("1_vdrdq")
+
+[node name="MainSprite" type="Sprite2D" parent="." unique_id=415175278]
+texture_repeat = 3
+scale = Vector2(0.7, 0.7)
+texture = SubResource("PlaceholderTexture2D_vsqts")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=29718005]
+shape = SubResource("CircleShape2D_fggut")
+
+[node name="VisibleOnScreenNotifier" type="VisibleOnScreenNotifier2D" parent="." unique_id=1483890363]
+position = Vector2(-0.499998, -0.499998)
+scale = Vector2(4.55, 4.55)
+rect = Rect2(-6, -6, 12, 12)
+
+[node name="FizzleParticles" type="CPUParticles2D" parent="." unique_id=1158731197]
+emitting = false
+amount = 15
+texture = ExtResource("2_qrv16")
+lifetime = 0.52
+one_shot = true
+explosiveness = 0.71
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+initial_velocity_min = 56.66
+initial_velocity_max = 178.47
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="ready" from="." to="." method="setup"]

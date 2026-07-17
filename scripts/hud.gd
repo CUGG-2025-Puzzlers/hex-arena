@@ -9,6 +9,10 @@ var player: CharacterBody2D = null
 @onready var mana_label: Label = $MarginContainer/VBoxContainer/ManaBar/Label
 @onready var ability_container: HBoxContainer = $MarginContainer/VBoxContainer/AbilityContainer
 
+@onready var passive_magic_label : Label = $MarginContainer/VBoxContainer/AbilityContainer/PassiveMagic/Label
+@onready var light_magic_label : Label = $MarginContainer/VBoxContainer/AbilityContainer/LightMagic/Label
+@onready var heavy_magic_label : Label = $MarginContainer/VBoxContainer/AbilityContainer/HeavyMagic/Label
+
 # movement buffs:
 @onready var move_ability_name: Label = $MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer/AbilityName
 @onready var move_timer_label: Label = $MarginContainer/VBoxContainer/AbilityContainer/MovementBuff/VBoxContainer/TimerLabel
@@ -18,27 +22,36 @@ func _ready() -> void:
 	# color this way bc easier to handle depletion
 	_style_bar(hp_bar, Color(0.1, 0.8, 0.2), Color(0.15, 0.15, 0.15))
 	_style_bar(mana_bar, Color(0.2, 0.4, 0.9), Color(0.15, 0.15, 0.15))
-	
-	var shield_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/Shield/Label")
-	var light_magic_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/LightMagic/Label")
-	var heavy_magic_label : Label = get_node("MarginContainer/VBoxContainer/AbilityContainer/HeavyMagic/Label")
-	
-	var shield_button : InputEventKey = InputMap.action_get_events("turn_pure_to_shield")[0]
-	var light_button : InputEventKey = InputMap.action_get_events("turn_pure_to_light")[0]
-	var heavy_button : InputEventKey = InputMap.action_get_events("turn_pure_to_heavy")[0]
 
-	shield_label.text = OS.get_keycode_string(shield_button.physical_keycode)+'\nShield\n'+str(Magic.cost[Magic.MagicType.SHIELD])+' Mana'
-	light_magic_label.text = OS.get_keycode_string(light_button.physical_keycode)+'\nLight\n'+str(Magic.cost[Magic.MagicType.LIGHT])+' Mana'
-	heavy_magic_label.text = OS.get_keycode_string(heavy_button.physical_keycode)+'\nHeavy\n'+str(Magic.cost[Magic.MagicType.HEAVY])+' Mana'
+func update_cost_and_button_labels(magics: Dictionary) -> void:
+	var passive_button : InputEventKey = InputMap.action_get_events("turn_to_passive")[0]
+	var light_button : InputEventKey = InputMap.action_get_events("turn_to_light")[0]
+	var heavy_button : InputEventKey = InputMap.action_get_events("turn_to_heavy")[0]
 
-func connect_to_player(p: CharacterBody2D) -> void:
+	var passive_magic : MagicStats = magics[Magic.MagicType.PASSIVE]
+	passive_magic_label.text = "%s\n%s\n%d Mana" % [OS.get_keycode_string(passive_button.physical_keycode),
+	passive_magic.magic_name, passive_magic.cost]
+	
+	var light_magic : MagicStats = magics[Magic.MagicType.LIGHT]
+	light_magic_label.text = "%s\n%s\n%d Mana" % [OS.get_keycode_string(light_button.physical_keycode),
+	light_magic.magic_name, light_magic.cost]
+	
+	var heavy_magic : MagicStats = magics[Magic.MagicType.HEAVY]
+	heavy_magic_label.text = "%s\n%s\n%d Mana" % [OS.get_keycode_string(heavy_button.physical_keycode),
+	heavy_magic.magic_name, heavy_magic.cost]
+
+func connect_to_player(p: Player) -> void:
 	player = p
-	var stats: StatsComponent = player.get_node("StatsComponent")
-	stats.health_changed.connect(_on_health_changed)
-	stats.mana_changed.connect(_on_mana_changed)
+	var player_preset: CharacterStats = player.preset
+	var stats_update: StatsUpdate = player.stats_update
 	
-	_on_health_changed(stats.current_health, stats.max_health)
-	_on_mana_changed(stats.current_mana, stats.max_mana)
+	stats_update.health_changed.connect(_on_health_changed)
+	stats_update.mana_changed.connect(_on_mana_changed)
+	
+	update_cost_and_button_labels(player_preset.magics)
+	
+	_on_health_changed(stats_update.current_health, stats_update.max_health)
+	_on_mana_changed(stats_update.current_mana, stats_update.max_mana)
 	
 	# connect movement ability
 	var ability: AbilityBase = player.get_node("Ability")

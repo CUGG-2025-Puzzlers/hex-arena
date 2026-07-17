@@ -7,8 +7,8 @@ signal server_disconnected
 # Dictionary of players using IDs as keys
 var players = {}
 
-var player_scene = preload("res://scenes/player.tscn")
-var hekaset = preload("res://scenes/hekaset.tscn")
+var zilo = preload("res://scenes/characters/Zilo.tscn")
+var hekaset = preload("res://scenes/characters/Hekaset.tscn")
 
 var bot_controller_script = preload("res://scripts/bot_controller.gd")
 
@@ -16,9 +16,9 @@ var _players_spawn_node
 
 # Local player info
 # Set these fields using some UI before creating/joining a game
-var player_info = { 
+var player_info = {
 	"name" : "Local Player",
-	"character" : Util.Character.None, 
+	"character" : Util.Character.None,
 }
 
 #region Setup
@@ -35,9 +35,9 @@ func _ready() -> void:
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
-	
+
 	local_ip = IP.get_local_addresses()[-1]
-	
+
 	if local_ip == "fe80:0:0:0:0:0:0:1":
 		local_ip = IP.get_local_addresses()[11]
 
@@ -46,23 +46,23 @@ func _ready() -> void:
 # The user who creates the server is considered the 'host'
 func create_game(player_name: String):
 	print("Setting up port forwarding...")
-	
+
 	external_ip = setup_upnp(DEFAULT_PORT)
 	if external_ip:
 		print("External IP is [%s]" % external_ip)
 	else:
 		print("Could not setup port forwarding, manual setup required.")
-	
+
 	print("Creating new game as host")
-	
+
 	var server_peer = ENetMultiplayerPeer.new()
 	server_peer.create_server(DEFAULT_PORT, 2)
 	multiplayer.multiplayer_peer = server_peer
-	
+
 	player_info["name"] = player_name
 	players[1] = player_info
 	player_connected.emit(1, player_info)
-	
+
 	SceneManager.load_character_select()
 
 # Joins a game
@@ -73,46 +73,46 @@ func join_game(player_name: String, ip: String, port: int):
 	if result != OK:
 		print("Failed to create client: %s" % result)
 		return
-	
+
 	multiplayer.multiplayer_peer = client_peer
-	
+
 	player_info["name"] = player_name
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 
 func setup_upnp(_port: int):
 	var result = ""
 	var upnp = UPNP.new()
-	
+
 	var discover_result = upnp.discover()
 	if discover_result != UPNP.UPNPResult.UPNP_RESULT_SUCCESS:
 		print("UPNP Discovery failed")
 		return result
-	
+
 	print("UPNP Discovery succeeded")
 	if upnp.get_device_count() == 0:
 		print("No devices found")
 		return result
-	
+
 	if not upnp.get_gateway():
 		print("Could not get default gateway")
 		return result
-		
+
 	if not upnp.get_gateway().is_valid_gateway():
 		print("Default gateway is invalid")
 		return result
-	
+
 	print("Default gateway is valid")
 	var map_result_udp = upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "godot_udp", "UDP", 0)
 	var map_result_tcp = upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "godot_tcp", "UDP", 0)
-	
+
 	if not map_result_udp == UPNP.UPNP_RESULT_SUCCESS:
-		upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
+		upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
 	if not map_result_tcp == UPNP.UPNP_RESULT_SUCCESS:
-		upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
-	
+		upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
+
 	print("UPNP Port Forwarding succeeded")
 	return upnp.query_external_address()
-	
+
 # Registers a player
 # Adds a player to the players list
 @rpc("any_peer", "reliable")
@@ -134,14 +134,14 @@ func _unregister_player(id):
 # Called on each client when a new player connects to the server
 func _on_peer_connected(id: int):
 	print("Player %s joined!" % id)
-	
+
 	# Register this client on the newly connected client
 	_register_player.rpc_id(id, player_info)
 
 # Called on each client when a player disconnects from the server
 func _on_peer_disconnected(id: int):
 	print("Player %s left..." % id)
-	
+
 	_unregister_player(id)
 
 func _on_connected_to_server():
@@ -171,7 +171,7 @@ func _set_character(character: Util.Character):
 func _set_player_character(player_id: int, character: Util.Character):
 	if not player_id in players:
 		return
-	
+
 	players[player_id].character = character
 
 # Resets all players' selected character
@@ -196,17 +196,17 @@ func _print_players():
 
 func _on_player_died(dead_player_id : int) -> void:
 	var winner_name = ""
-	
+
 	for id in players:
 		if id != dead_player_id:
 			winner_name = players[id].name
 			break
-	
+
 	if multiplayer.has_multiplayer_peer():
 		_end_game.rpc(winner_name)
 	else:
 		_end_game(winner_name)
-		
+
 @rpc("any_peer", "call_local", "reliable")
 func _end_game(winner_name: String):
 	SceneManager.load_end_scene(winner_name)
@@ -233,16 +233,16 @@ func _start_game():
 			"position": spawn_position,
 		}
 
-		var player_node = spawner.spawn(spawn_data)
+		var player_node := spawner.spawn(spawn_data) as Player
 
 		if player_node != null:
-			player_node.get_node("StatsComponent").deadgeLol.connect(
+			player_node.stats_update.deadgeLol.connect(
 				_on_player_died.bind(player)
 			)
 
 func _start_bot_match():
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
-	
+
 	var player_id = 1
 	var bot_id = 999
 
@@ -287,8 +287,8 @@ func _start_bot_match():
 		"is_bot": true,
 	}
 
-	var player_node := _spawn_player_from_data(player_spawn_data) as Node2D
-	var bot_node := _spawn_player_from_data(bot_spawn_data) as Node2D
+	var player_node := _spawn_player_from_data(player_spawn_data)
+	var bot_node := _spawn_player_from_data(bot_spawn_data)
 
 	_players_spawn_node.add_child(player_node)
 	_players_spawn_node.add_child(bot_node)
@@ -297,22 +297,18 @@ func _start_bot_match():
 
 	_setup_tutorial_camera_and_hud(player_node)
 	_setup_bot_controller(bot_node, player_node)
-	
-	var stats = player_node.get_node_or_null("StatsComponent")
-	
-	if stats != null:
-		stats.deadgeLol.connect(_on_player_died.bind(player_id))
-	
-	stats = bot_node.get_node_or_null("StatsComponent")
-	
-	if stats != null:
-		stats.deadgeLol.connect(_on_player_died.bind(bot_id))
+
+	if player_node.stats_update != null:
+		player_node.stats_update.deadgeLol.connect(_on_player_died.bind(player_id))
+
+	if bot_node.stats_update != null:
+		bot_node.stats_update.deadgeLol.connect(_on_player_died.bind(bot_id))
 
 	print("[BOT MATCH] ready")
 
 func _start_tutorial():
 	var character = Util.Character.Hekaset
-	
+
 	print("[START_TUTORIAL] scene=", get_tree().get_current_scene().name)
 
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
@@ -339,7 +335,7 @@ func _start_tutorial():
 		"position": Vector2(0, 1450),
 	}
 
-	var player_node := _spawn_player_from_data(spawn_data) as Node2D
+	var player_node := _spawn_player_from_data(spawn_data)
 
 	# Tutorial is local-only, so add it manually.
 	# Do NOT use MultiplayerSpawner.spawn() here.
@@ -349,24 +345,22 @@ func _start_tutorial():
 
 	_setup_tutorial_camera_and_hud(player_node)
 
-	var stats = player_node.get_node_or_null("StatsComponent")
-	
-	if stats != null:
-		stats.deadgeLol.connect(_on_tutorial_player_died)
+	if player_node.stats_update != null:
+		player_node.stats_update.deadgeLol.connect(_on_tutorial_player_died)
 
 func _on_tutorial_player_died() -> void:
 	print("[TUTORIAL] player died")
 	# Later: restart tutorial step, show prompt, reload tutorial, etc.
 
-func _spawn_player_from_data(data: Dictionary) -> Node:
+func _spawn_player_from_data(data: Dictionary) -> Player:
 	print("[SPAWN FUNCTION] peer=", multiplayer.get_unique_id(), " data=", data)
 
-	var player_node: Node2D
+	var player_node: Player
 
 	if Util.Character.keys()[data["character"]] == "Hekaset":
 		player_node = hekaset.instantiate()
 	else:
-		player_node = player_scene.instantiate()
+		player_node = zilo.instantiate()
 
 	player_node.player_id = data["id"]
 	player_node.name = str(data["id"])
@@ -386,16 +380,16 @@ func _spawn_player_from_data(data: Dictionary) -> Node:
 			input_sync.set_multiplayer_authority(data["id"])
 
 	return player_node
-	
-func _setup_bot_controller(bot_node: Node2D, target_player: Node2D) -> void:
+
+func _setup_bot_controller(bot_node: Player, target_player: Player) -> void:
 	var bot_controller = bot_controller_script.new()
 
 	bot_node.add_child(bot_controller)
 	bot_controller.setup(bot_node, target_player, bot_node.player_id)
 
 	print("[BOT MATCH] bot controller attached")
-	
-func _setup_tutorial_camera_and_hud(player_node: Node2D) -> void:
+
+func _setup_tutorial_camera_and_hud(player_node: Player) -> void:
 	var current_scene = get_tree().get_current_scene()
 
 	player_node.z_index = 1
