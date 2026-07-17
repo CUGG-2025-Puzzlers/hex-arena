@@ -1,7 +1,7 @@
 extends Area2D
-class_name Magic
+#class_name Magic
 
-enum MagicType {NEUTRAL, LIGHT, HEAVY, SHIELD}
+enum MagicType {NEUTRAL, LIGHT, HEAVY, PASSIVE}
 var state = MagicType.NEUTRAL
 
 static var last_placed_cell : Vector2i
@@ -15,7 +15,7 @@ static var cost = {
 	MagicType.NEUTRAL: 5,
 	MagicType.LIGHT: 5,
 	MagicType.HEAVY: 10,
-	MagicType.SHIELD: 5, }
+	MagicType.PASSIVE: 5, }
 
 const BULLET_SPEED : float = 450
 const BULLET_DISTANCE : float = 800
@@ -132,7 +132,7 @@ func change_state(new_state: MagicType):
 				animation_total_times.append(randf_range(2,8))
 			queue_redraw()
 			
-		MagicType.SHIELD:
+		MagicType.PASSIVE:
 			#modulate=Color.WEB_PURPLE
 			health = 80
 			damage = 30
@@ -175,7 +175,7 @@ func _process(delta: float) -> void:
 			animated_sprite.scale.y=0.5*(cos(2*PI*animation_timers[0])+1)*animated_sprite.scale.x
 			animated_sprite.scale.y = clampf(animated_sprite.scale.y, 0.07, animated_sprite.scale.x)
 			animated_sprite.position = Vector2.UP.rotated(animated_sprite.rotation)*cos(2*PI*(animation_timers[0]+0.2))*4
-		MagicType.SHIELD:
+		MagicType.PASSIVE:
 			shield_animated_texture.fill_to = Vector2.ONE*lerpf(0.6,0.8,0.5*(cos(2*PI*animation_timers[0])+1))*sqrt(2)
 		MagicType.NEUTRAL:
 			animated_children[0].position = Vector2.RIGHT.rotated(2*PI*animation_timers[0])*20
@@ -307,13 +307,13 @@ static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
 func _on_area_entered(area: Area2D) -> void:
 	if not area.is_in_group('magic') or \
 	area.player_id==player_id and not \
-	(area.state==MagicType.SHIELD or state ==MagicType.SHIELD):
+	(area.state==MagicType.PASSIVE or state ==MagicType.PASSIVE):
 		return
 	
 	take_damage(area.damage)
 	
 	#what is this force fizzle lol, commented out...
-	#if state!=MagicType.SHIELD and area.state in [MagicType.SHIELD, MagicType.HEAVY]:
+	#if state!=MagicType.PASSIVE and area.state in [MagicType.PASSIVE, MagicType.HEAVY]:
 	#	fizzle()
 
 # Decreases this magic object's health

@@ -62,11 +62,11 @@ layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="Shield" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=19660061]
+[node name="PassiveMagic" type="PanelContainer" parent="MarginContainer/VBoxContainer/AbilityContainer" unique_id=19660061]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ahhtf")
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/Shield" unique_id=1823860068]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/AbilityContainer/PassiveMagic" unique_id=1823860068]
 layout_mode = 2
 text = "Q
 Shield

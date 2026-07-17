@@ -7,8 +7,8 @@ signal server_disconnected
 # Dictionary of players using IDs as keys
 var players = {}
 
-var player_scene = preload("res://scenes/player.tscn")
-var hekaset = preload("res://scenes/hekaset.tscn")
+var zilo = preload("res://scenes/characters/Zilo.tscn")
+var hekaset = preload("res://scenes/characters/Hekaset.tscn")
 
 var _players_spawn_node
 
@@ -104,9 +104,9 @@ func setup_upnp(_port: int):
 	var map_result_tcp = upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "godot_tcp", "UDP", 0)
 	
 	if not map_result_udp == UPNP.UPNP_RESULT_SUCCESS:
-		upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
+		upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "", "UDP")
 	if not map_result_tcp == UPNP.UPNP_RESULT_SUCCESS:
-		upnp.add_port_mappping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
+		upnp.add_port_mapping(DEFAULT_PORT, DEFAULT_PORT, "", "TCP")
 	
 	print("UPNP Port Forwarding succeeded")
 	return upnp.query_external_address()
@@ -209,12 +209,12 @@ func _end_game(winner_name: String):
 func _start_game():
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 	for player in players:
-		var player_node
+		var player_node : Player
 		
 		if Util.Character.keys()[players[player].character] == "Hekaset":
 			player_node = hekaset.instantiate()
 		else: 
-			player_node = player_scene.instantiate()
+			player_node = zilo.instantiate()
 		
 		# change spawn positions of each player
 		if player == 1:
@@ -242,4 +242,4 @@ func _start_game():
 			hud.connect_to_player(player_node)
 			#hud.connect_to_player.call_deferred(player_node)
 		
-		player_node.get_node("StatsComponent").deadgeLol.connect(_on_player_died.bind(player))
+		player_node.stats_update.deadgeLol.connect(_on_player_died.bind(player))

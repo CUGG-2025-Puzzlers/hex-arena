@@ -1,12 +1,11 @@
 extends CharacterBody2D
+class_name Player
 
 @export var base_speed : float = 135.0
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
 
 @onready var _input: MultiplayerInput = %InputSynchronizer
-@onready var OverheadHp : ProgressBar = $OverheadHp
-@onready var stats : StatsComponent = $StatsComponent
 @onready var _ability : AbilityBase = %Ability
 
 var do_ability : String
@@ -18,12 +17,16 @@ var playback : AnimationNodeStateMachinePlayback
 var radius_cells : Array
 var cell : Vector2i
 
+@export var preset: CharacterStats
+@export var stats_update: StatsUpdate
+
 var player_id: int:
 	set(value):
 		player_id = value
 		%InputSynchronizer.set_multiplayer_authority(value)
 
 func _ready() -> void:
+	
 	playback = animation_tree["parameters/playback"]
 	
 	# collision with environment is layer 1 and ignore other players
@@ -34,11 +37,8 @@ func _ready() -> void:
 	get_node("Drawing range").draw_range(radius_cells)
 	
 	get_node("Area2D").area_entered.connect(_on_area_entered)
-	
-	stats.health_changed.connect(_on_overhead_hp_changed)
-	_on_overhead_hp_changed.call_deferred(stats.current_health, stats.max_health)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if multiplayer.is_server():
 		_reconcile_pos.rpc(position)
 
@@ -85,41 +85,17 @@ func _handle_movement(_delta: float) -> void:
 	move_and_slide()
 
 func set_player_name(player_name: String):
-	%NameLabel.text = player_name
+	stats_update.update_name(player_name) 
 
-func _on_overhead_hp_changed(current: float, maximum: float) -> void:
-	if not OverheadHp:
-		return
-		
-	#print("Overhead HP update: ", current, " / ", maximum)
-	OverheadHp.max_value = maximum
-	OverheadHp.value = current
 
-func get_stats() -> StatsComponent:
-	return stats
+func get_stats() -> StatsUpdate:
+	return stats_update
 	
 func is_channeling() -> bool:
 	return _ability is TeleportAbility and _ability.is_channeling
 	
 func is_dashing() -> bool:
 	return _ability is DashAbility and _ability.is_dashing
-
-"""
-# For testing damage, heal, mana use
-func _unhandled_input(event: InputEvent) -> void:
-	if %InputSynchronizer.get_multiplayer_authority() != player_id:
-		return
-
-
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_K:
-			stats.take_damage(10.0)
-		elif event.keycode == KEY_L:
-			stats.heal(10.0)
-		elif event.keycode == KEY_M:
-			stats.use_mana(20.0)
-"""
-
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -135,7 +111,11 @@ func _on_area_entered(area: Area2D) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _apply_damage(amount: float) -> void:
-	stats.take_damage(amount)
+	stats_update.take_damage(amount)
+
+@rpc("authority", "call_local", "reliable")
+func _use_mana(amount: float) -> void:
+	stats_update.use_mana(amount)
 
 #FORCE POSITION
 @rpc("authority", "call_local", "reliable")
