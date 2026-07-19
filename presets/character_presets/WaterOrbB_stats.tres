@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterStats" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/character_stats.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="2_magic_script"]
+[ext_resource type="Resource" path="res://presets/magic_types/WATER_ORB_NEUTRAL_stats.tres" id="3_neutral"]
+[ext_resource type="Resource" path="res://presets/magic_types/TIDEBLADE_ORB_stats.tres" id="4_light"]
+[ext_resource type="Resource" path="res://presets/magic_types/PRESSURE_LANCE_stats.tres" id="5_heavy"]
+[ext_resource type="Resource" path="res://presets/magic_types/FLOW_CIRCUIT_stats.tres" id="6_passive"]
+
+[resource]
+script = ExtResource("1_script")
+max_health = 95.0
+max_mana = 120.0
+mana_regen_rate = 7.5
+base_speed = 240.0
+magics = Dictionary[int, ExtResource("2_magic_script")]({
+1: ExtResource("3_neutral"),
+2: ExtResource("4_light"),
+3: ExtResource("5_heavy"),
+4: ExtResource("6_passive")
+})
+default_state_to_place = 1

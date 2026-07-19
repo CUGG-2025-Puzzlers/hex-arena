@@ -51,4 +51,4 @@ func _set_display_icon():
 	%Icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _set_display_name():
-	%Name.text = Util.Character.keys()[character]
+	%Name.text = Util.get_character_display_name(character)

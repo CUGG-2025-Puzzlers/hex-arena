@@ -85,3 +85,7 @@ func _draw() -> void:
 	var outline := Color(1.0, 0.12, 0.12, 0.95)
 	draw_circle(Vector2.ZERO, radius, fill)
 	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, outline, 5.0, true)
+
+
+func can_be_cut_by_wire() -> bool:
+	return false

@@ -9,6 +9,8 @@ var players = {}
 
 var zilo = preload("res://scenes/characters/Zilo.tscn")
 var hekaset = preload("res://scenes/characters/Hekaset.tscn")
+var water_orb_a = preload("res://scenes/characters/WaterOrbA.tscn")
+var water_orb_b = preload("res://scenes/characters/WaterOrbB.tscn")
 
 var _players_spawn_node
 
@@ -211,10 +213,15 @@ func _start_game():
 	for player in players:
 		var player_node : Player
 		
-		if Util.Character.keys()[players[player].character] == "Hekaset":
-			player_node = hekaset.instantiate()
-		else: 
-			player_node = zilo.instantiate()
+		match players[player].character:
+			Util.Character.Hekaset:
+				player_node = hekaset.instantiate()
+			Util.Character.WaterOrbA:
+				player_node = water_orb_a.instantiate()
+			Util.Character.WaterOrbB:
+				player_node = water_orb_b.instantiate()
+			_:
+				player_node = zilo.instantiate()
 		
 		# change spawn positions of each player
 		if player == 1:

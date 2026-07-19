@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="3_21i31"]
 [ext_resource type="Script" uid="uid://cty0adueu5syp" path="res://scripts/abilities/dash_ability.gd" id="4_0mf3p"]
 [ext_resource type="PackedScene" uid="uid://g25v82bkmahc" path="res://scenes/character_scenes/stats_component_scene.tscn" id="4_8r6hc"]
-[ext_resource type="Script" path="res://scripts/range_drawing.gd" id="5_amgx8"]
+[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="5_amgx8"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="6_tycdu"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+type = 4
+magic_name = "Razor Current"
+cost = 5.0
+cost_text = "5 + 2 / hex Mana"

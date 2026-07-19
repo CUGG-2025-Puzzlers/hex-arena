@@ -79,3 +79,7 @@ func _draw() -> void:
 	# Thumb.
 	draw_line(Vector2(5.0, 8.0), Vector2(18.0, 17.0), dark_red, 8.0, true)
 	draw_line(Vector2(5.0, 8.0), Vector2(18.0, 17.0), red, 4.5, true)
+
+
+func can_be_cut_by_wire() -> bool:
+	return is_active and not is_queued_for_deletion()

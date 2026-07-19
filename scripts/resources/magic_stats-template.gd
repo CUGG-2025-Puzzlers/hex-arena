@@ -8,6 +8,7 @@ class_name MagicStats
 @export var magic_name : String = ""
 
 @export var cost: float = 0.
+@export var cost_text: String = ""
 
 @export var scene: PackedScene = null
 

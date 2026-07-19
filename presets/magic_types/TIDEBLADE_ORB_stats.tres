@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://csc5dn4e4x5j1"]
+
+[ext_resource type="PackedScene" path="res://scenes/magic_types/magic_tideblade_orb.tscn" id="1_scene"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="2_script"]
+
+[resource]
+script = ExtResource("2_script")
+type = 2
+magic_name = "Tideblade Orb"
+cost = 6.0
+scene = ExtResource("1_scene")
+health = 38.0
+damage = 55.0

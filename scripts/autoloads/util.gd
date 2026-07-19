@@ -8,6 +8,8 @@ enum Character {
 	Zilo,
 	Vesta,
 	Hekaset,
+	WaterOrbA,
+	WaterOrbB,
 }
 
 enum Ability {
@@ -17,3 +19,15 @@ enum Ability {
 	Ghost,
 	Teleport,
 }
+
+
+func get_character_display_name(character: Character) -> String:
+	match character:
+		Character.WaterOrbA:
+			return "Aqua A"
+		Character.WaterOrbB:
+			return "Aqua B"
+		Character.None:
+			return "None"
+		_:
+			return Character.keys()[character]

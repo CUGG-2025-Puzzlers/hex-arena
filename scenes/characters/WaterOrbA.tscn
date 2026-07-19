@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://c7w0a8orba001"]
+
+[ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scripts/characters/player.gd" id="1_player"]
+[ext_resource type="Resource" path="res://presets/character_presets/WaterOrbA_stats.tres" id="2_preset"]
+[ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="3_input"]
+[ext_resource type="Texture2D" uid="uid://cqdvlhqfg7jug" path="res://assets/textures/water_orb/water_orb_model.png" id="4_model"]
+[ext_resource type="PackedScene" uid="uid://g25v82bkmahc" path="res://scenes/character_scenes/stats_component_scene.tscn" id="5_stats"]
+[ext_resource type="Script" path="res://scripts/abilities/reform_ability.gd" id="6_ability"]
+[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="7_range"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="8_particles"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:player_id")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_input"]
+properties/0/path = NodePath("InputSynchronizer:direction")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath("InputSynchronizer:mouse_pos")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("InputSynchronizer:use_ability")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[sub_resource type="RectangleShape2D" id="RectangleShape_feet"]
+size = Vector2(38, 12)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dash"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 80.0
+initial_velocity_max = 150.0
+gravity = Vector3(0, 0, 0)
+scale_min = 2.0
+scale_max = 4.0
+color = Color(0.35, 0.82, 1, 1)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape_hurtbox"]
+radius = 18.0
+height = 116.0
+
+[sub_resource type="Gradient" id="Gradient_hurt"]
+offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 1)
+colors = PackedColorArray(0.5, 0.9, 1, 1, 1, 1, 1, 1, 0.05, 0.25, 0.5, 1, 0.1, 0.6, 0.9, 1)
+
+[node name="WaterOrbA" type="CharacterBody2D" unique_id=323074262 node_paths=PackedStringArray("stats_update")]
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("1_player")
+base_speed = 240.0
+uses_directional_animation = false
+radius = 2
+preset = ExtResource("2_preset")
+stats_update = NodePath("StatsComponent")
+
+[node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1242546852]
+replication_config = SubResource("SceneReplicationConfig_player")
+
+[node name="InputSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=182395820]
+unique_name_in_owner = true
+replication_config = SubResource("SceneReplicationConfig_input")
+script = ExtResource("3_input")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=990146653]
+shape = SubResource("RectangleShape_feet")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1133917548]
+unique_name_in_owner = true
+modulate = Color(1, 0.82, 0.84, 1)
+position = Vector2(0.11710738, -48.51052)
+scale = Vector2(0.11846218, 0.11846218)
+texture = ExtResource("4_model")
+
+[node name="StatsComponent" parent="." unique_id=593226806 instance=ExtResource("5_stats")]
+
+[node name="Ability" type="Node" parent="." unique_id=668881120]
+unique_name_in_owner = true
+script = ExtResource("6_ability")
+dash_distance = 280.0
+dash_duration = 0.26
+dash_speed_curve = 1.8
+dash_opacity = 0.55
+cooldown_duration = 3.5
+ability_name = "Reform"
+
+[node name="FlashAnimation" type="GPUParticles2D" parent="." unique_id=999855624]
+visible = false
+emitting = false
+amount = 16
+lifetime = 0.35
+one_shot = true
+process_material = SubResource("ParticleProcessMaterial_dash")
+
+[node name="Drawing range" type="Node2D" parent="." unique_id=947587203]
+show_behind_parent = true
+script = ExtResource("7_range")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=2055358556]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=667018947]
+position = Vector2(0.117107406, -42.51052)
+scale = Vector2(0.74039453, 0.74039453)
+shape = SubResource("CapsuleShape_hurtbox")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Area2D" unique_id=639067102]
+modulate = Color(0.35, 0.75, 1, 1)
+position = Vector2(0, -58)
+emitting = false
+amount = 18
+texture = ExtResource("8_particles")
+lifetime = 0.52
+one_shot = true
+explosiveness = 0.71
+randomness = 0.26
+lifetime_randomness = 0.67
+emission_shape = 1
+emission_sphere_radius = 18.0
+direction = Vector2(0, -1)
+spread = 80.57
+initial_velocity_min = 56.66
+initial_velocity_max = 178.47
+color_ramp = SubResource("Gradient_hurt")
+
+[editable path="StatsComponent"]

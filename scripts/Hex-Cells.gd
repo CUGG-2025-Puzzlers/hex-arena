@@ -2,6 +2,8 @@
 extends Path2D
 class_name HexCells
 
+const WATER_ORB_WIRE_SCENE := preload("res://scenes/magic_types/water_orb_wire.tscn")
+
 
 @onready var text = $Coordinates
 @onready var last_magic = $LastMagic
@@ -227,6 +229,174 @@ func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array
 	for magic_instance in get_tree().get_nodes_in_group('magic'):
 		if is_instance_valid(magic_instance) and magic_instance.player_id==player_id and magic_instance.self_cell == cell:
 			magic_instance.start_rolling(wiggly_path_points)
+
+@rpc("call_local", "any_peer", "reliable")
+func try_create_water_orb_wire_for_player(player_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+
+	# A client may request only its own wire. Calls made locally by the host have
+	# sender ID 0, so those are also accepted.
+	var sender_id: int = multiplayer.get_remote_sender_id()
+	if sender_id != 0 and sender_id != player_id:
+		push_warning("Rejected Water Orb wire request for another player.")
+		return
+
+	var player_owner := _find_player_by_id(player_id)
+	if player_owner == null or player_owner.preset == null:
+		return
+
+	var passive_stats = player_owner.preset.magics.get(Magic.MagicType.PASSIVE)
+	if passive_stats == null:
+		return
+
+	var variant: int
+	match passive_stats.magic_name:
+		"Razor Current":
+			variant = 1
+		"Flow Circuit":
+			variant = 2
+		_:
+			# Q remains the normal Passive transform key for every other character.
+			return
+
+	var owned_orbs: Array[MagicTidebladeOrb] = []
+	for node in get_tree().get_nodes_in_group("tideblade_orb"):
+		if not (node is MagicTidebladeOrb):
+			continue
+
+		var orb := node as MagicTidebladeOrb
+		if orb.player_id != player_id:
+			continue
+		if orb.creation_sequence < 0 or orb.attacks_remaining <= 0:
+			continue
+		if orb.is_queued_for_deletion():
+			continue
+
+		owned_orbs.append(orb)
+
+	if owned_orbs.size() < 2:
+		print("[WATER ORB] Q requires at least two surviving Tideblade Orbs.")
+		return
+
+	owned_orbs.sort_custom(
+		func(first: MagicTidebladeOrb, second: MagicTidebladeOrb) -> bool:
+			return first.creation_sequence < second.creation_sequence
+	)
+
+	var endpoint_a: MagicTidebladeOrb = owned_orbs[owned_orbs.size() - 2]
+	var endpoint_b: MagicTidebladeOrb = owned_orbs[owned_orbs.size() - 1]
+
+	# Re-pressing Q with no newer endpoints should not waste mana.
+	if _water_orb_wire_matches_pair(player_id, endpoint_a.self_cell, endpoint_b.self_cell):
+		return
+
+	var hex_length: int = _water_orb_hex_distance(endpoint_a.self_cell, endpoint_b.self_cell)
+	var connection_cost: float = 5.0 + 2.0 * float(hex_length)
+
+	if player_owner.stats_update.current_mana < connection_cost:
+		print(
+			"[WATER ORB] Not enough mana to connect Tideblades. Need ",
+			connection_cost,
+			" mana."
+		)
+		return
+
+	# The existing line is replaced only after Q succeeds and the cost is paid.
+	player_owner._use_mana.rpc(connection_cost)
+	set_water_orb_wire_for_player.rpc(
+		player_id, endpoint_a.self_cell, endpoint_b.self_cell, variant
+	)
+
+
+func _find_player_by_id(player_id: int) -> Player:
+	var players_node := get_tree().current_scene.find_child("Players")
+	if players_node == null:
+		return null
+
+	for child in players_node.get_children():
+		if child is Player and (child as Player).player_id == player_id:
+			return child as Player
+
+	return null
+
+
+func _water_orb_wire_matches_pair(
+	player_id: int, endpoint_a_cell: Vector2i, endpoint_b_cell: Vector2i
+) -> bool:
+	for node in get_tree().get_nodes_in_group("water_orb_wire"):
+		if not is_instance_valid(node) or node.is_queued_for_deletion():
+			continue
+		if int(node.get("player_id")) != player_id:
+			continue
+
+		var current_a: Vector2i = node.get("endpoint_a_cell")
+		var current_b: Vector2i = node.get("endpoint_b_cell")
+		return (
+			(current_a == endpoint_a_cell and current_b == endpoint_b_cell)
+			or (current_a == endpoint_b_cell and current_b == endpoint_a_cell)
+		)
+
+	return false
+
+
+func _water_orb_hex_distance(first: Vector2i, second: Vector2i) -> int:
+	# Convert this project's odd-row offset coordinates to axial coordinates.
+	var first_q: int = first.x - int((first.y - posmod(first.y, 2)) / 2)
+	var second_q: int = second.x - int((second.y - posmod(second.y, 2)) / 2)
+	var delta_q: int = first_q - second_q
+	var delta_r: int = first.y - second.y
+	return int((absi(delta_q) + absi(delta_r) + absi(delta_q + delta_r)) / 2)
+
+
+@rpc("call_local", "authority", "reliable")
+func set_water_orb_wire_for_player(
+	player_id: int,
+	endpoint_a_cell: Vector2i,
+	endpoint_b_cell: Vector2i,
+	variant: int
+) -> void:
+	_clear_water_orb_wire_local(player_id)
+
+	var endpoint_a := _find_tideblade_endpoint(player_id, endpoint_a_cell)
+	var endpoint_b := _find_tideblade_endpoint(player_id, endpoint_b_cell)
+	if endpoint_a == null or endpoint_b == null:
+		push_warning(
+			"Could not create Water Orb wire because an endpoint was missing."
+		)
+		return
+
+	var wire := WATER_ORB_WIRE_SCENE.instantiate()
+	get_tree().current_scene.add_child(wire, true)
+	wire.call("configure", endpoint_a, endpoint_b, player_id, variant)
+
+
+@rpc("call_local", "authority", "reliable")
+func clear_water_orb_wire_for_player(player_id: int) -> void:
+	_clear_water_orb_wire_local(player_id)
+
+
+func _clear_water_orb_wire_local(player_id: int) -> void:
+	for node in get_tree().get_nodes_in_group("water_orb_wire"):
+		if not is_instance_valid(node):
+			continue
+		if int(node.get("player_id")) != player_id:
+			continue
+		node.queue_free()
+
+
+func _find_tideblade_endpoint(player_id: int, cell: Vector2i) -> Magic:
+	for node in get_tree().get_nodes_in_group("tideblade_orb"):
+		if not (node is Magic):
+			continue
+		var magic := node as Magic
+		if magic.player_id != player_id or magic.self_cell != cell:
+			continue
+		if magic.is_queued_for_deletion():
+			continue
+		return magic
+
+	return null
 
 func _draw() -> void:
 	if points.is_empty():

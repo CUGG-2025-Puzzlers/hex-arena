@@ -93,7 +93,11 @@ func _start_game():
 
 # Sets the character info for the local or remote player
 func _set_character_info(character: Util.Character, is_local_client: bool):
-	var character_name = Util.Character.keys()[character] if character != Util.Character.None else SELECT_CHARACTER
+	var character_name = (
+		Util.get_character_display_name(character)
+		if character != Util.Character.None
+		else SELECT_CHARACTER
+	)
 	var character_texture = texture_list[character]
 	
 	if is_local_client:
@@ -109,7 +113,7 @@ func _get_character_name(character: Util.Character):
 	if character == Util.Character.None:
 		return SELECT_CHARACTER
 	
-	return Util.Character.keys()[character]
+	return Util.get_character_display_name(character)
 
 # Checks if the players have both selected their characters, indicating readiness
 func _check_players_ready():

@@ -82,7 +82,7 @@ script = ExtResource("5_4ag8t")
 [node name="Players" type="Node2D" parent="." unique_id=355591495]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=842747712]
-_spawnable_scenes = PackedStringArray("uid://2gnmcjcwoy5e", "uid://bvdkuf6c1gdxs")
+_spawnable_scenes = PackedStringArray("uid://2gnmcjcwoy5e", "uid://bvdkuf6c1gdxs", "uid://c7w0a8orba001", "uid://c7w0a8orbb002")
 spawn_path = NodePath("../Players")
 spawn_limit = 2
 

@@ -7,10 +7,14 @@
 [ext_resource type="Texture2D" uid="uid://cps56w3hlht21" path="res://assets/textures/61457.png" id="4_uxcyu"]
 [ext_resource type="Texture2D" uid="uid://d0qgf3a125u1x" path="res://assets/textures/zilo_icon.png" id="5_5wdeo"]
 [ext_resource type="Texture2D" uid="uid://beey07mewbjie" path="res://assets/textures/hekaset_icon.png" id="6_w1hxv"]
+[ext_resource type="Texture2D" uid="uid://dctegpw8qfuie" path="res://assets/textures/water_orb/water_orb_razor_splash.png" id="7_water_splash"]
+[ext_resource type="Texture2D" uid="uid://pyigoo21ceqc" path="res://assets/textures/water_orb/water_orb_razor_icon.png" id="8_water_icon"]
+[ext_resource type="Texture2D" uid="uid://c7skq50044o0g" path="res://assets/textures/water_orb/water_orb_flow_splash.png" id="9_flow_splash"]
+[ext_resource type="Texture2D" uid="uid://bkqmjg6cjqtsy" path="res://assets/textures/water_orb/water_orb_flow_icon.png" id="10_flow_icon"]
 
 [node name="CharacterSelect" type="Node2D" unique_id=1709553184]
 script = ExtResource("1_x8mhf")
-texture_list = Array[Texture2D]([null, ExtResource("3_bow2h"), ExtResource("3_fa52j"), ExtResource("3_fa52j")])
+texture_list = Array[Texture2D]([null, ExtResource("3_bow2h"), ExtResource("3_fa52j"), ExtResource("3_fa52j"), ExtResource("7_water_splash"), ExtResource("9_flow_splash")])
 
 [node name="LocalPlayerInfo" type="Control" parent="." unique_id=1961302266]
 custom_minimum_size = Vector2(950, 1080)
@@ -128,6 +132,16 @@ layout_mode = 2
 icon = ExtResource("4_uxcyu")
 character = 2
 locked = true
+
+[node name="WaterOrbA" parent="CharacterContainer/CharacterList" unique_id=816066300 instance=ExtResource("2_jgus3")]
+layout_mode = 2
+icon = ExtResource("8_water_icon")
+character = 4
+
+[node name="WaterOrbB" parent="CharacterContainer/CharacterList" unique_id=847911 instance=ExtResource("2_jgus3")]
+layout_mode = 2
+icon = ExtResource("10_flow_icon")
+character = 5
 
 [node name="StartButton" type="Button" parent="." unique_id=2091587044]
 unique_name_in_owner = true

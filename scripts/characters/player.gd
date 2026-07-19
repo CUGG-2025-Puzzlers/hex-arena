@@ -4,6 +4,7 @@ class_name Player
 @export var base_speed : float = 135.0
 @export var animation_tree : AnimationTree
 @export var animation_player : AnimationPlayer
+@export var uses_directional_animation: bool = true
 
 @onready var _input: MultiplayerInput = %InputSynchronizer
 @onready var _ability : AbilityBase = %Ability
@@ -28,7 +29,8 @@ var player_id: int:
 		%InputSynchronizer.set_multiplayer_authority(value)
 
 func _ready() -> void:
-	playback = animation_tree["parameters/playback"]
+	if animation_tree != null:
+		playback = animation_tree["parameters/playback"]
 	
 	# collision with environment is layer 1 and ignore other players
 	set_collision_layer_value(2, true)   # player on layer 2
@@ -49,7 +51,8 @@ func _physics_process(delta: float) -> void:
 	if is_rooted():
 		velocity = Vector2.ZERO
 		move_and_slide()
-		playback.travel("Stop")
+		if playback != null:
+			playback.travel("Stop")
 		cell = HexCells.player_unique_instance.local_to_map(
 			get_node("CollisionShape2D").global_position
 		)
@@ -73,12 +76,18 @@ func _physics_process(delta: float) -> void:
 	)
 
 func select_animation():
+	if playback == null:
+		return
+
 	if _input.direction == Vector2.ZERO:
 		playback.travel("Stop")
 	else:
 		playback.travel("Walk")
 
 func update_animation_parameters():
+	if not uses_directional_animation or animation_tree == null:
+		return
+
 	if _input.direction == Vector2.ZERO:
 		return
 		
@@ -109,10 +118,29 @@ func is_channeling() -> bool:
 func is_dashing() -> bool:
 	return _ability is DashAbility and _ability.is_dashing
 
+
+func is_invulnerable() -> bool:
+	# Only Water Orb's Reform grants immunity. Zilo's Dash is still vulnerable.
+	if _ability is ReformAbility:
+		return (_ability as ReformAbility).is_granting_invulnerability()
+	return false
+
+
 func is_rooted() -> bool:
 	return Time.get_ticks_msec() < rooted_until_msec
 
 func _on_area_entered(area: Area2D) -> void:
+	# Reform behaves as a brief liquid/untargetable dash. Zilo's ordinary
+	# Dash does not enter this branch because it is not a ReformAbility.
+	if area is Magic:
+		var incoming_magic := area as Magic
+		if incoming_magic.player_id != player_id and is_invulnerable():
+			return
+
+	# Stationary weapon Magic subclasses resolve their own explicit attacks.
+	if area is Magic and (area as Magic).handles_player_contact():
+		return
+
 	if area is MagicRootHand:
 		var root_hand := area as MagicRootHand
 		if root_hand.player_id == player_id or not root_hand.try_consume_hit():
@@ -155,6 +183,10 @@ func _apply_root(duration: float) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _apply_damage(amount: float) -> void:
+	# Explicit attacks such as Tideblade, Pressure Lance, Burst, and Razor Wire
+	# call this function directly, so the invulnerability check belongs here too.
+	if is_invulnerable():
+		return
 	stats_update.take_damage(amount)
 
 @rpc("authority", "call_local", "reliable")

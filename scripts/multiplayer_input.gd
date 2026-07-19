@@ -10,6 +10,7 @@ var player_id: int
 @onready var player_preset: CharacterStats = get_parent().preset
 @onready var stats_update: StatsUpdate = $"../StatsComponent"
 
+
 func _ready() -> void:
 	if get_multiplayer_authority() != multiplayer.get_unique_id():
 		set_process(false)
@@ -17,24 +18,29 @@ func _ready() -> void:
 		set_process_unhandled_input(false)
 	else:
 		player_id = multiplayer.get_unique_id()
-	
+
 	direction = Input.get_vector("left", "right", "up", "down")
 	mouse_pos = get_parent().get_global_mouse_position()
+
 
 func _physics_process(_delta: float) -> void:
 	direction = Input.get_vector("left", "right", "up", "down")
 
+
 func _unhandled_input(event: InputEvent) -> void:
-	
 	mouse_pos = get_parent().get_global_mouse_position()
 	use_ability = event.is_action_pressed("ability")
-	
+
 	if Input.is_action_just_pressed("fire_magic"):
 		_fire_magic()
-	
 
-	if Input.is_action_pressed("place_magic") \
-	and stats_update.current_mana >= player_preset.magics[player_preset.default_state_to_place].cost:
+	if (
+		Input.is_action_pressed("place_magic")
+		and (
+			stats_update.current_mana
+			>= player_preset.magics[player_preset.default_state_to_place].cost
+		)
+	):
 		var global_mouse_pos: Vector2 = get_parent().get_global_mouse_position()
 		HexCells.player_unique_instance.rpc_id(
 			1,
@@ -45,18 +51,28 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_parent().radius_cells,
 			player_id
 		)
-	
+
+	# Q is the Water Orb character's explicit wire command. It does not create
+	# or replace a wire merely because a Tideblade Orb was placed or transformed.
+	var pressed_passive: bool = Input.is_action_just_pressed("turn_to_passive")
+	if pressed_passive and _is_water_orb_character():
+		HexCells.player_unique_instance.rpc_id(
+			1,
+			"try_create_water_orb_wire_for_player",
+			player_id
+		)
+
 	var possible_states = []
 	if Input.is_action_just_pressed("turn_to_heavy"):
 		possible_states.append(Magic.MagicType.HEAVY)
 	if Input.is_action_just_pressed("turn_to_light"):
 		possible_states.append(Magic.MagicType.LIGHT)
-	if Input.is_action_just_pressed("turn_to_passive"):
+	if pressed_passive and not _is_water_orb_character():
 		possible_states.append(Magic.MagicType.PASSIVE)
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
 		var pos = get_parent().get_node("CollisionShape2D").global_position
-		
+
 		HexCells.player_unique_instance.rpc_id(
 			1,
 			"try_and_change_magic_for_player",
@@ -67,15 +83,20 @@ func _unhandled_input(event: InputEvent) -> void:
 			stats_update.current_mana
 		)
 
-func _fire_magic() -> void:
-	var rolling_dir: Vector2 = (
-		HexCells.map_to_local(HexCells.curr_cell)
-		- HexCells.map_to_local(Magic.last_placed_cell)
-	)
-	if rolling_dir.is_zero_approx():
-		return
-	rolling_dir = rolling_dir.normalized()
 
+func _is_water_orb_character() -> bool:
+	if player_preset == null:
+		return false
+
+	var passive_stats = player_preset.magics.get(Magic.MagicType.PASSIVE)
+	if passive_stats == null:
+		return false
+
+	return passive_stats.magic_name in ["Razor Current", "Flow Circuit"]
+
+
+func _fire_magic() -> void:
+	var water_attacks: Array[Magic] = []
 	var root_hands: Array[Magic] = []
 	var bursts: Array[Magic] = []
 	var standard_magic: Array[Magic] = []
@@ -84,30 +105,58 @@ func _fire_magic() -> void:
 		if not (node is Magic):
 			continue
 
-		var magic_instance := node as Magic
+		var magic_instance: Magic = node as Magic
 		if magic_instance.player_id != player_id or magic_instance.rolling:
 			continue
 
-		if magic_instance is MagicRootHand:
+		if magic_instance is MagicTidebladeOrb:
+			if (magic_instance as MagicTidebladeOrb).can_activate_water_attack():
+				water_attacks.append(magic_instance)
+		elif magic_instance is MagicPressureLance:
+			if (magic_instance as MagicPressureLance).can_activate_water_attack():
+				water_attacks.append(magic_instance)
+		elif magic_instance is MagicRootHand:
 			root_hands.append(magic_instance)
 		elif magic_instance is MagicBurst:
 			bursts.append(magic_instance)
 		elif magic_instance.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY]:
 			standard_magic.append(magic_instance)
 
-	# Zilo's root takes priority. One press fires one prepared root.
-	if not root_hands.is_empty():
-		_launch_special_magic(_pick_preferred_magic(root_hands), rolling_dir)
+	if (
+		water_attacks.is_empty()
+		and root_hands.is_empty()
+		and bursts.is_empty()
+		and standard_magic.is_empty()
+	):
 		return
 
-	# Zilo detonates one prepared close-range burst per press, allowing rapid
-	# repeated attacks instead of all bursts disappearing simultaneously.
-	if not bursts.is_empty():
-		_launch_special_magic(_pick_preferred_magic(bursts), rolling_dir)
+	# Match Hekaset's targeting convention exactly: the cursor chooses a shared
+	# direction relative to the most recently placed magic. Every prepared
+	# attack then uses that same direction, regardless of its own position.
+	var rolling_dir: Vector2 = (
+		HexCells.map_to_local(HexCells.curr_cell)
+		- HexCells.map_to_local(Magic.last_placed_cell)
+	)
+	if rolling_dir.is_zero_approx():
 		return
+	rolling_dir = rolling_dir.normalized()
 
-	# Preserve the existing Hekaset behavior: fire all ordinary Light/Heavy magic.
-	for magic_instance in standard_magic:
+	# Every ready Tideblade and charged Pressure Lance activates together and
+	# follows the shared direction selected from the last-placed magic.
+	for magic_instance: Magic in water_attacks:
+		_launch_special_magic(magic_instance, rolling_dir)
+
+	# Every prepared Root Hand follows the same shared direction.
+	for magic_instance: Magic in root_hands:
+		_launch_special_magic(magic_instance, rolling_dir)
+
+	# Every prepared Burst activates together. The direction is supplied for a
+	# consistent launch contract even when the Burst itself is stationary.
+	for magic_instance: Magic in bursts:
+		_launch_special_magic(magic_instance, rolling_dir)
+
+	# Hekaset's ordinary Light and Heavy magic already use this same direction.
+	for magic_instance: Magic in standard_magic:
 		var distance: float
 		match magic_instance.state:
 			Magic.MagicType.HEAVY:
@@ -117,7 +166,10 @@ func _fire_magic() -> void:
 			_:
 				continue
 
-		var points := Magic.create_wiggly_path(rolling_dir, distance)
+		var points: PackedVector2Array = Magic.create_wiggly_path(
+			rolling_dir,
+			distance
+		)
 		HexCells.player_unique_instance.rpc(
 			"launch_magic_in_cell",
 			magic_instance.self_cell,
@@ -125,19 +177,11 @@ func _fire_magic() -> void:
 			player_id
 		)
 
-func _pick_preferred_magic(candidates: Array[Magic]) -> Magic:
-	for magic_instance in candidates:
-		if magic_instance.self_cell == Magic.last_placed_cell:
-			return magic_instance
-	return candidates[0]
 
 func _launch_special_magic(magic_instance: Magic, rolling_dir: Vector2) -> void:
-	# Both special subclasses only need a direction. They define their own
-	# travel distance or explosion behavior inside start_rolling().
+	# Special subclasses need only a direction. They define their own movement,
+	# stationary attack, beam, or explosion behavior inside start_rolling().
 	var direction_only_path := PackedVector2Array([Vector2.ZERO, rolling_dir])
 	HexCells.player_unique_instance.rpc(
-		"launch_magic_in_cell",
-		magic_instance.self_cell,
-		direction_only_path,
-		player_id
+		"launch_magic_in_cell", magic_instance.self_cell, direction_only_path, player_id
 	)
