@@ -1,14 +1,17 @@
 extends Node
 
+@onready var _bot_match_button: Button = %BotMatchButton
 @onready var _host_game_button: Button = %HostGameButton
 @onready var _join_game_button: Button = %JoinGameButton
+@onready var _tutorial_button: Button = %TutorialButton
+@onready var _account_button: Button = %AccountButton
+
 @onready var _connect_button: Button = %ConnectButton
 @onready var _back_button: Button = %BackButton
 
 @onready var _main_panel: Panel = %MainPanel
 @onready var _join_container: Container = %JoinContainer
 
-@onready var _name_line_edit: LineEdit = %NameLineEdit
 @onready var _ip_line_edit: LineEdit = %IPLineEdit
 @onready var _port_line_edit: LineEdit = %PortLineEdit
 
@@ -19,8 +22,11 @@ extends Node
 #region Setup
 
 func _ready() -> void:
+	_bot_match_button.pressed.connect(_on_bot_match)
 	_host_game_button.pressed.connect(_on_host_game)
 	_join_game_button.pressed.connect(_on_join_game)
+	_tutorial_button.pressed.connect(_on_start_tutorial)
+	_account_button.pressed.connect(_on_account_pressed)
 	_connect_button.pressed.connect(_on_connect)
 	_back_button.pressed.connect(_on_back)
 	
@@ -34,34 +40,40 @@ func _ready() -> void:
 
 #region Button Callbacks
 
+func _on_bot_match() -> void:
+	SceneManager.load_bot_match()
+
 # Creates a new game room
 # Switches to the character select screen
 func _on_host_game() -> void:
-	var player_name: String = _name_line_edit.text.strip_edges()
-	if not _is_valid_name(player_name):
+	if not GameManager.is_valid_name(GameManager.player_name):
 		_name_error_label.show()
 		return
 	else:
 		_name_error_label.hide()
 	
-	MultiplayerManager.create_game(player_name)
+	MultiplayerManager.create_game(GameManager.player_name)
+
+func _on_start_tutorial() -> void:
+	SceneManager.load_tutorial()
+
+func _on_account_pressed() -> void:
+	SceneManager.load_account_page()
 
 # Opens up the join menu
 func _on_join_game() -> void:
+	if not GameManager.is_valid_name(GameManager.player_name):
+		_name_error_label.show()
+		return
+	else:
+		_name_error_label.hide()
+		
 	_set_join_menu(true)
 
 # Joins an existing game room
 # Switches to the character select screen
 func _on_connect() -> void:
 	var errors: int = 0
-	
-	# Get and validate player name
-	var player_name: String = _name_line_edit.text.strip_edges()
-	if not _is_valid_name(player_name):
-		errors += 1
-		_name_error_label.show()
-	else:
-		_name_error_label.hide()
 	
 	# Get and validate IP address
 	var ip: String = _ip_line_edit.text.strip_edges()
@@ -98,7 +110,7 @@ func _on_connect() -> void:
 		print("Fix %d error(s) before connecting..." % errors)
 		return
 	
-	MultiplayerManager.join_game(player_name, ip, port)
+	MultiplayerManager.join_game(GameManager.player_name, ip, port)
 
 # Closes the join menu
 func _on_back() -> void:
@@ -117,21 +129,6 @@ func _set_join_menu(open: bool) -> void:
 	
 	_main_panel.visible = not open
 	_join_container.visible = open
-
-# Validates the given name
-# Length: 2 - 16 characters
-# Characters: Uppercase and Lowercase letters only
-func _is_valid_name(player_name: String) -> bool:
-	if player_name.length() < 2 || player_name.length() > 16:
-		print("Invalid Name Length: %d" % player_name.length())
-		return false
-	
-	var name_regex = RegEx.create_from_string("^[a-zA-Z]{2,16}$")
-	if name_regex.search(player_name):
-		return true
-	
-	print("Invalid Name: %s does not match regex pattern %s" % [player_name, name_regex.get_pattern()])
-	return false
 
 # Validates the given port
 # Range: 1 - 65535 (inclusive)

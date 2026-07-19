@@ -15,6 +15,7 @@ const SELECT_CHARACTER = "Select Character"
 @onready var _copy_internal_ip_button: Button = %CopyInternalIPButton
 @onready var _port_forwarding_label: Label = %PortForwardingLabel
 @onready var _start_button: Button = %StartButton
+@onready var _back_button: Button = %BackButton
 
 @export var texture_list: Array[Texture2D]
 
@@ -23,6 +24,7 @@ func _ready() -> void:
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 	Events.character_selected.connect(_on_character_selected)
 	_start_button.pressed.connect(_on_start_pressed)
+	_back_button.pressed.connect(_on_back_pressed)
 	
 	_copy_internal_ip_button.hide()
 	_copy_external_ip_button.hide()
@@ -83,6 +85,9 @@ func _on_copy_internal_ip_pressed():
 
 func _on_start_pressed():
 	_start_game.rpc()
+
+func _on_back_pressed():
+	SceneManager.load_title()
 
 #endregion
 
