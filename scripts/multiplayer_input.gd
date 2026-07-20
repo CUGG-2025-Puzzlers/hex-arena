@@ -52,22 +52,22 @@ func _unhandled_input(event: InputEvent) -> void:
 			player_id
 		)
 
-	# Q is the Water Orb character's explicit wire command. It does not create
-	# or replace a wire merely because a Tideblade Orb was placed or transformed.
+	# Character-specific commands live on optional child controllers. Characters
+	# without a WaterOrbWireController keep the normal Passive transformation.
 	var pressed_passive: bool = Input.is_action_just_pressed("turn_to_passive")
-	if pressed_passive and _is_water_orb_character():
-		HexCells.player_unique_instance.rpc_id(
-			1,
-			"try_create_water_orb_wire_for_player",
-			player_id
-		)
+	var wire_controller: Node = get_parent().get_node_or_null(
+		"WaterOrbWireController"
+	)
+
+	if pressed_passive and wire_controller != null:
+		wire_controller.call("try_create_wire")
 
 	var possible_states = []
 	if Input.is_action_just_pressed("turn_to_heavy"):
 		possible_states.append(Magic.MagicType.HEAVY)
 	if Input.is_action_just_pressed("turn_to_light"):
 		possible_states.append(Magic.MagicType.LIGHT)
-	if pressed_passive and not _is_water_orb_character():
+	if pressed_passive and wire_controller == null:
 		possible_states.append(Magic.MagicType.PASSIVE)
 	if not possible_states.is_empty():
 		var state = possible_states.pick_random()
@@ -82,17 +82,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			player_id,
 			stats_update.current_mana
 		)
-
-
-func _is_water_orb_character() -> bool:
-	if player_preset == null:
-		return false
-
-	var passive_stats = player_preset.magics.get(Magic.MagicType.PASSIVE)
-	if passive_stats == null:
-		return false
-
-	return passive_stats.magic_name in ["Razor Current", "Flow Circuit"]
 
 
 func _fire_magic() -> void:

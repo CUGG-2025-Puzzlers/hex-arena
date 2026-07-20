@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CharacterStats" format=3]
+[gd_resource type="Resource" script_class="CharacterStats" format=3 uid="uid://ol5yy4tcj1up"]
 
-[ext_resource type="Script" path="res://scripts/resources/character_stats.gd" id="1_script"]
-[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="2_magic_script"]
+[ext_resource type="Script" uid="uid://prs3ewngemc7" path="res://scripts/resources/character_stats.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="2_magic_script"]
 [ext_resource type="Resource" path="res://presets/magic_types/WATER_ORB_NEUTRAL_stats.tres" id="3_neutral"]
-[ext_resource type="Resource" path="res://presets/magic_types/TIDEBLADE_ORB_stats.tres" id="4_light"]
+[ext_resource type="Resource" uid="uid://csc5dn4e4x5j1" path="res://presets/magic_types/TIDEBLADE_ORB_stats.tres" id="4_light"]
 [ext_resource type="Resource" path="res://presets/magic_types/PRESSURE_LANCE_stats.tres" id="5_heavy"]
 [ext_resource type="Resource" path="res://presets/magic_types/RAZOR_CURRENT_stats.tres" id="6_passive"]
 
@@ -19,4 +19,3 @@ magics = Dictionary[int, ExtResource("2_magic_script")]({
 3: ExtResource("5_heavy"),
 4: ExtResource("6_passive")
 })
-default_state_to_place = 1

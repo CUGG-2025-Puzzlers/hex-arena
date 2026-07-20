@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("5_ypa77")
+max_health = 80.0
 magics = Dictionary[int, ExtResource("1_1l7e5")]({
 1: ExtResource("2_80ppx"),
 2: ExtResource("3_3eaop"),

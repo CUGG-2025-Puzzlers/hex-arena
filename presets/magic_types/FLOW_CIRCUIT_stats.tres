@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="MagicStats" format=3]
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://b50744022usur"]
 
-[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
 type = 4
 magic_name = "Flow Circuit"
-cost = 5.0
-cost_text = "5 + 2 / hex Mana"
+cost = 20.0
+cost_text = "20 + 4 / hex Mana"

@@ -1,13 +1,15 @@
 [gd_scene format=3 uid="uid://c7w0a8orbb002"]
 
 [ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scripts/characters/player.gd" id="1_player"]
-[ext_resource type="Resource" path="res://presets/character_presets/WaterOrbB_stats.tres" id="2_preset"]
+[ext_resource type="Resource" uid="uid://cgfgf4bnepvrh" path="res://presets/character_presets/WaterOrbB_stats.tres" id="2_preset"]
 [ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="3_input"]
-[ext_resource type="Texture2D" uid="uid://cqdvlhqfg7jug" path="res://assets/textures/water_orb/water_orb_model.png" id="4_model"]
+[ext_resource type="Texture2D" uid="uid://60gyc2o104ga" path="res://assets/textures/water_orb/water_orb_model.png" id="4_model"]
 [ext_resource type="PackedScene" uid="uid://g25v82bkmahc" path="res://scenes/character_scenes/stats_component_scene.tscn" id="5_stats"]
-[ext_resource type="Script" path="res://scripts/abilities/reform_ability.gd" id="6_ability"]
-[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/range_drawing.gd" id="7_range"]
+[ext_resource type="Script" uid="uid://dy23yyl1gxawb" path="res://scripts/abilities/reform_ability.gd" id="6_ability"]
+[ext_resource type="Script" path="res://scripts/resources/draw_range.gd" id="7_a3emg"]
+[ext_resource type="PackedScene" uid="uid://cub773k4uxu8h" path="res://scenes/cells_bold_outline.tscn" id="8_kdydl"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="8_particles"]
+[ext_resource type="Script" uid="uid://bx4b4ph1kl0md" path="res://scripts/characters/water_orb_wire_controller.gd" id="9_wire_controller"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
 properties/0/path = NodePath(".:player_id")
@@ -67,6 +69,12 @@ unique_name_in_owner = true
 replication_config = SubResource("SceneReplicationConfig_input")
 script = ExtResource("3_input")
 
+[node name="WaterOrbWireController" type="Node" parent="." unique_id=1375188803]
+script = ExtResource("9_wire_controller")
+wire_variant = 2
+base_connection_cost = 20.0
+cost_per_hex = 5.0
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1415118537]
 shape = SubResource("RectangleShape_feet")
 
@@ -85,7 +93,6 @@ script = ExtResource("6_ability")
 dash_distance = 280.0
 dash_duration = 0.26
 dash_speed_curve = 1.8
-dash_opacity = 0.55
 cooldown_duration = 3.5
 ability_name = "Reform"
 
@@ -97,9 +104,10 @@ lifetime = 0.35
 one_shot = true
 process_material = SubResource("ParticleProcessMaterial_dash")
 
-[node name="Drawing range" type="Node2D" parent="." unique_id=416623009]
-show_behind_parent = true
-script = ExtResource("7_range")
+[node name="Drawing range" type="Node2D" parent="." unique_id=293511154]
+script = ExtResource("7_a3emg")
+
+[node name="RangeOutline" parent="Drawing range" unique_id=1250776310 instance=ExtResource("8_kdydl")]
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1678031498]
 

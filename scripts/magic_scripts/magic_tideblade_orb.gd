@@ -3,12 +3,6 @@ extends Magic
 class_name MagicTidebladeOrb
 
 
-const RAZOR_CURRENT_NAME := "Razor Current"
-const FLOW_CIRCUIT_NAME := "Flow Circuit"
-const RAZOR_VARIANT := 1
-const FLOW_VARIANT := 2
-
-
 @export_group("Attack")
 @export var max_attacks: int = 3
 @export var swing_windup: float = 0.12
@@ -16,6 +10,7 @@ const FLOW_VARIANT := 2
 @export var swing_recovery: float = 0.30
 @export var remote_damage_multiplier: float = 0.55
 @export var remote_radius_multiplier: float = 0.82
+@export var projectile_damage: float = 35.0
 
 @export_group("Slash Hitbox")
 @export_range(40.0, 260.0, 1.0) var swing_radius: float = 155.0
@@ -40,13 +35,10 @@ var local_swing_progress: float = 0.0
 var local_swing_visible: bool = false
 var local_swing_direction: Vector2 = Vector2.RIGHT
 
-var remote_swing_progress: float = 0.0
-var remote_swing_visible: bool = false
-var remote_swing_direction: Vector2 = Vector2.RIGHT
+var remote_swings: Dictionary = {}
+var next_remote_swing_id: int = 0
 
 var local_swing_tween: Tween = null
-var remote_swing_tween: Tween = null
-var network_unregistered: bool = false
 
 static var next_sequence_by_player: Dictionary = {}
 
@@ -176,19 +168,21 @@ func perform_remote_swing(direction: Vector2) -> void:
 	if direction.is_zero_approx():
 		return
 
-	remote_swing_direction = direction.normalized()
-	remote_swing_progress = 0.0
-	remote_swing_visible = true
+	next_remote_swing_id += 1
+	var swing_id: int = next_remote_swing_id
 
-	if remote_swing_tween != null:
-		remote_swing_tween.kill()
+	remote_swings[swing_id] = {
+		"direction": direction.normalized(),
+		"progress": 0.0,
+	}
 
-	remote_swing_tween = create_tween()
+	var remote_tween: Tween = create_tween()
 
 	(
-		remote_swing_tween
+		remote_tween
 		.tween_method(
-			_set_remote_swing_progress,
+			func(value: float) -> void:
+				_set_remote_swing_progress(swing_id, value),
 			0.0,
 			0.42,
 			swing_windup
@@ -197,19 +191,25 @@ func perform_remote_swing(direction: Vector2) -> void:
 		.set_ease(Tween.EASE_IN)
 	)
 
-	remote_swing_tween.tween_callback(
+	remote_tween.tween_callback(
 		func() -> void:
+			if not remote_swings.has(swing_id):
+				return
+
+			var swing: Dictionary = remote_swings[swing_id]
+			var swing_direction: Vector2 = swing["direction"]
 			_resolve_swing_hits(
-				remote_swing_direction,
+				swing_direction,
 				remote_damage_multiplier,
 				remote_radius_multiplier
 			)
 	)
 
 	(
-		remote_swing_tween
+		remote_tween
 		.tween_method(
-			_set_remote_swing_progress,
+			func(value: float) -> void:
+				_set_remote_swing_progress(swing_id, value),
 			0.42,
 			1.0,
 			swing_active_time
@@ -218,20 +218,47 @@ func perform_remote_swing(direction: Vector2) -> void:
 		.set_ease(Tween.EASE_OUT)
 	)
 
-	remote_swing_tween.tween_callback(
+	remote_tween.tween_callback(
 		func() -> void:
-			remote_swing_visible = false
-			remote_swing_progress = 0.0
+			remote_swings.erase(swing_id)
 			queue_redraw()
 	)
 
 
-func _set_remote_swing_progress(value: float) -> void:
-	remote_swing_progress = value
+func _set_remote_swing_progress(
+	swing_id: int,
+	value: float
+) -> void:
+	if not remote_swings.has(swing_id):
+		return
+
+	var swing: Dictionary = remote_swings[swing_id]
+	swing["progress"] = value
+	remote_swings[swing_id] = swing
 	queue_redraw()
 
 
 func _resolve_swing_hits(
+	direction: Vector2,
+	damage_multiplier: float,
+	radius_multiplier: float
+) -> void:
+	# Player damage remains server-authoritative, matching Hekaset's explicit
+	# attacks. Magic health is resolved deterministically on every peer, matching
+	# Pressure Lance and the existing magic-vs-magic collision convention.
+	_resolve_player_hits(
+		direction,
+		damage_multiplier,
+		radius_multiplier
+	)
+	_resolve_projectile_hits(
+		direction,
+		damage_multiplier,
+		radius_multiplier
+	)
+
+
+func _resolve_player_hits(
 	direction: Vector2,
 	damage_multiplier: float,
 	radius_multiplier: float
@@ -279,6 +306,48 @@ func _resolve_swing_hits(
 		)
 
 		target._apply_damage.rpc(actual_damage)
+
+
+func _resolve_projectile_hits(
+	direction: Vector2,
+	damage_multiplier: float,
+	radius_multiplier: float
+) -> void:
+	for node: Node in get_tree().get_nodes_in_group("magic"):
+		if not (node is Magic):
+			continue
+
+		var projectile: Magic = node as Magic
+
+		if projectile == self:
+			continue
+
+		if projectile.player_id == player_id:
+			continue
+
+		if projectile.is_queued_for_deletion():
+			continue
+
+		# By default this selects only active travelling Light/Heavy magic.
+		# Special attacks can opt in or out through can_be_cut_by_wire().
+		if not projectile.can_be_cut_by_wire():
+			continue
+
+		var offset: Vector2 = (
+			projectile.global_position
+			- global_position
+		)
+
+		if not _is_point_inside_slash(
+			offset,
+			direction,
+			radius_multiplier
+		):
+			continue
+
+		projectile.take_damage(
+			projectile_damage * damage_multiplier
+		)
 
 
 func _is_point_inside_slash(
@@ -363,8 +432,6 @@ func _trigger_flow_circuit(direction: Vector2) -> void:
 			direction
 		)
 
-		return
-
 
 func _server_register_creation_sequence() -> void:
 	if not multiplayer.is_server():
@@ -379,51 +446,6 @@ func _server_register_creation_sequence() -> void:
 
 	next_sequence_by_player[player_id] = next_sequence
 	creation_sequence = next_sequence
-
-
-func _unregister_network_endpoint() -> void:
-	if network_unregistered:
-		return
-
-	network_unregistered = true
-
-	if not multiplayer.is_server():
-		return
-
-	if not is_instance_valid(HexCells.player_unique_instance):
-		return
-
-	# A Q-created wire lasts until either endpoint disappears or uses its
-	# final attack. Unconnected Tideblades do not disturb the active wire.
-	for node: Node in get_tree().get_nodes_in_group(
-		"water_orb_wire"
-	):
-		if (
-			not is_instance_valid(node)
-			or node.is_queued_for_deletion()
-		):
-			continue
-
-		if int(node.get("player_id")) != player_id:
-			continue
-
-		if not bool(node.call("connects_cell", self_cell)):
-			continue
-
-		HexCells.player_unique_instance.clear_water_orb_wire_for_player.rpc(
-			player_id
-		)
-
-		return
-
-
-func fizzle() -> void:
-	_unregister_network_endpoint()
-	super.fizzle()
-
-
-func _exit_tree() -> void:
-	_unregister_network_endpoint()
 
 
 func _draw() -> void:
@@ -471,10 +493,12 @@ func _draw() -> void:
 			1.0
 		)
 
-	if remote_swing_visible:
+	for swing_value: Variant in remote_swings.values():
+		var swing: Dictionary = swing_value
+		var swing_direction: Vector2 = swing["direction"]
 		_draw_swing_ribbon(
-			remote_swing_direction,
-			remote_swing_progress,
+			swing_direction,
+			float(swing["progress"]),
 			remote_radius_multiplier,
 			0.72
 		)

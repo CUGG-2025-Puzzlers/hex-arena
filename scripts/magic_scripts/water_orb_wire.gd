@@ -19,20 +19,23 @@ var endpoint_b: Magic = null
 var endpoint_a_cell: Vector2i
 var endpoint_b_cell: Vector2i
 var player_id: int = -1
+var wire_id: int = -1
 var variant: WireVariant = WireVariant.RAZOR_CURRENT
 
 var wire_length: float = 0.0
 var animation_time: float = 0.0
 var players_inside: Dictionary = {}
 
-var conduit_active: bool = false
-var conduit_from_a: bool = true
-var conduit_progress: float = 0.0
-var active_conduit_count: int = 0
+var conduit_pulses: Dictionary = {}
+var next_conduit_pulse_id: int = 0
 
 
 func configure(
-	new_endpoint_a: Magic, new_endpoint_b: Magic, new_player_id: int, new_variant: int
+	new_endpoint_a: Magic,
+	new_endpoint_b: Magic,
+	new_player_id: int,
+	new_variant: int,
+	new_wire_id: int
 ) -> void:
 	endpoint_a = new_endpoint_a
 	endpoint_b = new_endpoint_b
@@ -40,8 +43,8 @@ func configure(
 	endpoint_b_cell = endpoint_b.self_cell
 	player_id = new_player_id
 	variant = new_variant
+	wire_id = new_wire_id
 
-	name = "WaterWire_%s" % player_id
 	add_to_group("water_orb_wire")
 	_update_geometry()
 	queue_redraw()
@@ -51,7 +54,10 @@ func _process(delta: float) -> void:
 	animation_time += delta
 
 	if not _endpoints_are_valid():
-		queue_free()
+		# A Flow pulse that has already left an endpoint is allowed to finish.
+		# The wire removes itself as soon as no active pulse remains.
+		if conduit_pulses.is_empty():
+			queue_free()
 		return
 
 	_update_geometry()
@@ -91,52 +97,81 @@ func connects_cell(cell: Vector2i) -> bool:
 	return cell == endpoint_a_cell or cell == endpoint_b_cell
 
 
-func conduct_attack_from(source_cell: Vector2i, direction: Vector2) -> void:
+func conduct_attack_from(
+	source_cell: Vector2i,
+	direction: Vector2
+) -> void:
 	if variant != WireVariant.FLOW_CIRCUIT:
 		return
+
 	if not _endpoints_are_valid():
 		return
+
 	if not connects_cell(source_cell):
 		return
 
-	var other_endpoint: Magic = endpoint_b if source_cell == endpoint_a_cell else endpoint_a
+	var other_endpoint: Magic = (
+		endpoint_b
+		if source_cell == endpoint_a_cell
+		else endpoint_a
+	)
+
 	if not is_instance_valid(other_endpoint):
 		return
+
 	if not other_endpoint.has_method("perform_remote_swing"):
 		return
 
-	# All Tideblades fire in one volley. Each endpoint therefore gets its own
-	# independent conduit pulse instead of one pulse cancelling the other.
-	var pulse_from_a: bool = source_cell == endpoint_a_cell
-	active_conduit_count += 1
-	conduit_active = true
-	conduit_from_a = pulse_from_a
-	conduit_progress = 0.0
+	next_conduit_pulse_id += 1
+	var pulse_id: int = next_conduit_pulse_id
+
+	conduit_pulses[pulse_id] = {
+		"from_a": source_cell == endpoint_a_cell,
+		"progress": 0.0,
+	}
 
 	var conduit_tween: Tween = create_tween()
-	conduit_tween.tween_method(
-		func(value: float) -> void:
-			conduit_from_a = pulse_from_a
-			conduit_progress = value
-			queue_redraw(),
-		0.0,
-		1.0,
-		conduit_travel_time
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
-	conduit_tween.tween_callback(
-		func() -> void:
-			if not is_instance_valid(other_endpoint):
-				return
-			other_endpoint.call("perform_remote_swing", direction)
+	(
+		conduit_tween
+		.tween_method(
+			func(value: float) -> void:
+				_set_conduit_progress(pulse_id, value),
+			0.0,
+			1.0,
+			conduit_travel_time
+		)
+		.set_trans(Tween.TRANS_SINE)
+		.set_ease(Tween.EASE_IN_OUT)
 	)
 
 	conduit_tween.tween_callback(
 		func() -> void:
-			active_conduit_count = maxi(active_conduit_count - 1, 0)
-			conduit_active = active_conduit_count > 0
+			if is_instance_valid(other_endpoint):
+				other_endpoint.call(
+					"perform_remote_swing",
+					direction
+				)
+	)
+
+	conduit_tween.tween_callback(
+		func() -> void:
+			conduit_pulses.erase(pulse_id)
 			queue_redraw()
 	)
+
+
+func _set_conduit_progress(
+	pulse_id: int,
+	value: float
+) -> void:
+	if not conduit_pulses.has(pulse_id):
+		return
+
+	var pulse: Dictionary = conduit_pulses[pulse_id]
+	pulse["progress"] = value
+	conduit_pulses[pulse_id] = pulse
+	queue_redraw()
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -219,8 +254,25 @@ func _draw() -> void:
 		draw_line(start, finish, Color(0.58, 0.92, 1.0, 0.58), 5.0, true)
 		draw_line(start, finish, Color(0.92, 0.99, 1.0, 0.82), 1.5, true)
 
-		if conduit_active:
-			var progress := conduit_progress if conduit_from_a else 1.0 - conduit_progress
-			var pulse_position := start.lerp(finish, progress)
-			draw_circle(pulse_position, 12.0, Color(0.72, 0.96, 1.0, 0.24))
-			draw_circle(pulse_position, 5.0, Color(0.95, 1.0, 1.0, 0.98))
+		for pulse_value: Variant in conduit_pulses.values():
+			var pulse: Dictionary = pulse_value
+			var progress: float = float(pulse["progress"])
+
+			if not bool(pulse["from_a"]):
+				progress = 1.0 - progress
+
+			var pulse_position: Vector2 = start.lerp(
+				finish,
+				progress
+			)
+
+			draw_circle(
+				pulse_position,
+				12.0,
+				Color(0.72, 0.96, 1.0, 0.24)
+			)
+			draw_circle(
+				pulse_position,
+				5.0,
+				Color(0.95, 1.0, 1.0, 0.98)
+			)
