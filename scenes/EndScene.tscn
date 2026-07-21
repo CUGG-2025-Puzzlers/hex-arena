@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cp0acrvwc8fd3"]
 
-[ext_resource type="Script" uid="uid://dod0axqlalpdv" path="res://scripts/end_scene.gd" id="1_cv086"]
+[ext_resource type="Script" path="res://scripts/end_scene.gd" id="1_cv086"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cv086"]
 content_margin_left = 24.0

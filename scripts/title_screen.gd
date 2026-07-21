@@ -91,7 +91,7 @@ func _on_create_lobby() -> void:
 		_name_error_label.hide()
 
 	_set_menu_buttons_disabled(true)
-	var success := await LobbyMatchmakingManager.create_lobby(player_name)
+	var success = await LobbyMatchmakingManager.create_lobby(player_name)
 	if not success:
 		_set_menu_buttons_disabled(false)
 
@@ -105,7 +105,7 @@ func _on_find_lobbies() -> void:
 		_name_error_label.hide()
 
 	_set_menu_buttons_disabled(true)
-	var lobbies := await LobbyMatchmakingManager.find_lobbies(player_name)
+	var lobbies = await LobbyMatchmakingManager.find_lobbies(player_name)
 	_set_menu_buttons_disabled(false)
 	_show_lobby_results(lobbies)
 
@@ -227,7 +227,7 @@ func _clear_lobby_results() -> void:
 func _on_lobby_join_pressed(lobby: HLobby) -> void:
 	var player_name: String = "TEST"
 	_set_menu_buttons_disabled(true)
-	var success := await LobbyMatchmakingManager.join_lobby(lobby, player_name)
+	var success = await LobbyMatchmakingManager.join_lobby(lobby, player_name)
 	if not success:
 		_set_menu_buttons_disabled(false)
 
