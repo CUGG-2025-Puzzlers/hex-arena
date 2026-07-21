@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blgoctyjk2mb5"]
 
-[ext_resource type="Script" uid="uid://c6lb0lff1aonj" path="res://scripts/magic_burst.gd" id="1_burst"]
+[ext_resource type="Script" uid="uid://d0ns6fosqvdvo" path="res://scripts/magic_burst.gd" id="1_burst"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_burst"]
 radius = 18.0

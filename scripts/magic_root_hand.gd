@@ -39,7 +39,7 @@ func start_rolling(wiggly_path: PackedVector2Array) -> void:
 	if _update_hand_visual not in process_callables:
 		process_callables.append(_update_hand_visual)
 
-	var target_position := _cast_origin_global + rolling_dir * (HexCells.hex_width * 1.5)
+	var target_position := _cast_origin_global + rolling_dir * (HexCells.hex_width * 3.5)
 	_movement_tween = create_tween()
 	_movement_tween.set_trans(Tween.TRANS_LINEAR)
 	_movement_tween.set_ease(Tween.EASE_IN_OUT)
