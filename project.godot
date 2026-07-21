@@ -29,6 +29,17 @@ MultiplayerManager="*uid://dhwwc4t2mdyga"
 GameManager="*uid://cvimhpwolfbnu"
 Events="*uid://brxpdvd1ijwfd"
 Music="*uid://cqx5k3psrd4xg"
+LobbyMatchmakingManager="*res://scripts/autoloads/lobby_matchmaking_manager.gd"
+EOSGRuntime="*uid://7saywdx0ipep"
+HPlatform="*uid://yl2muvqrdiud"
+HAuth="*uid://786t1jiowvvg"
+HAchievements="*uid://bis404dty5u5c"
+HFriends="*uid://uumqbey8ji5t"
+HStats="*uid://dbckdip83oone"
+HLeaderboards="*uid://b06khhf20mplm"
+HLobbies="*uid://6iqvm33q0tb1"
+HP2P="*uid://u6ae5fpm6l8q"
+HSessions="*uid://bieh2rxxahuu2"
 
 [display]
 
@@ -38,6 +49,10 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/epic-online-services-godot/plugin.cfg")
 
 [input]
 

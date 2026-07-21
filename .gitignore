@@ -12,3 +12,7 @@ export_credentials.cfg
 .claude/
 *.uid
 *.import
+
+# EOS Credentials
+scripts/eos/EosCredentials.gd
+scripts/eos/EosCredentials.gd.uid
