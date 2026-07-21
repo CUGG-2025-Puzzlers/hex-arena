@@ -6,9 +6,9 @@
 [ext_resource type="Texture2D" uid="uid://cuk2faeygjffr" path="res://assets/textures/sprite_sheet 3.png" id="4_qs17t"]
 [ext_resource type="PackedScene" uid="uid://g25v82bkmahc" path="res://scenes/character_scenes/stats_component_scene.tscn" id="5_i5orq"]
 [ext_resource type="Script" uid="uid://cciheadly5brc" path="res://scripts/abilities/ghost_ability.gd" id="5_yj2uh"]
-[ext_resource type="Script" uid="uid://brf41r4egp8dp" path="res://scripts/resources/draw_range.gd" id="6_3q4dn"]
-[ext_resource type="PackedScene" uid="uid://cub773k4uxu8h" path="res://scenes/cells_bold_outline.tscn" id="8_range_outline"]
+[ext_resource type="Script" path="res://scripts/resources/draw_range.gd" id="6_3q4dn"]
 [ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="7_tpk3q"]
+[ext_resource type="PackedScene" uid="uid://cub773k4uxu8h" path="res://scenes/cells_bold_outline.tscn" id="8_range_outline"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_smehm"]
 properties/0/path = NodePath(".:player_id")

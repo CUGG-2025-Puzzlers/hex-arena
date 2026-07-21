@@ -83,7 +83,7 @@ func _on_join_game() -> void:
 
 
 func _on_create_lobby() -> void:
-	var player_name: String = _name_line_edit.text.strip_edges()
+	var player_name: String = "TEST"
 	if not _is_valid_name(player_name):
 		_name_error_label.show()
 		return
@@ -97,7 +97,7 @@ func _on_create_lobby() -> void:
 
 
 func _on_find_lobbies() -> void:
-	var player_name: String = _name_line_edit.text.strip_edges()
+	var player_name: String = "TEST"
 	if not _is_valid_name(player_name):
 		_name_error_label.show()
 		return
@@ -225,7 +225,7 @@ func _clear_lobby_results() -> void:
 
 
 func _on_lobby_join_pressed(lobby: HLobby) -> void:
-	var player_name: String = _name_line_edit.text.strip_edges()
+	var player_name: String = "TEST"
 	_set_menu_buttons_disabled(true)
 	var success := await LobbyMatchmakingManager.join_lobby(lobby, player_name)
 	if not success:

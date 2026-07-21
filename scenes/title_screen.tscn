@@ -66,6 +66,9 @@ theme_override_font_sizes/font_size = 35
 text = "Join Game"
 
 [node name="TutorialButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=800524646]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="CreateLobbyButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=1238003056]
 unique_name_in_owner = true
 layout_mode = 2
@@ -77,6 +80,12 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 35
 text = "Find Lobbies"
+
+[node name="AccountButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=696000209]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Account"
 
 [node name="NameContainer" type="HBoxContainer" parent="." unique_id=7973569]
 offset_left = 480.0
@@ -90,16 +99,9 @@ custom_minimum_size = Vector2(500, 120)
 layout_mode = 2
 
 [node name="NameErrorLabel" type="Label" parent="NameContainer/NamePanel" unique_id=1417586793]
-unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
 theme_override_font_sizes/font_size = 35
 text = "Tutorial"
-
-[node name="AccountButton" type="Button" parent="MainPanel/CenterContainer/VBoxContainer" unique_id=696000209]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 35
-text = "Account"
 
 [node name="JoinContainer" type="HBoxContainer" parent="." unique_id=2113765539]
 unique_name_in_owner = true
