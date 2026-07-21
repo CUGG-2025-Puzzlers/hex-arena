@@ -8,7 +8,7 @@ radius = 18.0
 [node name="MagicRootHand" type="Area2D" unique_id=403023474]
 monitorable = false
 script = ExtResource("1_root")
-travel_time = 0.08
+travel_time = 0.14
 linger_time = 0.12
 root_duration = 2.0
 
