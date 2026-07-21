@@ -10,7 +10,6 @@ class_name MagicTidebladeOrb
 @export var swing_recovery: float = 0.30
 @export var remote_damage_multiplier: float = 0.55
 @export var remote_radius_multiplier: float = 0.82
-@export var projectile_damage: float = 35.0
 
 @export_group("Slash Hitbox")
 @export_range(40.0, 260.0, 1.0) var swing_radius: float = 155.0
@@ -251,7 +250,7 @@ func _resolve_swing_hits(
 		damage_multiplier,
 		radius_multiplier
 	)
-	_resolve_projectile_hits(
+	_resolve_magic_hits(
 		direction,
 		damage_multiplier,
 		radius_multiplier
@@ -308,33 +307,37 @@ func _resolve_player_hits(
 		target._apply_damage.rpc(actual_damage)
 
 
-func _resolve_projectile_hits(
+func _resolve_magic_hits(
 	direction: Vector2,
 	damage_multiplier: float,
 	radius_multiplier: float
 ) -> void:
+	# Match Magic._on_area_entered(): the cleave behaves like a real magic
+	# attack, so it can break Light magic and damage Heavy magic, Shields,
+	# stationary setup magic, and other hostile magic subclasses.
 	for node: Node in get_tree().get_nodes_in_group("magic"):
 		if not (node is Magic):
 			continue
 
-		var projectile: Magic = node as Magic
+		var target: Magic = node as Magic
 
-		if projectile == self:
+		if target == self:
 			continue
 
-		if projectile.player_id == player_id:
+		if target.is_queued_for_deletion():
 			continue
 
-		if projectile.is_queued_for_deletion():
-			continue
+		var should_collide: bool = (
+			target.player_id != player_id
+			or collides_w_own
+			or target.collides_w_own
+		)
 
-		# By default this selects only active travelling Light/Heavy magic.
-		# Special attacks can opt in or out through can_be_cut_by_wire().
-		if not projectile.can_be_cut_by_wire():
+		if not should_collide:
 			continue
 
 		var offset: Vector2 = (
-			projectile.global_position
+			target.global_position
 			- global_position
 		)
 
@@ -345,8 +348,10 @@ func _resolve_projectile_hits(
 		):
 			continue
 
-		projectile.take_damage(
-			projectile_damage * damage_multiplier
+		# Use the Tideblade's normal MagicStats damage, exactly like ordinary
+		# magic-on-magic collision. Conducted cleaves retain their multiplier.
+		target.take_damage(
+			damage * damage_multiplier
 		)
 
 
