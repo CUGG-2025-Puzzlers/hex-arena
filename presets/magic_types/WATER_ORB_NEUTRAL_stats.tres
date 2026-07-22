@@ -1,15 +1,15 @@
-[gd_resource type="Resource" script_class="MagicStats" format=3]
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://71nne5ec8w8c"]
 
-[ext_resource type="PackedScene" path="res://scenes/magic_types/magic_water_orb.tscn" id="1_scene"]
-[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="2_script"]
-[ext_resource type="Resource" path="res://presets/magic_types/TIDEBLADE_ORB_stats.tres" id="3_light"]
+[ext_resource type="PackedScene" uid="uid://bcpgrlgroslrk" path="res://scenes/magic_types/magic_water_orb.tscn" id="1_scene"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="2_script"]
+[ext_resource type="Resource" uid="uid://csc5dn4e4x5j1" path="res://presets/magic_types/TIDEBLADE_ORB_stats.tres" id="3_light"]
 [ext_resource type="Resource" path="res://presets/magic_types/PRESSURE_LANCE_stats.tres" id="4_heavy"]
 
 [resource]
 script = ExtResource("2_script")
 type = 1
 magic_name = "Water Orb"
-cost = 4.0
+cost = 5.0
 scene = ExtResource("1_scene")
 health = 24.0
 transform_dict = Dictionary[int, Resource]({

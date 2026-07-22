@@ -80,7 +80,7 @@ func _draw() -> void:
 	if not detonating:
 		return
 
-	var radius := HexCells.hex_width * _blast_progress
+	var radius := (HexCells.hex_width * 1.5) * _blast_progress
 	var fill := Color(1.0, 0.03, 0.05, 0.24 * (1.0 - 0.35 * _blast_progress))
 	var outline := Color(1.0, 0.12, 0.12, 0.95)
 	draw_circle(Vector2.ZERO, radius, fill)
