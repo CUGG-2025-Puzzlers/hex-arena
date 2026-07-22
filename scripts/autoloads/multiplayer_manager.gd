@@ -15,6 +15,7 @@ var water_orb_b = preload("res://scenes/characters/WaterOrbB.tscn")
 var bot_controller_script = preload("res://scripts/bot_controller.gd")
 
 var _players_spawn_node
+var arena_ready_peers: Dictionary = {}
 
 # Local player info
 # Set these fields using some UI before creating/joining a game
@@ -39,11 +40,32 @@ func _ready() -> void:
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
 
-	local_ip = IP.get_local_addresses()[-1]
+	local_ip = _find_local_ipv4()
 
-	if local_ip == "fe80:0:0:0:0:0:0:1":
-		local_ip = IP.get_local_addresses()[11]
 
+func _find_local_ipv4() -> String:
+	var addresses: PackedStringArray = IP.get_local_addresses()
+
+	for address: String in addresses:
+		if not address.is_valid_ip_address():
+			continue
+
+		# Your current direct-connect UI expects IPv4.
+		if address.contains(":"):
+			continue
+
+		if address.begins_with("127."):
+			continue
+
+		if address.begins_with("169.254."):
+			continue
+
+		if address == "0.0.0.0":
+			continue
+
+		return address
+
+	return "127.0.0.1"
 # Creates a game that other players can connect to
 # Creates a server with at the port specified in settings
 # The user who creates the server is considered the 'host'
@@ -251,7 +273,7 @@ func _on_player_died(dead_player_id : int) -> void:
 func _end_game(winner_name: String):
 	SceneManager.load_end_scene(winner_name)
 
-func _start_game():
+func _start_game() -> void:
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 
 	var spawner: MultiplayerSpawner = (
@@ -260,9 +282,42 @@ func _start_game():
 	)
 	spawner.spawn_function = Callable(self, "_spawn_player_from_data")
 
-	# Every peer needs the spawn function, but only the server creates players.
+	# Every peer configures its local spawner before reporting ready.
+	if multiplayer.is_server():
+		_mark_arena_ready(multiplayer.get_unique_id())
+	else:
+		_report_arena_ready.rpc_id(1)
+
+
+@rpc("any_peer", "reliable")
+func _report_arena_ready() -> void:
 	if not multiplayer.is_server():
 		return
+
+	var sender_id := multiplayer.get_remote_sender_id()
+	if not players.has(sender_id):
+		return
+
+	_mark_arena_ready(sender_id)
+
+
+func _mark_arena_ready(peer_id: int) -> void:
+	arena_ready_peers[peer_id] = true
+
+	if arena_ready_peers.size() < players.size():
+		return
+
+	_spawn_players()
+
+
+func _spawn_players() -> void:
+	if not multiplayer.is_server():
+		return
+
+	var spawner: MultiplayerSpawner = (
+		get_tree().get_current_scene().get_node("MultiplayerSpawner")
+		as MultiplayerSpawner
+	)
 
 	for player in players:
 		var spawn_position := Vector2.ZERO
@@ -285,6 +340,8 @@ func _start_game():
 			player_node.stats_update.deadgeLol.connect(
 				_on_player_died.bind(player)
 			)
+
+	arena_ready_peers.clear()
 
 func _start_bot_match():
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
