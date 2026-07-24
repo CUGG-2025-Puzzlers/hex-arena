@@ -23,6 +23,9 @@ signal changed_cell(player_ind: int, new_cell: Vector2i)
 @export var stats_update: StatsUpdate
 
 var rooted_until_msec: int = 0
+var silenced_until_msec: int = 0
+var _move_modifiers: Dictionary = {}
+var _fading_modifier_versions: Dictionary = {}
 
 var player_id: int:
 	set(value):
@@ -59,6 +62,14 @@ func _physics_process(delta: float) -> void:
 		if playback != null:
 			playback.travel("Stop")
 
+		_update_current_cell()
+		return
+
+	if _ability != null and _ability.blocks_movement():
+		velocity = Vector2.ZERO
+		move_and_slide()
+		if playback != null:
+			playback.travel("Stop")
 		_update_current_cell()
 		return
 
@@ -125,12 +136,12 @@ func update_animation_parameters() -> void:
 
 
 func _handle_movement(_delta: float) -> void:
-	var speed: float = base_speed
+	var speed: float = base_speed * get_move_speed_multiplier()
 
 	if _ability is GhostAbility:
 		speed *= _ability.get_speed_multiplier()
 
-	if _input.use_ability:
+	if _input.use_ability and not is_gameplay_input_blocked():
 		_ability.try_activate()
 
 	velocity = _input.direction * speed
@@ -154,13 +165,39 @@ func is_dashing() -> bool:
 
 
 func is_invulnerable() -> bool:
-	# Only Water Orb's Reform grants immunity. Zilo's Dash remains vulnerable.
+	if _ability != null and _ability.grants_invulnerability():
+		return true
+
+	# Preserve Water Orb Reform without requiring a broader refactor.
 	if _ability is ReformAbility:
 		return (
 			_ability as ReformAbility
 		).is_granting_invulnerability()
 
 	return false
+
+
+func is_silenced() -> bool:
+	return Time.get_ticks_msec() < silenced_until_msec
+
+
+func is_gameplay_input_blocked() -> bool:
+	return (
+		is_silenced()
+		or (_ability != null and _ability.blocks_gameplay_input())
+	)
+
+
+func is_friendly_to(other: Player) -> bool:
+	# Current game is 1v1. Replace this comparison with team_id later.
+	return other != null and player_id == other.player_id
+
+
+func get_move_speed_multiplier() -> float:
+	var multiplier := 1.0
+	for value in _move_modifiers.values():
+		multiplier *= float(value)
+	return clampf(multiplier, 0.2, 2.5)
 
 
 func is_rooted() -> bool:
@@ -255,6 +292,89 @@ func _apply_damage(amount: float) -> void:
 @rpc("authority", "call_local", "reliable")
 func _use_mana(amount: float) -> void:
 	stats_update.use_mana(amount)
+
+
+@rpc("authority", "call_local", "reliable")
+func _apply_heal(amount: float) -> void:
+	if amount > 0.0:
+		stats_update.heal(amount)
+
+
+@rpc("authority", "call_local", "reliable")
+func _restore_mana(amount: float) -> void:
+	if amount > 0.0:
+		stats_update.restore_mana(amount)
+
+
+@rpc("authority", "call_local", "reliable")
+func _apply_silence(duration: float) -> void:
+	if duration <= 0.0:
+		return
+	silenced_until_msec = maxi(
+		silenced_until_msec,
+		Time.get_ticks_msec() + int(duration * 1000.0)
+	)
+
+
+@rpc("authority", "call_local", "reliable")
+func _set_move_modifier(source_id: String, multiplier: float) -> void:
+	_move_modifiers[source_id] = maxf(multiplier, 0.05)
+
+
+@rpc("authority", "call_local", "reliable")
+func _remove_move_modifier(source_id: String) -> void:
+	_move_modifiers.erase(source_id)
+
+
+@rpc("authority", "call_local", "reliable")
+func _apply_fading_slow(
+	source_id: String,
+	starting_multiplier: float,
+	duration: float
+) -> void:
+	var version := int(_fading_modifier_versions.get(source_id, 0)) + 1
+	_fading_modifier_versions[source_id] = version
+	_run_fading_slow(
+		source_id,
+		clampf(starting_multiplier, 0.05, 1.0),
+		maxf(duration, 0.01),
+		version
+	)
+
+
+func _run_fading_slow(
+	source_id: String,
+	starting_multiplier: float,
+	duration: float,
+	version: int
+) -> void:
+	var start_msec := Time.get_ticks_msec()
+	var duration_msec := int(duration * 1000.0)
+
+	while (
+		is_inside_tree()
+		and int(_fading_modifier_versions.get(source_id, -1)) == version
+	):
+		var elapsed_msec := Time.get_ticks_msec() - start_msec
+		var progress := clampf(
+			float(elapsed_msec) / float(maxi(duration_msec, 1)),
+			0.0,
+			1.0
+		)
+		_move_modifiers[source_id] = lerpf(
+			starting_multiplier,
+			1.0,
+			progress
+		)
+
+		if progress >= 1.0:
+			break
+
+		await get_tree().process_frame
+
+	if int(_fading_modifier_versions.get(source_id, -1)) == version:
+		_move_modifiers.erase(source_id)
+		_fading_modifier_versions.erase(source_id)
 
 
 # FORCE POSITION

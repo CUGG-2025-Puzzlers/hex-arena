@@ -281,22 +281,32 @@ func _resolve_player_hits(
 		if target.player_id == player_id:
 			continue
 
-		var target_position: Vector2 = target.global_position
-		var target_shape: CollisionShape2D = (
-			target.get_node_or_null("CollisionShape2D")
+		var target_shape := (
+			target.get_node_or_null("Area2D/CollisionShape2D")
 			as CollisionShape2D
 		)
 
-		if target_shape != null:
-			target_position = target_shape.global_position
+		var was_hit: bool = false
 
-		var offset: Vector2 = target_position - global_position
-
-		if not _is_point_inside_slash(
-			offset,
-			direction,
-			radius_multiplier
+		if (
+			target_shape != null
+			and target_shape.shape != null
+			and not target_shape.disabled
 		):
+			was_hit = _does_shape_intersect_slash(
+				target_shape,
+				direction,
+				radius_multiplier
+			)
+		else:
+			# Fallback for a malformed character scene.
+			was_hit = _is_point_inside_slash(
+				target.global_position - global_position,
+				direction,
+				radius_multiplier
+			)
+
+		if not was_hit:
 			continue
 
 		var actual_damage: float = (
@@ -305,6 +315,137 @@ func _resolve_player_hits(
 		)
 
 		target._apply_damage.rpc(actual_damage)
+
+
+func _does_shape_intersect_slash(
+	target_shape: CollisionShape2D,
+	direction: Vector2,
+	radius_multiplier: float
+) -> bool:
+	if direction.is_zero_approx():
+		return false
+
+	var outer_radius: float = swing_radius * radius_multiplier
+	var inner_radius: float = swing_inner_radius * radius_multiplier
+	var half_angle: float = deg_to_rad(swing_arc_degrees * 0.5)
+	var center_angle: float = direction.angle()
+
+	# Split the curved slash into convex triangles. Shape2D.collide() then
+	# tests those triangles against the player's complete capsule, including
+	# the CollisionShape2D node's position, rotation, and scale.
+	var segment_count: int = maxi(
+		12,
+		int(ceil(float(swing_visual_segments) * 0.75))
+	)
+
+	for index: int in range(segment_count):
+		var fraction_a: float = (
+			float(index) / float(segment_count)
+		)
+		var fraction_b: float = (
+			float(index + 1) / float(segment_count)
+		)
+
+		var angle_a: float = lerpf(
+			center_angle - half_angle,
+			center_angle + half_angle,
+			fraction_a
+		)
+		var angle_b: float = lerpf(
+			center_angle - half_angle,
+			center_angle + half_angle,
+			fraction_b
+		)
+
+		var inner_a: float = _get_slash_inner_radius(
+			fraction_a,
+			outer_radius,
+			inner_radius,
+			radius_multiplier
+		)
+		var inner_b: float = _get_slash_inner_radius(
+			fraction_b,
+			outer_radius,
+			inner_radius,
+			radius_multiplier
+		)
+
+		var outer_point_a: Vector2 = (
+			Vector2.RIGHT.rotated(angle_a) * outer_radius
+		)
+		var outer_point_b: Vector2 = (
+			Vector2.RIGHT.rotated(angle_b) * outer_radius
+		)
+		var inner_point_a: Vector2 = (
+			Vector2.RIGHT.rotated(angle_a) * inner_a
+		)
+		var inner_point_b: Vector2 = (
+			Vector2.RIGHT.rotated(angle_b) * inner_b
+		)
+
+		if _triangle_hits_shape(
+			PackedVector2Array([
+				outer_point_a,
+				outer_point_b,
+				inner_point_b,
+			]),
+			target_shape
+		):
+			return true
+
+		if _triangle_hits_shape(
+			PackedVector2Array([
+				outer_point_a,
+				inner_point_b,
+				inner_point_a,
+			]),
+			target_shape
+		):
+			return true
+
+	return false
+
+
+func _triangle_hits_shape(
+	points: PackedVector2Array,
+	target_shape: CollisionShape2D
+) -> bool:
+	var triangle := ConvexPolygonShape2D.new()
+	triangle.points = points
+
+	return triangle.collide(
+		global_transform,
+		target_shape.shape,
+		target_shape.global_transform
+	)
+
+
+func _get_slash_inner_radius(
+	angle_fraction: float,
+	outer_radius: float,
+	inner_radius: float,
+	radius_multiplier: float
+) -> float:
+	var taper: float = sin(
+		clampf(angle_fraction, 0.0, 1.0) * PI
+	)
+
+	var maximum_body_thickness: float = maxf(
+		1.0,
+		outer_radius - inner_radius
+	)
+
+	var scaled_tip_thickness: float = clampf(
+		swing_tip_thickness * radius_multiplier,
+		1.0,
+		maximum_body_thickness
+	)
+
+	return lerpf(
+		outer_radius - scaled_tip_thickness,
+		inner_radius,
+		taper
+	)
 
 
 func _resolve_magic_hits(

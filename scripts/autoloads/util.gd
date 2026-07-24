@@ -10,6 +10,7 @@ enum Character {
 	Hekaset,
 	WaterOrbA,
 	WaterOrbB,
+	Aurora,
 }
 
 enum Ability {
@@ -27,6 +28,8 @@ func get_character_display_name(character: Character) -> String:
 			return "Aqua A"
 		Character.WaterOrbB:
 			return "Aqua B"
+		Character.Aurora:
+			return "Aurora"
 		Character.None:
 			return "None"
 		_:

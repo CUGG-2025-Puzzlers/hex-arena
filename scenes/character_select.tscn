@@ -11,10 +11,12 @@
 [ext_resource type="Texture2D" uid="uid://pyigoo21ceqc" path="res://assets/textures/water_orb/water_orb_razor_icon.png" id="8_water_icon"]
 [ext_resource type="Texture2D" uid="uid://c7skq50044o0g" path="res://assets/textures/water_orb/water_orb_flow_splash.png" id="9_flow_splash"]
 [ext_resource type="Texture2D" uid="uid://bkqmjg6cjqtsy" path="res://assets/textures/water_orb/water_orb_flow_icon.png" id="10_flow_icon"]
+[ext_resource type="Texture2D" path="res://assets/textures/aurora/aurora_splash.png" id="11_aurora_splash"]
+[ext_resource type="Texture2D" path="res://assets/textures/aurora/aurora_icon.png" id="12_aurora_icon"]
 
 [node name="CharacterSelect" type="Node2D" unique_id=1709553184]
 script = ExtResource("1_x8mhf")
-texture_list = Array[Texture2D]([null, ExtResource("3_bow2h"), ExtResource("3_fa52j"), ExtResource("3_fa52j"), ExtResource("7_water_splash"), ExtResource("9_flow_splash")])
+texture_list = Array[Texture2D]([null, ExtResource("3_bow2h"), ExtResource("3_fa52j"), ExtResource("3_fa52j"), ExtResource("7_water_splash"), ExtResource("9_flow_splash"), ExtResource("11_aurora_splash")])
 
 [node name="LocalPlayerInfo" type="Control" parent="." unique_id=1961302266]
 custom_minimum_size = Vector2(950, 1080)
@@ -142,6 +144,11 @@ character = 4
 layout_mode = 2
 icon = ExtResource("10_flow_icon")
 character = 5
+
+[node name="Aurora" parent="CharacterContainer/CharacterList" instance=ExtResource("2_jgus3")]
+layout_mode = 2
+icon = ExtResource("12_aurora_icon")
+character = 6
 
 [node name="StartButton" type="Button" parent="." unique_id=2091587044]
 unique_name_in_owner = true

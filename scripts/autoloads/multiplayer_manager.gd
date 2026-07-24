@@ -11,6 +11,7 @@ var zilo = preload("res://scenes/characters/Zilo.tscn")
 var hekaset = preload("res://scenes/characters/Hekaset.tscn")
 var water_orb_a = preload("res://scenes/characters/WaterOrbA.tscn")
 var water_orb_b = preload("res://scenes/characters/WaterOrbB.tscn")
+var aurora = preload("res://scenes/characters/Aurora.tscn")
 
 var bot_controller_script = preload("res://scripts/bot_controller.gd")
 
@@ -471,6 +472,8 @@ func _spawn_player_from_data(data: Dictionary) -> Player:
 			player_node = water_orb_a.instantiate()
 		Util.Character.WaterOrbB:
 			player_node = water_orb_b.instantiate()
+		Util.Character.Aurora:
+			player_node = aurora.instantiate()
 		_:
 			player_node = zilo.instantiate()
 

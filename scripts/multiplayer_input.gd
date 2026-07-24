@@ -31,6 +31,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	mouse_pos = get_parent().get_global_mouse_position()
 	use_ability = event.is_action_pressed("ability")
 
+	var owning_player := get_parent() as Player
+	if owning_player != null and owning_player.is_gameplay_input_blocked():
+		use_ability = false
+		return
+
 	if Input.is_action_just_pressed("fire_magic"):
 		_fire_magic()
 
@@ -108,7 +113,7 @@ func _fire_magic() -> void:
 			root_hands.append(magic_instance)
 		elif magic_instance is MagicBurst:
 			bursts.append(magic_instance)
-		elif magic_instance.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY]:
+		elif magic_instance.state in [Magic.MagicType.LIGHT, Magic.MagicType.HEAVY, Magic.MagicType.PASSIVE]:
 			standard_magic.append(magic_instance)
 
 	if (
@@ -152,6 +157,8 @@ func _fire_magic() -> void:
 				distance = Magic.BULLET_DISTANCE * randf_range(1.0, 2.0)
 			Magic.MagicType.LIGHT:
 				distance = Magic.BULLET_DISTANCE * randf_range(0.5, 1.0)
+			Magic.MagicType.PASSIVE:
+				distance = Magic.BULLET_DISTANCE * 0.8
 			_:
 				continue
 

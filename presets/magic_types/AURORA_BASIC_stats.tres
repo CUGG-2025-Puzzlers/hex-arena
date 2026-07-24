@@ -1,0 +1,24 @@
+
+[gd_resource type="Resource" script_class="MagicStats" load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/magic_types/magic_aurora_basic.tscn" id="1_scene"]
+[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="2_script"]
+[ext_resource type="Resource" path="res://presets/magic_types/GENTLE_MOTE_stats.tres" id="3_light"]
+[ext_resource type="Resource" path="res://presets/magic_types/AURORA_ORB_stats.tres" id="4_heavy"]
+[ext_resource type="Resource" path="res://presets/magic_types/HUSH_WAVE_stats.tres" id="5_passive"]
+
+[resource]
+script = ExtResource("2_script")
+type = 1
+magic_name = "Basic Light"
+cost = 4.0
+scene = ExtResource("1_scene")
+health = 35.0
+damage = 0.0
+speed = 0.0
+transform_dict = Dictionary[int, Resource]({
+1: null,
+2: ExtResource("3_light"),
+3: ExtResource("4_heavy"),
+4: ExtResource("5_passive")
+})

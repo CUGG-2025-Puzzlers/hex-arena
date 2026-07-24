@@ -7,13 +7,15 @@ radius = 22.0
 
 [node name="MagicTidebladeOrb" type="Area2D" unique_id=19450268 groups=["magic"]]
 script = ExtResource("1_script")
-swing_windup = 0.05
-swing_active_time = 0.11
+swing_windup = 0.13
+swing_active_time = 0.19
 swing_recovery = 0.04
+swing_radius = 145.0
+swing_arc_degrees = 135.0
 state = 2
 own_cost = 15.0
 own_health = 38.0
-damage = 20.0
+damage = 30.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=649412803]
 shape = SubResource("CircleShape_tideblade")

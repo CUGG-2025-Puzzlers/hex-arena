@@ -55,6 +55,17 @@ func can_activate() -> bool:
 func _execute() -> void:
 	pass
 
+# Optional capability hooks. Character-specific abilities override only the
+# behavior they actually need; Player does not need to know their class names.
+func blocks_movement() -> bool:
+	return false
+
+func blocks_gameplay_input() -> bool:
+	return false
+
+func grants_invulnerability() -> bool:
+	return false
+
 func get_aim_direction() -> Vector2:
 	var mouse_pos = %InputSynchronizer.mouse_pos
 	return (mouse_pos - player.global_position).normalized()

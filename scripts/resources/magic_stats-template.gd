@@ -27,12 +27,10 @@ class_name MagicStats
 	set(val):
 		for key in val:
 			var value = val[key]
-			
 			if value and not (value is MagicStats):
-				if Engine.is_editor_hint():
-					push_warning(
-						"Bad Value Assignment! "
-						+ "This slot only accepts MagicStats resources."
-					)
+				push_warning(
+					"Bad Value Assignment! "
+					+ "This slot only accepts MagicStats resources."
+				)
 				val[key] = null
 		transform_dict = val
