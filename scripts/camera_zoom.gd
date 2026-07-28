@@ -30,10 +30,14 @@ func _wait_for_players() -> void:
 
 		await get_tree().process_frame
 
-	# Move camera under the local player only after the player exists.
+	# Move camera under the local player only after both players exist.
 	reparent(this_player)
 	position = Vector2.ZERO
 	make_current()
+
+	var hud := current_scene.get_node_or_null("HUD")
+	if hud != null and hud.has_method("connect_to_players"):
+		hud.call("connect_to_players", this_player, other_player)
 
 func _process(delta: float) -> void:
 

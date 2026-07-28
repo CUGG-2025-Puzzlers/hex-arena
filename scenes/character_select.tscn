@@ -7,12 +7,12 @@
 [ext_resource type="Texture2D" uid="uid://cps56w3hlht21" path="res://assets/textures/61457.png" id="4_uxcyu"]
 [ext_resource type="Texture2D" uid="uid://d0qgf3a125u1x" path="res://assets/textures/zilo_icon.png" id="5_5wdeo"]
 [ext_resource type="Texture2D" uid="uid://beey07mewbjie" path="res://assets/textures/hekaset_icon.png" id="6_w1hxv"]
-[ext_resource type="Texture2D" uid="uid://dctegpw8qfuie" path="res://assets/textures/water_orb/water_orb_razor_splash.png" id="7_water_splash"]
-[ext_resource type="Texture2D" uid="uid://pyigoo21ceqc" path="res://assets/textures/water_orb/water_orb_razor_icon.png" id="8_water_icon"]
-[ext_resource type="Texture2D" uid="uid://c7skq50044o0g" path="res://assets/textures/water_orb/water_orb_flow_splash.png" id="9_flow_splash"]
-[ext_resource type="Texture2D" uid="uid://bkqmjg6cjqtsy" path="res://assets/textures/water_orb/water_orb_flow_icon.png" id="10_flow_icon"]
-[ext_resource type="Texture2D" path="res://assets/textures/aurora/aurora_splash.png" id="11_aurora_splash"]
-[ext_resource type="Texture2D" path="res://assets/textures/aurora/aurora_icon.png" id="12_aurora_icon"]
+[ext_resource type="Texture2D" uid="uid://q44v2exean2e" path="res://assets/textures/water_orb/water_orb_razor_splash.png" id="7_water_splash"]
+[ext_resource type="Texture2D" uid="uid://c26ka76hhx40o" path="res://assets/textures/water_orb/water_orb_razor_icon.png" id="8_water_icon"]
+[ext_resource type="Texture2D" uid="uid://d3p14r1unwk4r" path="res://assets/textures/water_orb/water_orb_flow_splash.png" id="9_flow_splash"]
+[ext_resource type="Texture2D" uid="uid://cwu5sko7ky25k" path="res://assets/textures/water_orb/water_orb_flow_icon.png" id="10_flow_icon"]
+[ext_resource type="Texture2D" uid="uid://cg58jgbvo8jpp" path="res://assets/textures/aurora/aurora_splash.png" id="11_aurora_splash"]
+[ext_resource type="Texture2D" uid="uid://drkmae6f862c0" path="res://assets/textures/aurora/aurora_icon.png" id="12_aurora_icon"]
 
 [node name="CharacterSelect" type="Node2D" unique_id=1709553184]
 script = ExtResource("1_x8mhf")
@@ -29,6 +29,7 @@ offset_bottom = 40.0
 layout_mode = 0
 offset_right = 950.0
 offset_bottom = 100.0
+theme_type_variation = &"ModePanel"
 
 [node name="LocalPlayerName" type="Label" parent="LocalPlayerInfo/NamePanel" unique_id=1331055825]
 unique_name_in_owner = true
@@ -37,6 +38,7 @@ offset_left = 20.0
 offset_top = 10.0
 offset_right = 930.0
 offset_bottom = 90.0
+theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 50
 text = "Waiting for player..."
 
@@ -57,6 +59,7 @@ layout_mode = 0
 offset_top = 100.0
 offset_right = 950.0
 offset_bottom = 123.0
+theme_type_variation = &"MutedLabel"
 theme_override_font_sizes/font_size = 40
 text = "Character Name"
 horizontal_alignment = 1
@@ -74,6 +77,7 @@ offset_bottom = 40.0
 layout_mode = 0
 offset_right = 950.0
 offset_bottom = 100.0
+theme_type_variation = &"ModePanel"
 
 [node name="RemotePlayerName" type="Label" parent="RemotePlayerInfo/NamePanel" unique_id=1112659897]
 unique_name_in_owner = true
@@ -82,6 +86,7 @@ offset_left = 20.0
 offset_top = 10.0
 offset_right = 930.0
 offset_bottom = 90.0
+theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 50
 text = "Waiting for player..."
 
@@ -103,6 +108,7 @@ layout_mode = 0
 offset_top = 100.0
 offset_right = 950.0
 offset_bottom = 123.0
+theme_type_variation = &"MutedLabel"
 theme_override_font_sizes/font_size = 40
 text = "Character Name"
 horizontal_alignment = 1
@@ -145,10 +151,46 @@ layout_mode = 2
 icon = ExtResource("10_flow_icon")
 character = 5
 
-[node name="Aurora" parent="CharacterContainer/CharacterList" instance=ExtResource("2_jgus3")]
+[node name="Aurora" parent="CharacterContainer/CharacterList" unique_id=1573898395 instance=ExtResource("2_jgus3")]
 layout_mode = 2
 icon = ExtResource("12_aurora_icon")
 character = 6
+
+[node name="SelectionInstruction" type="Label" parent="." unique_id=296388342]
+unique_name_in_owner = true
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 42.0
+grow_horizontal = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 30
+text = "Choose your mage"
+horizontal_alignment = 1
+
+[node name="SelectionTargetContainer" type="HBoxContainer" parent="." unique_id=1586798201]
+unique_name_in_owner = true
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 54.0
+grow_horizontal = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ChoosePlayerButton" type="Button" parent="SelectionTargetContainer" unique_id=204482782]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 48)
+layout_mode = 2
+theme_type_variation = &"TealButton"
+theme_override_font_sizes/font_size = 24
+text = "Choose Your Character"
+
+[node name="ChooseBotButton" type="Button" parent="SelectionTargetContainer" unique_id=1219023909]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 48)
+layout_mode = 2
+theme_type_variation = &"TealButton"
+theme_override_font_sizes/font_size = 24
+text = "Choose Bot Character"
 
 [node name="StartButton" type="Button" parent="." unique_id=2091587044]
 unique_name_in_owner = true
@@ -163,6 +205,7 @@ offset_right = 1060.0
 offset_bottom = 525.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"PlayButton"
 theme_override_font_sizes/font_size = 50
 text = " Start "
 
@@ -179,6 +222,7 @@ offset_right = 1892.0
 offset_bottom = 1045.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"NavButton"
 theme_override_font_sizes/font_size = 35
 text = "Back
 "
@@ -194,6 +238,7 @@ alignment = 2
 [node name="PortForwardingLabel" type="Label" parent="VBoxContainer" unique_id=1022525613]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"RedLabel"
 theme_override_font_sizes/font_size = 25
 text = " Manual Port Forwarding 
  Required For Online Play "
@@ -201,11 +246,13 @@ text = " Manual Port Forwarding
 [node name="CopyExternalIPButton" type="Button" parent="VBoxContainer" unique_id=1286893130]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"TealButton"
 theme_override_font_sizes/font_size = 35
 text = "Copy External IP"
 
 [node name="CopyInternalIPButton" type="Button" parent="VBoxContainer" unique_id=337733082]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"TealButton"
 theme_override_font_sizes/font_size = 35
 text = "Copy LAN IP"

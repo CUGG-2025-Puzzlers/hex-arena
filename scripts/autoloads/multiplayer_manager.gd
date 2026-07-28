@@ -4,6 +4,14 @@ signal player_connected(id, info)
 signal player_disconnected(id)
 signal server_disconnected
 
+enum CharacterSelectMode {
+	ONLINE,
+	BOT,
+}
+
+const BOT_PLAYER_ID := 999
+var character_select_mode: CharacterSelectMode = CharacterSelectMode.ONLINE
+
 # Dictionary of players using IDs as keys
 var players = {}
 
@@ -34,6 +42,12 @@ const SERVER_IP = "127.0.0.1"
 
 var local_ip: String
 var external_ip: String
+
+var _active_transport := "none"
+var _active_eos_socket := ""
+var _active_eos_target := ""
+var _connection_started_msec := 0
+var _connection_trace_generation := 0
 
 func _ready() -> void:
 	multiplayer.peer_connected.connect(_on_peer_connected)
@@ -71,6 +85,9 @@ func _find_local_ipv4() -> String:
 # Creates a server with at the port specified in settings
 # The user who creates the server is considered the 'host'
 func create_game(player_name: String):
+	character_select_mode = CharacterSelectMode.ONLINE
+	players.clear()
+	arena_ready_peers.clear()
 	print("Setting up port forwarding...")
 
 	external_ip = setup_upnp(DEFAULT_PORT)
@@ -92,31 +109,57 @@ func create_game(player_name: String):
 	SceneManager.load_character_select()
 
 # EOS version of create_game
-func create_eos_game(player_name: String) -> bool:
-	print("Creating game...")
-	var server_peer = EOSGMultiplayerPeer.new()
-	
-	if not HAuth.product_user_id:
-		print("Cannot create EOS game: missing product user id")
+func create_eos_game(
+	player_name: String,
+	socket_name: String = EOS_SOCKET_NAME
+) -> bool:
+	character_select_mode = CharacterSelectMode.ONLINE
+	players.clear()
+	arena_ready_peers.clear()
+
+	var local_puid := str(HAuth.product_user_id)
+	print(
+		"[NET][EOS][SERVER_CREATE] local_puid=", local_puid,
+		" socket=", socket_name
+	)
+
+	var server_peer := EOSGMultiplayerPeer.new()
+
+	if local_puid.is_empty():
+		push_error("[NET][EOS][SERVER_CREATE] Missing Product User ID.")
 		return false
-		
-	var result := server_peer.create_server(EOS_SOCKET_NAME)
+
+	var result = server_peer.create_server(socket_name)
+	print(
+		"[NET][EOS][SERVER_CREATE_RESULT] code=", result,
+		" name=", error_string(result),
+		" status=", _connection_status_name(
+			server_peer.get_connection_status()
+		)
+	)
+
 	if result != OK:
-		print("Failed to create EOS server: ", result)
 		return false
-		
+
 	multiplayer.multiplayer_peer = server_peer
-	
+	_active_transport = "eos_server"
+	_active_eos_socket = socket_name
+	_active_eos_target = ""
+	_connection_started_msec = Time.get_ticks_msec()
+
 	player_info["name"] = player_name
 	players[1] = player_info
 	player_connected.emit(1, player_info)
 	SceneManager.load_character_select()
-	
+
 	return true
 	
 # Joins a game
 # Attempts to connect to the server using the specified name, ip, and port
 func join_game(player_name: String, ip: String, port: int):
+	character_select_mode = CharacterSelectMode.ONLINE
+	players.clear()
+	arena_ready_peers.clear()
 	var client_peer = ENetMultiplayerPeer.new()
 	var result = client_peer.create_client(ip, port)
 	if result != OK:
@@ -129,17 +172,55 @@ func join_game(player_name: String, ip: String, port: int):
 	print("Attempting to connect to %s on port %d as %s" % [ip, port, player_name])
 	
 # EOS version of join_game
-func join_eos_game(player_name: String, host_product_user_id) -> bool:
-	var client_peer = EOSGMultiplayerPeer.new()
-	var result = client_peer.create_client(EOS_SOCKET_NAME, host_product_user_id)
+func join_eos_game(
+	player_name: String,
+	host_product_user_id,
+	socket_name: String = EOS_SOCKET_NAME
+) -> bool:
+	character_select_mode = CharacterSelectMode.ONLINE
+	players.clear()
+	arena_ready_peers.clear()
+
+	var local_puid := str(HAuth.product_user_id)
+	var host_puid := str(host_product_user_id)
+	var client_peer := EOSGMultiplayerPeer.new()
+
+	print(
+		"[NET][EOS][CLIENT_CREATE] local_puid=", local_puid,
+		" host_puid=", host_puid,
+		" same_user=", local_puid == host_puid,
+		" socket=", socket_name,
+		" player_name=", player_name
+	)
+
+	var result = client_peer.create_client(
+		socket_name,
+		host_product_user_id
+	)
+
+	print(
+		"[NET][EOS][CLIENT_CREATE_RESULT] code=", result,
+		" name=", error_string(result),
+		" status=", _connection_status_name(
+			client_peer.get_connection_status()
+		)
+	)
+
 	if result != OK:
-		print("Failed to create client: %s" % result)
 		return false
-	
+
 	multiplayer.multiplayer_peer = client_peer
 	player_info["name"] = player_name
-	print("Attempting EOS P2P connection to host %s using socket %s as %s" % [str(host_product_user_id), EOS_SOCKET_NAME, player_name])
-	
+	_active_transport = "eos_client"
+	_active_eos_socket = socket_name
+	_active_eos_target = host_puid
+	_connection_started_msec = Time.get_ticks_msec()
+	_connection_trace_generation += 1
+	_trace_connection_status(
+		client_peer,
+		_connection_trace_generation
+	)
+
 	return true
 
 func setup_upnp(_port: int):
@@ -208,17 +289,144 @@ func _on_peer_disconnected(id: int):
 	_unregister_player(id)
 
 func _on_connected_to_server():
-	print("Successfully connected to server!")
+	var elapsed_ms := Time.get_ticks_msec() - _connection_started_msec
+	print(
+		"[NET][CONNECTED] transport=", _active_transport,
+		" elapsed_ms=", elapsed_ms,
+		" local_peer_id=", multiplayer.get_unique_id(),
+		" eos_local_puid=", str(HAuth.product_user_id),
+		" eos_target_puid=", _active_eos_target,
+		" socket=", _active_eos_socket
+	)
+
 	players[multiplayer.get_unique_id()] = player_info
 	SceneManager.load_character_select()
 
+
 func _on_connection_failed():
-	print("Failed to connect to server: Double-check IP, Port, and Firewall settings")
+	var elapsed_ms := Time.get_ticks_msec() - _connection_started_msec
+	var peer := multiplayer.multiplayer_peer
+	var status := MultiplayerPeer.CONNECTION_DISCONNECTED
+
+	if peer != null:
+		status = peer.get_connection_status()
+
+	if _active_transport == "eos_client":
+		push_error(
+			"[NET][EOS][CONNECTION_FAILED] "
+			+ "elapsed_ms=" + str(elapsed_ms)
+			+ " local_puid=" + str(HAuth.product_user_id)
+			+ " target_puid=" + _active_eos_target
+			+ " socket=" + _active_eos_socket
+			+ " peer_status=" + _connection_status_name(status)
+			+ ". This is EOS P2P; IP and port are not involved."
+		)
+	else:
+		push_error(
+			"[NET][CONNECTION_FAILED] transport="
+			+ _active_transport
+			+ " elapsed_ms=" + str(elapsed_ms)
+			+ " peer_status=" + _connection_status_name(status)
+		)
+
+
+func _trace_connection_status(
+	peer: MultiplayerPeer,
+	generation: int
+) -> void:
+	var deadline := Time.get_ticks_msec() + 15000
+	var previous_status := -1
+
+	while (
+		generation == _connection_trace_generation
+		and multiplayer.multiplayer_peer == peer
+		and Time.get_ticks_msec() < deadline
+	):
+		var status := peer.get_connection_status()
+
+		if status != previous_status:
+			print(
+				"[NET][EOS][STATUS] target_puid=", _active_eos_target,
+				" socket=", _active_eos_socket,
+				" status=", _connection_status_name(status),
+				" elapsed_ms=",
+				Time.get_ticks_msec() - _connection_started_msec
+			)
+			previous_status = status
+
+		if status != MultiplayerPeer.CONNECTION_CONNECTING:
+			return
+
+		await get_tree().create_timer(0.25).timeout
+
+	print(
+		"[NET][EOS][STATUS_TRACE_END] target_puid=", _active_eos_target,
+		" socket=", _active_eos_socket,
+		" status=", _connection_status_name(
+			peer.get_connection_status()
+		)
+	)
+
+
+func _connection_status_name(status: int) -> String:
+	match status:
+		MultiplayerPeer.CONNECTION_DISCONNECTED:
+			return "DISCONNECTED"
+		MultiplayerPeer.CONNECTION_CONNECTING:
+			return "CONNECTING"
+		MultiplayerPeer.CONNECTION_CONNECTED:
+			return "CONNECTED"
+		_:
+			return "UNKNOWN_%s" % status
 
 #endregion
 
+func begin_bot_character_select() -> void:
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	character_select_mode = CharacterSelectMode.BOT
+	player_info["character"] = Util.Character.None
+	players.clear()
+	players[1] = {
+		"name": player_info.get("name", "Player"),
+		"character": Util.Character.None,
+		"is_bot": false,
+	}
+	players[BOT_PLAYER_ID] = {
+		"name": "Training Bot",
+		"character": Util.Character.None,
+		"is_bot": true,
+	}
+	Telemetry.track("bot_character_select_opened")
+	SceneManager.load_character_select()
+
+
+func set_bot_match_character(player_id_to_set: int, character: Util.Character) -> void:
+	if character_select_mode != CharacterSelectMode.BOT:
+		return
+	if player_id_to_set not in [1, BOT_PLAYER_ID]:
+		return
+	_set_player_character(player_id_to_set, character)
+	Events.select_character(character, player_id_to_set)
+	Telemetry.track("character_selected", {
+		"mode": "bot",
+		"slot": "player" if player_id_to_set == 1 else "bot",
+		"character": Util.get_character_display_name(character),
+	})
+
+
+func reset_character_select_mode() -> void:
+	if character_select_mode == CharacterSelectMode.BOT:
+		players.clear()
+		player_info["character"] = Util.Character.None
+	character_select_mode = CharacterSelectMode.ONLINE
+
+
 # Selects the given character for this player on all clients
 func select_character(character: Util.Character):
+	Telemetry.track("character_selected", {
+		"mode": "online",
+		"character": Util.get_character_display_name(character),
+	})
 	_set_character.rpc(character)
 
 # Sets the sending client's selected character on this client
@@ -272,10 +480,19 @@ func _on_player_died(dead_player_id : int) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func _end_game(winner_name: String):
+	Telemetry.end_match({
+		"winner_name_present": not winner_name.is_empty(),
+	})
 	SceneManager.load_end_scene(winner_name)
 
 func _start_game() -> void:
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
+	var local_character: Util.Character = player_info.get(
+		"character", Util.Character.None
+	)
+	Telemetry.start_match("online_1v1", {
+		"character": Util.get_character_display_name(local_character),
+	})
 
 	var spawner: MultiplayerSpawner = (
 		get_tree().get_current_scene().get_node("MultiplayerSpawner")
@@ -347,8 +564,19 @@ func _spawn_players() -> void:
 func _start_bot_match():
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
-	var player_id = 1
-	var bot_id = 999
+	var player_id := 1
+	var bot_id := BOT_PLAYER_ID
+	var player_character: Util.Character = players.get(
+		player_id, {}
+	).get("character", Util.Character.Hekaset)
+	var bot_character: Util.Character = players.get(
+		bot_id, {}
+	).get("character", Util.Character.Hekaset)
+
+	if player_character == Util.Character.None:
+		player_character = Util.Character.Hekaset
+	if bot_character == Util.Character.None:
+		bot_character = Util.Character.Hekaset
 
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 
@@ -357,9 +585,6 @@ func _start_bot_match():
 			child.queue_free()
 
 	await get_tree().process_frame
-
-	var player_character = Util.Character.Hekaset
-	var bot_character = Util.Character.Hekaset
 
 	players.clear()
 
@@ -399,8 +624,12 @@ func _start_bot_match():
 
 	await get_tree().process_frame
 
-	_setup_tutorial_camera_and_hud(player_node)
+	_setup_tutorial_camera_and_hud(player_node, bot_node)
 	_setup_bot_controller(bot_node, player_node)
+	Telemetry.start_match("bot", {
+		"player_character": Util.get_character_display_name(player_character),
+		"bot_character": Util.get_character_display_name(bot_character),
+	})
 
 	if player_node.stats_update != null:
 		player_node.stats_update.deadgeLol.connect(_on_player_died.bind(player_id))
@@ -412,6 +641,9 @@ func _start_bot_match():
 
 func _start_tutorial():
 	var character = Util.Character.Hekaset
+	Telemetry.start_match("tutorial", {
+		"character": Util.get_character_display_name(character),
+	})
 
 	print("[START_TUTORIAL] scene=", get_tree().get_current_scene().name)
 
@@ -504,7 +736,10 @@ func _setup_bot_controller(bot_node: Player, target_player: Player) -> void:
 
 	print("[BOT MATCH] bot controller attached")
 
-func _setup_tutorial_camera_and_hud(player_node: Player) -> void:
+func _setup_tutorial_camera_and_hud(
+	player_node: Player,
+	opponent_node: Player = null
+) -> void:
 	var current_scene = get_tree().get_current_scene()
 
 	player_node.z_index = 1
@@ -519,4 +754,7 @@ func _setup_tutorial_camera_and_hud(player_node: Player) -> void:
 	if hud != null:
 		if not hud.is_node_ready():
 			await hud.ready
-		hud.connect_to_player(player_node)
+		if hud.has_method("connect_to_players"):
+			hud.call("connect_to_players", player_node, opponent_node)
+		else:
+			hud.connect_to_player(player_node)

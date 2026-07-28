@@ -1,86 +1,69 @@
 [gd_scene format=3 uid="uid://cp0acrvwc8fd3"]
 
-[ext_resource type="Script" path="res://scripts/end_scene.gd" id="1_cv086"]
+[ext_resource type="Script" path="res://scripts/end_scene.gd" id="1"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cv086"]
-content_margin_left = 24.0
-content_margin_top = 12.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
-bg_color = Color(0.2, 0.54901963, 0.34901962, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ga8gb"]
-content_margin_left = 24.0
-content_margin_top = 12.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
-bg_color = Color(0.14901961, 0.4509804, 0.3019608, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n2wrm"]
-content_margin_left = 24.0
-content_margin_top = 12.0
-content_margin_right = 24.0
-content_margin_bottom = 12.0
-bg_color = Color(0.2509804, 0.6509804, 0.4, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[node name="EndScene" type="Control" unique_id=2014117180]
+[node name="EndScene" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_cv086")
+script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="." unique_id=321870178]
+[node name="Background" type="ColorRect" parent="."]
+color = Color(0.0470588, 0.0666667, 0.0901961, 1)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05882353, 0.05882353, 0.14117648, 1)
-
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1998518321]
+[node name="Panel" type="PanelContainer" parent="."]
+theme_type_variation = &"ModePanelContainer"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -210.0
-offset_top = -90.0
-offset_right = 190.0
-offset_bottom = 70.0
+offset_left = -350.0
+offset_top = -190.0
+offset_right = 350.0
+offset_bottom = 210.0
 grow_horizontal = 2
 grow_vertical = 2
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 22
 alignment = 1
 
-[node name="WinnerLabel" type="Label" parent="VBoxContainer" unique_id=1981317496]
+[node name="ResultHeading" type="Label" parent="Panel/VBox"]
+theme_type_variation = &"MutedLabel"
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.8392157, 0, 1)
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 25
+text = "DUEL COMPLETE"
 horizontal_alignment = 1
-
-[node name="PlayAgainBtn" type="Button" parent="VBoxContainer" unique_id=1865388114]
-custom_minimum_size = Vector2(300, 100)
+[node name="WinnerLabel" type="Label" parent="Panel/VBox"]
+theme_type_variation = &"HeadingLabel"
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_cv086")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ga8gb")
-theme_override_styles/hover = SubResource("StyleBoxFlat_n2wrm")
+theme_override_font_sizes/font_size = 50
+text = "Player wins!"
+horizontal_alignment = 1
+vertical_alignment = 1
+[node name="PlayAgainButton" type="Button" parent="Panel/VBox"]
+theme_type_variation = &"PlayButton"
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 68)
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
 text = "Play Again"
+[node name="MainMenuButton" type="Button" parent="Panel/VBox"]
+theme_type_variation = &"TealButton"
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 62)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Main Menu"

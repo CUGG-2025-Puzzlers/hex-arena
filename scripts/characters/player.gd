@@ -27,6 +27,8 @@ var silenced_until_msec: int = 0
 var _move_modifiers: Dictionary = {}
 var _fading_modifier_versions: Dictionary = {}
 
+var display_name: String = "Player"
+
 var player_id: int:
 	set(value):
 		player_id = value
@@ -149,6 +151,7 @@ func _handle_movement(_delta: float) -> void:
 
 
 func set_player_name(player_name: String) -> void:
+	display_name = player_name
 	stats_update.update_name(player_name)
 
 

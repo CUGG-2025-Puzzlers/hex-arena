@@ -191,21 +191,22 @@ spawn_limit = 2
 script = ExtResource("13_dv6bh")
 
 [node name="ProgressPanel" type="PanelContainer" parent="TutorialUI" unique_id=1587851339]
+theme_type_variation = &"ModePanelContainer"
 custom_minimum_size = Vector2(300, 70)
 offset_left = 24.0
 offset_top = 24.0
 offset_right = 324.0
 offset_bottom = 94.0
-
 [node name="ProgressLabel" type="Label" parent="TutorialUI/ProgressPanel" unique_id=231575602]
+theme_type_variation = &"HeadingLabel"
 unique_name_in_owner = true
 layout_mode = 2
-
 [node name="ProgressBar" type="ProgressBar" parent="TutorialUI/ProgressPanel" unique_id=180982829]
 unique_name_in_owner = true
 layout_mode = 2
 
 [node name="TaskPanel" type="PanelContainer" parent="TutorialUI" unique_id=853288618]
+theme_type_variation = &"ModePanelContainer"
 custom_minimum_size = Vector2(520, 120)
 anchors_preset = 7
 anchor_left = 0.5
@@ -218,7 +219,6 @@ offset_right = -425.0
 offset_bottom = -480.0
 grow_horizontal = 2
 grow_vertical = 0
-
 [node name="MarginContainer" type="MarginContainer" parent="TutorialUI/TaskPanel" unique_id=752847539]
 layout_mode = 2
 theme_override_constants/margin_left = 16
@@ -231,32 +231,32 @@ layout_mode = 2
 theme_override_constants/separation = 14
 
 [node name="TaskTitle" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=29318746]
+theme_type_variation = &"HeadingLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 autowrap_mode = 3
-
 [node name="Separator" type="Control" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=756579504]
 layout_mode = 2
 
 [node name="TaskDescription" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=879803828]
+theme_type_variation = &"Label"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 autowrap_mode = 3
-
 [node name="Separator2" type="Control" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=988531806]
 layout_mode = 2
 
 [node name="HintLabel" type="Label" parent="TutorialUI/TaskPanel/MarginContainer/VBoxContainer" unique_id=24892872]
+theme_type_variation = &"MutedLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 autowrap_mode = 3
-
 [node name="TextureRect2" type="TextureRect" parent="." unique_id=419691914]
 modulate = Color(0.12941177, 0.12941177, 0.12941177, 1)
 offset_left = -964.0

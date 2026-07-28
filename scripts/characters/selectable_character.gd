@@ -40,8 +40,12 @@ func _on_mouse_exited():
 func _on_mouse_pressed():
 	if locked:
 		return
-	
-	MultiplayerManager.select_character(character)
+
+	var screen := get_tree().current_scene
+	if screen != null and screen.has_method("handle_character_card_pressed"):
+		screen.call("handle_character_card_pressed", character)
+	else:
+		MultiplayerManager.select_character(character)
 
 #endregion
 

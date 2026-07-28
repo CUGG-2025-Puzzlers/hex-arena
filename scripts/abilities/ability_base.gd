@@ -10,6 +10,7 @@ signal ability_ended
 
 @export var cooldown_duration : float = 250.0
 @export var ability_name : String = "mobility_buff"
+@export var ability_icon: Texture2D = preload("res://assets/ui/icons/shift_ability.svg")
 @export var input_action : String = ""
 
 var is_on_cooldown: bool = false

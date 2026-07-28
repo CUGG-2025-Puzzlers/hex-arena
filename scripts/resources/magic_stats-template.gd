@@ -6,6 +6,7 @@ class_name MagicStats
 @export var type: Magic.MagicType = Magic.MagicType.NONE
 
 @export var magic_name : String = ""
+@export var icon: Texture2D
 
 @export var cost: float = 0.
 @export var cost_text: String = ""

@@ -15,6 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Hex Arena"
+config/version="0.1.0-dev"
 run/main_scene="uid://bxue7p844nv7d"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/image="uid://deca7ssjqvdbx"
@@ -28,6 +29,8 @@ SceneManager="*uid://bosapdapain4b"
 MultiplayerManager="*uid://dhwwc4t2mdyga"
 GameManager="*uid://cvimhpwolfbnu"
 Events="*uid://brxpdvd1ijwfd"
+Telemetry="*res://scripts/autoloads/telemetry.gd"
+FireDirectionDebug="*res://debug/fire_direction_debug.tscn"
 Music="*uid://cqx5k3psrd4xg"
 LobbyMatchmakingManager="*res://scripts/autoloads/lobby_matchmaking_manager.gd"
 EOSGRuntime="*uid://7saywdx0ipep"
@@ -53,6 +56,10 @@ window/vsync/vsync_mode=0
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/epic-online-services-godot/plugin.cfg")
+
+[gui]
+
+theme/custom="res://ui/themes/hex_red_teal.tres"
 
 [input]
 

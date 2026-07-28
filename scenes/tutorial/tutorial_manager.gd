@@ -137,6 +137,8 @@ func _on_shield_objective_completed() -> void:
 		heavy_objective.activate()
 
 func _on_final_objective_completed() -> void:
+	Telemetry.track("tutorial_completed")
+	Telemetry.end_match({"completed": true})
 	GameManager.add_xp(10)
 	SceneManager.load_title()
 
@@ -223,6 +225,10 @@ func spawn_tutorial_magic(
 
 func _show_task(id: String) -> void:
 	var task = task_text[id]
+	Telemetry.track("tutorial_step_shown", {
+		"step_id": id,
+		"step_number": task["step"],
+	})
 
 	tutorial_ui.set_progress(task["step"], TOTAL_STEPS)
 	tutorial_ui.set_task(
