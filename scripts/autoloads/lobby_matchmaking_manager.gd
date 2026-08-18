@@ -70,6 +70,7 @@ func _on_player_connected(id, info) -> void:
 	)
 
 	if is_host and MultiplayerManager.players.size() >= 2:
+		Telemetry.mark_matchmaking_connected("host")
 		_quick_match_active = false
 		quick_match_status.emit("Opponent connected.")
 		await hide_current_lobby_from_search()
@@ -84,6 +85,7 @@ func _on_connected_to_server() -> void:
 			"socket": _pending_join_socket,
 		}
 	)
+	Telemetry.mark_matchmaking_connected("joiner")
 	_quick_match_active = false
 	quick_match_status.emit("Connected to opponent.")
 
