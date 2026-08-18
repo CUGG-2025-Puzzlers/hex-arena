@@ -67,6 +67,9 @@ var task_text := {
 
 var light_count := 0
 
+var current_step_id := ""
+var current_step_started_msec := 0
+
 var shield_objective_activated := false
 var shield_objective_completed := false
 
@@ -98,6 +101,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			print("[DEBUG] clicked cell: ", cell)
 			
 func _on_walk_objective_completed() -> void:
+	_complete_current_step()
 	print("[TUTORIAL] Walk objective completed. Showing place magic objective.")
 
 	_show_task("create_light")
@@ -106,6 +110,7 @@ func _on_walk_objective_completed() -> void:
 
 
 func _on_place_magic_objective_completed() -> void:
+	_complete_current_step()
 	print("[TUTORIAL] Light magic created. Activating light targets.")
 	_show_task("fire_light")
 
@@ -113,6 +118,7 @@ func _on_place_magic_objective_completed() -> void:
 
 
 func _on_light_objective_completed() -> void:
+	_complete_current_step()
 	print("[TUTORIAL] Activating shield objective.")
 	
 	_show_task("create_shield")
@@ -123,6 +129,7 @@ func _on_shield_objective_completed() -> void:
 		return
 
 	shield_objective_completed = true
+	_complete_current_step()
 
 	print("[TUTORIAL] Shield block objective completed.")
 
@@ -137,6 +144,7 @@ func _on_shield_objective_completed() -> void:
 		heavy_objective.activate()
 
 func _on_final_objective_completed() -> void:
+	_complete_current_step()
 	Telemetry.track("tutorial_completed")
 	Telemetry.end_match({"completed": true})
 	GameManager.add_xp(10)
@@ -146,6 +154,7 @@ func _on_heavy_objective_completed() -> void:
 	if heavy_objective_completed:
 		return
 	heavy_objective_completed = true
+	_complete_current_step()
 	print("[TUTORIAL] Heavy objective completed.")
 	_show_task("complete")
 	final_objective.activate()
@@ -223,7 +232,28 @@ func spawn_tutorial_magic(
 
 	return magic
 
+func _complete_current_step() -> void:
+	if current_step_id.is_empty() or current_step_started_msec <= 0:
+		return
+
+	var task = task_text[current_step_id]
+	Telemetry.track("tutorial_step_completed", {
+		"step_id": current_step_id,
+		"step_number": task["step"],
+		"duration_seconds": maxf(
+			0.0,
+			float(Time.get_ticks_msec() - current_step_started_msec) / 1000.0
+		),
+	})
+
+	current_step_id = ""
+	current_step_started_msec = 0
+
+
 func _show_task(id: String) -> void:
+	current_step_id = id
+	current_step_started_msec = Time.get_ticks_msec()
+
 	var task = task_text[id]
 	Telemetry.track("tutorial_step_shown", {
 		"step_id": id,

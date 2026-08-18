@@ -9,6 +9,7 @@ const SAVE_PATH = "user://save_data.json"
 func _ready() -> void:
 	MultiplayerManager.server_disconnected.connect(_on_server_disconnected)
 	load_data()
+	print(OS.get_user_data_dir())
 
 func save_data() -> void:
 	var data = {

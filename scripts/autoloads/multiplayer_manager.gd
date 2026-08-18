@@ -466,23 +466,58 @@ func _print_players():
 		print("Name: %s\nSelected Character: %s\n" % [players[player].name, Util.Character.keys()[players[player].character]])
 
 func _on_player_died(dead_player_id : int) -> void:
-	var winner_name = ""
+	var winner_name := ""
+	var winner_id := -1
 
 	for id in players:
 		if id != dead_player_id:
+			winner_id = int(id)
 			winner_name = players[id].name
 			break
 
+	var winner_health_pct := _get_player_health_pct(winner_id)
+
 	if multiplayer.has_multiplayer_peer():
-		_end_game.rpc(winner_name)
+		_end_game.rpc(winner_name, winner_id, winner_health_pct)
 	else:
-		_end_game(winner_name)
+		_end_game(winner_name, winner_id, winner_health_pct)
+
+
+func _get_player_health_pct(player_id: int) -> float:
+	if player_id < 0 or _players_spawn_node == null:
+		return -1.0
+
+	var player_node := _players_spawn_node.get_node_or_null(str(player_id)) as Player
+	if player_node == null or player_node.stats_update == null:
+		return -1.0
+	if player_node.stats_update.max_health <= 0.0:
+		return -1.0
+
+	return clampf(
+		player_node.stats_update.current_health
+		/ player_node.stats_update.max_health,
+		0.0,
+		1.0
+	)
+
 
 @rpc("any_peer", "call_local", "reliable")
-func _end_game(winner_name: String):
-	Telemetry.end_match({
+func _end_game(
+	winner_name: String,
+	winner_id: int,
+	winner_health_pct: float
+):
+	var local_id := multiplayer.get_unique_id()
+	var match_properties := {
 		"winner_name_present": not winner_name.is_empty(),
-	})
+		"result": "win" if local_id == winner_id else "loss",
+	}
+
+	if winner_health_pct >= 0.0:
+		match_properties["winner_health_pct"] = winner_health_pct
+		match_properties["close_match"] = winner_health_pct <= 0.25
+
+	Telemetry.end_match(match_properties)
 	SceneManager.load_end_scene(winner_name)
 
 func _start_game() -> void:

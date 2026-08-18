@@ -88,8 +88,7 @@ func _setup_bot_mode() -> void:
 
 func _setup_online_mode() -> void:
 	_selection_target_container.hide()
-	_selection_instruction.text = "Choose your mage"
-
+	
 	if multiplayer.is_server():
 		_copy_internal_ip_button.show()
 		_copy_internal_ip_button.pressed.connect(_on_copy_internal_ip_pressed)

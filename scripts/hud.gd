@@ -53,13 +53,10 @@ func _ready() -> void:
 	_style_bar(opponent_mana_bar, Color(0.45, 0.35, 0.92), Color(0.08, 0.09, 0.12))
 	move_overlay.hide()
 	move_timer_label.hide()
-	opponent_panel.hide()
 
 
 func _process(_delta: float) -> void:
 	player_status_label.text = _get_status_text(player)
-	opponent_status_label.text = _get_status_text(opponent)
-
 
 func connect_to_player(p: Player) -> void:
 	var found_opponent: Player = null
@@ -93,23 +90,6 @@ func connect_to_players(local_player: Player, remote_player: Player = null) -> v
 
 	update_cost_and_button_labels(player.preset.magics)
 	_connect_ability(player.get_node_or_null("Ability") as AbilityBase)
-
-	if opponent != null and opponent.stats_update != null:
-		opponent_panel.show()
-		opponent_name_label.text = opponent.display_name
-		opponent.stats_update.health_changed.connect(_on_opponent_health_changed)
-		opponent.stats_update.mana_changed.connect(_on_opponent_mana_changed)
-		_on_opponent_health_changed(
-			opponent.stats_update.current_health,
-			opponent.stats_update.max_health
-		)
-		_on_opponent_mana_changed(
-			opponent.stats_update.current_mana,
-			opponent.stats_update.max_mana
-		)
-	else:
-		opponent_panel.hide()
-
 
 func update_cost_and_button_labels(magics: Dictionary) -> void:
 	_set_magic_card(
@@ -159,7 +139,6 @@ func _set_magic_card(
 	fallback_icon: Texture2D
 ) -> void:
 	var magic_stats := magic_value as MagicStats
-	key_node.text = _get_action_key_text(action_name, fallback_key)
 	icon_node.texture = fallback_icon
 
 	if magic_stats == null:
@@ -175,10 +154,6 @@ func _set_magic_card(
 	name_node.text = magic_stats.magic_name
 	cost_node.text = _format_magic_cost(magic_stats)
 
-	if magic_stats.magic_name in ["Razor Current", "Flow Circuit"]:
-		key_node.text = "AUTO"
-
-
 func _format_magic_cost(magic_stats: MagicStats) -> String:
 	if not magic_stats.cost_text.is_empty():
 		return magic_stats.cost_text
@@ -187,7 +162,6 @@ func _format_magic_cost(magic_stats: MagicStats) -> String:
 
 func _connect_ability(ability: AbilityBase) -> void:
 	_ability = ability
-	move_ability_key.text = _get_action_key_text("ability", "Shift")
 	move_ability_icon.texture = DEFAULT_SHIFT_ICON
 	move_ability_name.text = "Ability"
 
@@ -304,7 +278,6 @@ func _style_bar(bar: ProgressBar, fill_color: Color, bg_color: Color) -> void:
 	fill_style.corner_radius_top_right = 6
 	fill_style.corner_radius_bottom_left = 6
 	fill_style.corner_radius_bottom_right = 6
-	bar.add_theme_stylebox_override("fill", fill_style)
 
 	var bg_style := StyleBoxFlat.new()
 	bg_style.bg_color = bg_color
@@ -317,4 +290,3 @@ func _style_bar(bar: ProgressBar, fill_color: Color, bg_color: Color) -> void:
 	bg_style.corner_radius_top_right = 6
 	bg_style.corner_radius_bottom_left = 6
 	bg_style.corner_radius_bottom_right = 6
-	bar.add_theme_stylebox_override("background", bg_style)

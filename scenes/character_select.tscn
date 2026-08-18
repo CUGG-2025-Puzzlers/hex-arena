@@ -156,22 +156,14 @@ layout_mode = 2
 icon = ExtResource("12_aurora_icon")
 character = 6
 
-[node name="SelectionInstruction" type="Label" parent="." unique_id=296388342]
-unique_name_in_owner = true
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 42.0
-grow_horizontal = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 30
-text = "Choose your mage"
-horizontal_alignment = 1
-
 [node name="SelectionTargetContainer" type="HBoxContainer" parent="." unique_id=1586798201]
 unique_name_in_owner = true
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 54.0
+offset_left = 660.0
+offset_top = 686.0
+offset_right = 1267.0
+offset_bottom = 740.0
 grow_horizontal = 2
 theme_override_constants/separation = 16
 alignment = 1
