@@ -12,7 +12,7 @@ const POSTHOG_PROJECT_TOKEN := "phc_nPaiAZZf8KVBFzU6pHLLu5fRtmC9f8q62mgtZA3ccSXd
 const POSTHOG_HOST := "https://us.i.posthog.com"
 const POSTHOG_BATCH_SIZE := 25
 const POSTHOG_FLUSH_SECONDS := 15.0
-const SCHEMA_VERSION := 2
+const SCHEMA_VERSION := 4
 
 # Sparse checkpoints make first-session length measurable even if the game is
 # force-closed before session_ended can be sent.
@@ -238,6 +238,16 @@ func record_magic_fired(player_id: int, ability: String) -> void:
 		_get_ability_stats(player_id, ability)["casts"] += 1
 
 
+func record_enemy_magic_destroyed(
+	player_id: int, amount: int = 1, ability: String = ""
+) -> void:
+	if current_match_id.is_empty() or player_id < 0 or amount <= 0:
+		return
+	_get_player_stats(player_id)["enemy_magic_destroyed"] += amount
+	if not ability.is_empty():
+		_get_ability_stats(player_id, ability)["enemy_magic_destroyed"] += amount
+
+
 func record_cc(
 	source_player_id: int,
 	target_player_id: int,
@@ -338,6 +348,7 @@ func _get_player_stats(player_id: int) -> Dictionary:
 			"magic_placed": 0,
 			"magic_transformed": 0,
 			"magic_fired": 0,
+			"enemy_magic_destroyed": 0,
 			"cc_inflicted_seconds": 0.0,
 			"cc_received_seconds": 0.0,
 		}
@@ -357,6 +368,7 @@ func _get_ability_stats(player_id: int, ability: String) -> Dictionary:
 			"damage_dealt": 0.0,
 			"healing_done": 0.0,
 			"damage_blocked": 0.0,
+			"enemy_magic_destroyed": 0,
 			"cc_seconds": 0.0,
 		}
 	return player_abilities[ability]
@@ -480,6 +492,7 @@ func _base_properties() -> Dictionary:
 		"control_scheme": GameManager.control_scheme,
 		"camera_profile": GameManager.camera_profile,
 		"camera_locked": GameManager.camera_locked,
+		"readability_style": GameManager.readability_style,
 	}
 
 

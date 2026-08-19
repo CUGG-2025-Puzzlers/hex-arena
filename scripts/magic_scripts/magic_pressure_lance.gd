@@ -203,34 +203,30 @@ func _draw() -> void:
 	draw_arc(Vector2.ZERO, 28.0, -PI * 0.5, -PI * 0.5 + charge_angle, 48, highlight, 4.0, true)
 
 	if firing and not beam_visible:
-		# Show the entire threatened lane immediately. The color intensifies from
-		# warning yellow to danger red as the shot approaches instead of revealing
-		# the danger area progressively from the caster outward.
-		var warning := Color(
-			1.0,
-			lerpf(0.82, 0.12, firing_progress),
-			0.06,
-			0.30 + pulse * 0.18
+		# Minimal full-lane warning inspired by Undertale's red/yellow attack
+		# tells: flash one thin line instead of filling the beam footprint.
+		var flash_index := int(floor(firing_progress * 6.0))
+		var warning := (
+			Color(1.0, 0.86, 0.08, 0.96)
+			if flash_index % 2 == 0
+			else Color(1.0, 0.10, 0.08, 0.96)
 		)
+		var warning_width := maxf(2.0, beam_width * 0.15)
+
+		# A very thin dark edge preserves contrast without making the tell look like
+		# a second beam.
 		draw_line(
 			Vector2.ZERO,
 			firing_direction * beam_range,
-			Color(0.02, 0.02, 0.02, 0.68),
-			beam_width + 8.0,
+			Color(0.02, 0.02, 0.02, 0.78),
+			warning_width + 1.0,
 			true
 		)
 		draw_line(
 			Vector2.ZERO,
 			firing_direction * beam_range,
 			warning,
-			beam_width * 0.72,
-			true
-		)
-		draw_line(
-			Vector2.ZERO,
-			firing_direction * beam_range,
-			Color(1.0, 0.95, 0.72, 0.86),
-			3.0,
+			warning_width,
 			true
 		)
 

@@ -37,11 +37,12 @@ func _set_blast_progress(value: float) -> void:
 	queue_redraw()
 
 func _resolve_hits() -> void:
+	var blast_radius := (HexCells.hex_width * 1.5)
+	_resolve_magic_breaks(blast_radius)
+
 	var players_node := get_tree().current_scene.find_child("Players")
 	if players_node == null:
 		return
-
-	var blast_radius := (HexCells.hex_width * 1.5)
 
 	for child in players_node.get_children():
 		if not (child is Player):
@@ -68,6 +69,33 @@ func _resolve_hits() -> void:
 		if multiplayer.is_server():
 			var damage_amount := damage / randf_range(3.3, 3.5)
 			target._apply_damage.rpc(damage_amount, player_id, get_telemetry_name())
+
+
+func _resolve_magic_breaks(blast_radius: float) -> void:
+	var destroyed := 0
+
+	for node in get_tree().get_nodes_in_group("magic"):
+		if not (node is Magic):
+			continue
+
+		var target := node as Magic
+		if (
+			target == self
+			or target.player_id == player_id
+			or target.is_queued_for_deletion()
+			or global_position.distance_to(target.global_position) > blast_radius
+		):
+			continue
+
+		# Zilo's E is explicit counter-magic: anything hostile caught in the
+		# blast is removed regardless of its remaining magic health.
+		target.fizzle()
+		destroyed += 1
+
+	if destroyed > 0:
+		Telemetry.record_enemy_magic_destroyed(
+			player_id, destroyed, get_telemetry_name()
+		)
 
 func _draw() -> void:
 	var core_red := Color(0.93, 0.828, 0.829, 1.0)

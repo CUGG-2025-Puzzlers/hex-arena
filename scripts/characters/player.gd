@@ -53,6 +53,25 @@ func _ready() -> void:
 
 	_update_current_cell()
 
+	if not GameManager.readability_style_changed.is_connected(_apply_readability_style):
+		GameManager.readability_style_changed.connect(_apply_readability_style)
+	_apply_readability_style(GameManager.readability_style)
+
+
+func _apply_readability_style(style: String) -> void:
+	var sprite := get_node_or_null("Sprite2D") as Sprite2D
+	if sprite == null:
+		return
+
+	var outline_enabled := style == GameManager.READABILITY_STYLE_OUTLINE
+	var is_enemy := player_id != multiplayer.get_unique_id()
+	var outline_color := (
+		GameManager.ENEMY_OUTLINE_COLOR
+		if is_enemy
+		else GameManager.LOCAL_OUTLINE_COLOR
+	)
+	GameManager.set_team_outline(sprite, outline_color, outline_enabled)
+
 
 func _physics_process(delta: float) -> void:
 	# Root stops movement but does not disable MultiplayerInput, so the player

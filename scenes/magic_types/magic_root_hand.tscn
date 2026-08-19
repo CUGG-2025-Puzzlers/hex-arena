@@ -10,7 +10,7 @@ monitorable = false
 script = ExtResource("1_root")
 travel_time = 0.18
 linger_time = 0.12
-root_duration = 1.8
+root_duration = 1.1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1663271826]
 shape = SubResource("CircleShape2D_root")

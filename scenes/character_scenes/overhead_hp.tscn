@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://dbkuln5v5ie2q"]
+[gd_scene format=3 uid="uid://dbkuln5v5ie2q"]
 
 [sub_resource type="StyleBoxFlat" id="HPBackground"]
 bg_color = Color(0.025, 0.025, 0.03, 1)

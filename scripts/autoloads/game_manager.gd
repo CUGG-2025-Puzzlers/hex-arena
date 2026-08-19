@@ -6,6 +6,17 @@ const CONTROL_SCHEME_LEGACY := "legacy"
 const CONTROL_SCHEME_NEW := "mouse_primary_fire"
 const CAMERA_PROFILE_LEGACY := "legacy"
 const CAMERA_PROFILE_LEAGUE := "league_test"
+const READABILITY_STYLE_CURRENT := "current"
+const READABILITY_STYLE_OUTLINE := "team_outline"
+
+const LOCAL_OUTLINE_COLOR := Color("69DFFF")
+const ENEMY_OUTLINE_COLOR := Color("FF4B55")
+const OUTLINE_WORLD_WIDTH := 1.35
+const TEAM_OUTLINE_SHADER := preload("res://shaders/team_outline.gdshader")
+const ORIGINAL_MATERIAL_META := &"_readability_original_material"
+const OUTLINE_MATERIAL_META := &"_readability_outline_material"
+
+signal readability_style_changed(style: String)
 
 var player_name: String = ""
 var xp: int = 0
@@ -16,6 +27,7 @@ var level: int = 1
 var control_scheme: String = CONTROL_SCHEME_NEW
 var camera_profile: String = CAMERA_PROFILE_LEAGUE
 var camera_locked: bool = true
+var readability_style: String = READABILITY_STYLE_CURRENT
 
 
 func _ready() -> void:
@@ -23,7 +35,7 @@ func _ready() -> void:
 	load_data()
 	_apply_control_scheme()
 	print(OS.get_user_data_dir())
-	print("[PLAYTEST] F6 toggles controls; F7 toggles camera profile.")
+	print("[PLAYTEST] F6 controls; F7 camera; F8 readability style.")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -46,6 +58,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			CAMERA_PROFILE_LEGACY
 			if camera_profile == CAMERA_PROFILE_LEAGUE
 			else CAMERA_PROFILE_LEAGUE
+		)
+	elif key == KEY_F8:
+		set_readability_style(
+			READABILITY_STYLE_CURRENT
+			if readability_style == READABILITY_STYLE_OUTLINE
+			else READABILITY_STYLE_OUTLINE
 		)
 
 
@@ -73,6 +91,56 @@ func set_camera_profile(value: String) -> void:
 		"setting": "camera_profile",
 		"value": camera_profile,
 	})
+
+
+func set_readability_style(value: String) -> void:
+	if value not in [READABILITY_STYLE_CURRENT, READABILITY_STYLE_OUTLINE]:
+		return
+	readability_style = value
+	save_data()
+	readability_style_changed.emit(readability_style)
+	print("[PLAYTEST] Readability: ", readability_style)
+	Telemetry.track("playtest_setting_changed", {
+		"setting": "readability_style",
+		"value": readability_style,
+	})
+
+
+func set_team_outline(item: CanvasItem, color: Color, enabled: bool) -> void:
+	if item == null:
+		return
+
+	if not item.has_meta(ORIGINAL_MATERIAL_META):
+		item.set_meta(ORIGINAL_MATERIAL_META, item.material)
+
+	if not enabled:
+		item.material = item.get_meta(ORIGINAL_MATERIAL_META, null)
+		return
+
+	# Do not replace authored shader/material effects. The current player and
+	# persistent-magic sprites do not use one, so this keeps the test isolated.
+	var original_material = item.get_meta(ORIGINAL_MATERIAL_META, null)
+	if original_material != null:
+		return
+
+	var material := item.get_meta(OUTLINE_MATERIAL_META, null) as ShaderMaterial
+	if material == null:
+		material = ShaderMaterial.new()
+		material.shader = TEAM_OUTLINE_SHADER
+		item.set_meta(OUTLINE_MATERIAL_META, material)
+
+	var node_2d := item as Node2D
+	var visual_scale := 1.0
+	if node_2d != null:
+		var global_scale := node_2d.global_transform.get_scale().abs()
+		visual_scale = maxf(minf(global_scale.x, global_scale.y), 0.03)
+
+	material.set_shader_parameter("outline_color", color)
+	material.set_shader_parameter(
+		"outline_width_texels",
+		clampf(OUTLINE_WORLD_WIDTH / visual_scale, 1.0, 48.0)
+	)
+	item.material = material
 
 
 func _apply_control_scheme() -> void:
@@ -107,6 +175,7 @@ func save_data() -> void:
 		"level": level,
 		"control_scheme": control_scheme,
 		"camera_profile": camera_profile,
+		"readability_style": readability_style,
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -138,6 +207,12 @@ func load_data() -> void:
 	var saved_camera := str(data.get("camera_profile", CAMERA_PROFILE_LEAGUE))
 	if saved_camera in [CAMERA_PROFILE_LEGACY, CAMERA_PROFILE_LEAGUE]:
 		camera_profile = saved_camera
+
+	var saved_readability := str(
+		data.get("readability_style", READABILITY_STYLE_CURRENT)
+	)
+	if saved_readability in [READABILITY_STYLE_CURRENT, READABILITY_STYLE_OUTLINE]:
+		readability_style = saved_readability
 
 
 func add_xp(amount: int) -> void:

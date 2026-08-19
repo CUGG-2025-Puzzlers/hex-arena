@@ -23,6 +23,8 @@ var player_owner : Player
 var player_id : int = -1
 var telemetry_name: String = ""
 
+const ENEMY_MAGIC_TINT := Color(0.819, 0.205, 0.204, 1.0)
+
 
 @export var own_cost: float
 @export var own_health: float
@@ -102,9 +104,36 @@ func place_instance_for_player(cell: Vector2i, _player_owner: Player = null, _st
 	hex_cells.add_child(self, true)
 	name = "Magic"
 	add_to_group('magic')
-	
-	if player_id > 0 and player_id != multiplayer.get_unique_id():
-		modulate = Color(0.819, 0.205, 0.204, 1.0)
+
+	if not GameManager.readability_style_changed.is_connected(_apply_readability_style):
+		GameManager.readability_style_changed.connect(_apply_readability_style)
+	_apply_readability_style(GameManager.readability_style)
+
+
+func _apply_readability_style(style: String) -> void:
+	if player_id <= 0:
+		return
+
+	var is_enemy := player_id != multiplayer.get_unique_id()
+	var outline_enabled := style == GameManager.READABILITY_STYLE_OUTLINE
+
+	# Baseline reproduces the current full red modulation exactly. Outline mode
+	# restores authored colors and communicates ownership only at sprite edges.
+	modulate = Color.WHITE if outline_enabled or not is_enemy else ENEMY_MAGIC_TINT
+
+	var outline_color := (
+		GameManager.ENEMY_OUTLINE_COLOR
+		if is_enemy
+		else GameManager.LOCAL_OUTLINE_COLOR
+	)
+	for child in find_children("*", "", true, false):
+		if child is Sprite2D or child is AnimatedSprite2D:
+			GameManager.set_team_outline(
+				child as CanvasItem,
+				outline_color,
+				outline_enabled
+			)
+
 
 func get_telemetry_name() -> String:
 	if not telemetry_name.is_empty():

@@ -3,7 +3,7 @@ class_name MagicRootHand
 
 @export var travel_time: float = 0.8
 @export var linger_time: float = 0.5
-@export var root_duration: float = 1.6
+@export var root_duration: float = 1.1
 
 var is_active: bool = false
 var _hit_consumed: bool = false
