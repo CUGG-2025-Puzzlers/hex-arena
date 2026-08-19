@@ -238,7 +238,7 @@ func _on_area_entered(area: Area2D) -> void:
 			root_blood.restart()
 
 		if multiplayer.is_server():
-			_apply_root.rpc(root_hand.root_duration)
+			_apply_root.rpc(root_hand.root_duration, root_hand.player_id, root_hand.get_telemetry_name())
 
 		return
 
@@ -265,15 +265,20 @@ func _on_area_entered(area: Area2D) -> void:
 			var damage_amount: float = (
 				area.damage / randf_range(3.3, 3.5)
 			)
-			_apply_damage.rpc(damage_amount)
+			_apply_damage.rpc(damage_amount, area.player_id, area.get_telemetry_name())
 
 
 @rpc("authority", "call_local", "reliable")
-func _apply_root(duration: float) -> void:
-	rooted_until_msec = maxi(
-		rooted_until_msec,
-		Time.get_ticks_msec() + int(duration * 1000.0)
-	)
+func _apply_root(
+	duration: float,
+	source_player_id: int = -1,
+	source_ability: String = ""
+) -> void:
+	var now := Time.get_ticks_msec()
+	var old_until := rooted_until_msec
+	rooted_until_msec = maxi(old_until, now + int(duration * 1000.0))
+	var added_duration := float(maxi(0, rooted_until_msec - maxi(old_until, now))) / 1000.0
+	Telemetry.record_cc(source_player_id, player_id, added_duration, source_ability)
 	velocity = Vector2.ZERO
 
 	# DashAbility moves the player from its own _physics_process(), so it must
@@ -283,24 +288,43 @@ func _apply_root(duration: float) -> void:
 
 
 @rpc("authority", "call_local", "reliable")
-func _apply_damage(amount: float) -> void:
+func _apply_damage(
+	amount: float,
+	source_player_id: int = -1,
+	source_ability: String = ""
+) -> void:
 	# Explicit attacks such as Tideblade, Pressure Lance, Burst, and Razor Wire
 	# call this directly, so the Reform invulnerability check belongs here too.
-	if is_invulnerable():
+	if is_invulnerable() or amount <= 0.0:
 		return
 
+	var actual_damage := minf(amount, stats_update.current_health)
+	Telemetry.record_damage(source_player_id, player_id, actual_damage, source_ability)
 	stats_update.take_damage(amount)
 
 
 @rpc("authority", "call_local", "reliable")
 func _use_mana(amount: float) -> void:
-	stats_update.use_mana(amount)
+	var before := stats_update.current_mana
+	if stats_update.use_mana(amount):
+		Telemetry.record_mana_spent(player_id, before - stats_update.current_mana)
 
 
 @rpc("authority", "call_local", "reliable")
-func _apply_heal(amount: float) -> void:
-	if amount > 0.0:
-		stats_update.heal(amount)
+func _apply_heal(
+	amount: float,
+	source_player_id: int = -1,
+	source_ability: String = ""
+) -> void:
+	if amount <= 0.0:
+		return
+	var before := stats_update.current_health
+	stats_update.heal(amount)
+	Telemetry.record_heal(
+		source_player_id,
+		stats_update.current_health - before,
+		source_ability
+	)
 
 
 @rpc("authority", "call_local", "reliable")
@@ -310,13 +334,18 @@ func _restore_mana(amount: float) -> void:
 
 
 @rpc("authority", "call_local", "reliable")
-func _apply_silence(duration: float) -> void:
+func _apply_silence(
+	duration: float,
+	source_player_id: int = -1,
+	source_ability: String = ""
+) -> void:
 	if duration <= 0.0:
 		return
-	silenced_until_msec = maxi(
-		silenced_until_msec,
-		Time.get_ticks_msec() + int(duration * 1000.0)
-	)
+	var now := Time.get_ticks_msec()
+	var old_until := silenced_until_msec
+	silenced_until_msec = maxi(old_until, now + int(duration * 1000.0))
+	var added_duration := float(maxi(0, silenced_until_msec - maxi(old_until, now))) / 1000.0
+	Telemetry.record_cc(source_player_id, player_id, added_duration, source_ability)
 
 
 @rpc("authority", "call_local", "reliable")

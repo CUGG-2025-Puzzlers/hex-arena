@@ -41,6 +41,7 @@ func try_activate() -> bool:
 	if not can_activate():
 		return false
 	_execute()
+	Telemetry.record_ability_cast(player.player_id, ability_name)
 	ability_activated.emit()
 	_start_cooldown()
 	return true

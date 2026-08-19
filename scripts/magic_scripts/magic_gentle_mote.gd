@@ -32,7 +32,12 @@ func can_be_cut_by_wire() -> bool:
 
 
 func start_rolling(path: PackedVector2Array) -> void:
-	if rolling or path.size() < 2:
+	if rolling or path.size() < 2 or hit_consumed:
+		return
+
+	# A player can already be standing on the mote when it is fired. Resolve
+	# that overlap before moving so the projectile cannot visually pass through.
+	if _resolve_current_overlap():
 		return
 
 	var direction := path[path.size() - 1] - path[0]
@@ -43,7 +48,6 @@ func start_rolling(path: PackedVector2Array) -> void:
 	rolling = true
 	travelled = 0.0
 	lifetime_elapsed = 0.0
-	hit_consumed = false
 
 	if HexCells.cell_dict.has(self_cell) and HexCells.cell_dict[self_cell] == self:
 		HexCells.cell_dict[self_cell] = null
@@ -72,26 +76,38 @@ func _advance_mote(delta: float) -> void:
 		fizzle()
 
 
-# Uses the exact Area2D hurtbox collision path used by Light Arrow instead of
-# measuring distance to the CharacterBody2D origin at the player's feet.
 func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group("magic"):
 		super._on_area_entered(area)
 		return
 
-	if not rolling or hit_consumed:
-		return
+	_try_consume_player_area(area)
+
+
+func _resolve_current_overlap() -> bool:
+	for area in get_overlapping_areas():
+		if _try_consume_player_area(area):
+			return true
+	return false
+
+
+func _try_consume_player_area(area: Area2D) -> bool:
+	if hit_consumed:
+		return false
 
 	var target := area.get_parent() as Player
 	if target == null:
-		return
+		return false
 
-	if target.player_id == player_id and lifetime_elapsed < self_hit_grace:
-		return
+	# The grace period only protects the caster from immediately catching a mote
+	# they just fired. A stationary mote intentionally works on contact.
+	if rolling and target.player_id == player_id and lifetime_elapsed < self_hit_grace:
+		return false
 
 	hit_consumed = true
 	_resolve_hit(target)
 	call_deferred("fizzle")
+	return true
 
 
 func _find_homing_target() -> Player:
@@ -144,9 +160,9 @@ func _resolve_hit(target: Player) -> void:
 		return
 
 	if player_owner.is_friendly_to(target):
-		target._apply_heal.rpc(heal_amount)
+		target._apply_heal.rpc(heal_amount, player_id, get_telemetry_name())
 	else:
-		target._apply_damage.rpc(damage)
+		target._apply_damage.rpc(damage, player_id, get_telemetry_name())
 
 
 func _draw() -> void:

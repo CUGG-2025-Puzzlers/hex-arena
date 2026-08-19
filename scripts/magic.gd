@@ -21,6 +21,7 @@ var rolling_pathfollow : PathFollow2D
 var self_cell: Vector2i
 var player_owner : Player
 var player_id : int = -1
+var telemetry_name: String = ""
 
 
 @export var own_cost: float
@@ -70,6 +71,7 @@ func reset_stats(stats_reference: MagicStats):
 	own_health = stats_reference.health
 	damage = stats_reference.damage
 	roll_speed = stats_reference.speed
+	telemetry_name = stats_reference.magic_name
 	collides_w_own = stats_reference.collide_w_own
 	
 	own_transforms.clear()
@@ -103,6 +105,12 @@ func place_instance_for_player(cell: Vector2i, _player_owner: Player = null, _st
 	
 	if player_id > 0 and player_id != multiplayer.get_unique_id():
 		modulate = Color(0.819, 0.205, 0.204, 1.0)
+
+func get_telemetry_name() -> String:
+	if not telemetry_name.is_empty():
+		return telemetry_name
+	return MagicType.keys()[state] if state != MagicType.NONE else "Magic"
+
 
 # Create and start moving along provided path
 func start_rolling(wiggly_path: PackedVector2Array):

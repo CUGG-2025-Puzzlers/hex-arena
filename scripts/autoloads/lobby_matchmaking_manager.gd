@@ -33,6 +33,7 @@ var _eos_ready := false
 
 var _quick_match_active := false
 var _quick_match_attempt := 0
+var _quick_match_generation := 0
 var _pending_join_owner := ""
 var _pending_join_socket := ""
 
@@ -561,18 +562,16 @@ func quick_match(player_name: String) -> bool:
 		return false
 
 	_quick_match_attempt += 1
+	_quick_match_generation += 1
+	var generation := _quick_match_generation
 	_quick_match_active = true
 	_is_busy = true
 
-	_trace(
-		"QUICK_MATCH_BEGIN",
-		{
-			"attempt": _quick_match_attempt,
-			"player_name": player_name,
-		}
-	)
+	_trace("QUICK_MATCH_BEGIN", {"attempt": _quick_match_attempt})
 
 	var eos_ready := await _ensure_eos_ready(player_name)
+	if not _quick_match_is_current(generation):
+		return false
 	if not eos_ready:
 		_is_busy = false
 		_quick_match_active = false
@@ -580,53 +579,71 @@ func quick_match(player_name: String) -> bool:
 		return false
 
 	var lobbies = await _search_bucket("QUICK_SEARCH_1")
+	if not _quick_match_is_current(generation):
+		return false
 	var joinable: Array[HLobby] = []
-
 	if lobbies != null:
-		joinable = _filter_joinable_lobbies(
-			lobbies,
-			MATCH_QUICK
-		)
+		joinable = _filter_joinable_lobbies(lobbies, MATCH_QUICK)
 
-	# The EOSG sample also searches twice with a random delay before hosting.
-	# This reduces the chance that two players entering simultaneously both host.
 	if joinable.is_empty():
 		var retry_delay := randf_range(0.25, 1.25)
-		quick_match_status.emit(
-			"No opponent found. Rechecking in %.2f seconds…"
-			% retry_delay
-		)
-		_trace(
-			"QUICK_MATCH_RECHECK_DELAY",
-			{"seconds": retry_delay}
-		)
+		quick_match_status.emit("No opponent found. Rechecking in %.2f seconds…" % retry_delay)
 		_is_busy = false
 		await get_tree().create_timer(retry_delay).timeout
+		if not _quick_match_is_current(generation):
+			return false
 		_is_busy = true
 
 		lobbies = await _search_bucket("QUICK_SEARCH_2")
+		if not _quick_match_is_current(generation):
+			return false
 		if lobbies != null:
-			joinable = _filter_joinable_lobbies(
-				lobbies,
-				MATCH_QUICK
-			)
+			joinable = _filter_joinable_lobbies(lobbies, MATCH_QUICK)
 
 	_is_busy = false
+	if not _quick_match_is_current(generation):
+		return false
 
 	if not joinable.is_empty():
 		var selected := joinable[0]
 		quick_match_status.emit("Opponent found. Connecting…")
 		Telemetry.track("matchmaking_match_found")
-		_trace(
-			"QUICK_MATCH_JOIN_SELECTED",
-			_describe_lobby(selected)
-		)
-		return await join_lobby(selected, player_name)
+		var joined := await join_lobby(selected, player_name)
+		if not _quick_match_is_current(generation):
+			if joined:
+				await cleanup_lobby()
+			return false
+		return joined
 
 	quick_match_status.emit("Creating a match. Waiting for an opponent…")
 	Telemetry.track("matchmaking_host_created")
-	_trace("QUICK_MATCH_HOSTING")
-	return await create_lobby(player_name, MATCH_QUICK)
+	var created := await create_lobby(player_name, MATCH_QUICK)
+	if not _quick_match_is_current(generation):
+		if created:
+			await cleanup_lobby()
+		return false
+	return created
+
+
+func cancel_quick_match() -> void:
+	if not _quick_match_active and current_lobby == null:
+		return
+
+	_quick_match_generation += 1
+	_quick_match_active = false
+	_is_busy = false
+	Telemetry.track("matchmaking_cancelled")
+
+	if current_lobby != null:
+		await cleanup_lobby()
+
+
+func is_quick_match_active() -> bool:
+	return _quick_match_active
+
+
+func _quick_match_is_current(generation: int) -> bool:
+	return generation == _quick_match_generation
 
 
 func join_lobby(lobby: HLobby, player_name: String) -> bool:

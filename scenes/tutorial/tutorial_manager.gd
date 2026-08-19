@@ -77,6 +77,7 @@ var heavy_objectives_activated := false
 var heavy_objective_completed := false
 
 func _ready() -> void:
+	_update_control_copy()
 	walk_objective.completed.connect(_on_walk_objective_completed)
 	place_magic_objective.completed.connect(_on_place_magic_objective_completed)
 
@@ -91,15 +92,36 @@ func _ready() -> void:
 		
 	_show_task("move")
 	
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			var mouse_global := get_global_mouse_position()
-			var mouse_local := hex_cells.to_local(mouse_global)
-			var cell = hex_cells.local_to_map(mouse_local)
+func _update_control_copy() -> void:
+	var place := _action_label("place_magic")
+	var fire := _action_label("fire_magic")
+	task_text["create_light"]["description"] = (
+		"%s on a hex to place Basic Magic.\nE to transform it into Light Arrow." % place
+	)
+	task_text["fire_light"]["description"] = "Aim with your mouse.\n%s to fire." % fire
+	task_text["create_shield"]["description"] = (
+		"%s on a hex to place Basic Magic.\nQ to transform it." % place
+	)
+	task_text["break_shields"]["description"] = (
+		"%s on a hex to place Basic Magic.\nR to transform it." % place
+	)
 
-			print("[DEBUG] clicked cell: ", cell)
-			
+
+func _action_label(action: StringName) -> String:
+	for event in InputMap.action_get_events(action):
+		if event is InputEventMouseButton:
+			match (event as InputEventMouseButton).button_index:
+				MOUSE_BUTTON_LEFT:
+					return "Left click"
+				MOUSE_BUTTON_RIGHT:
+					return "Right click"
+		if event is InputEventKey:
+			var key := (event as InputEventKey).physical_keycode
+			if key == 0:
+				key = (event as InputEventKey).keycode
+			return OS.get_keycode_string(key)
+	return str(action)
+
 func _on_walk_objective_completed() -> void:
 	_complete_current_step()
 	print("[TUTORIAL] Walk objective completed. Showing place magic objective.")

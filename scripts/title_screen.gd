@@ -106,6 +106,7 @@ const MODE_DESCRIPTIONS := {
 @onready var _player_name_label: Label = %PlayerNameLabel
 @onready var _player_progress_label: Label = %PlayerProgressLabel
 @onready var _status_label: Label = %StatusLabel
+@onready var _cancel_queue_button: Button = %CancelQueueButton
 @onready var _name_error_label: Label = %NameErrorLabel
 
 @onready var _lobbies_grid: GridContainer = %LobbiesGrid
@@ -119,6 +120,7 @@ var _selected_mode := MODE_QUICK
 var _selected_character: Util.Character = Util.Character.Hekaset
 var _preview_character: Util.Character = Util.Character.Hekaset
 var _current_lobbies: Array[HLobby] = []
+var _quick_match_cancelled := false
 
 
 func _ready() -> void:
@@ -141,6 +143,8 @@ func _ready() -> void:
 	_ip_error_label.hide()
 	_port_error_label.hide()
 	_status_label.text = ""
+	_cancel_queue_button.hide()
+	_cancel_queue_button.pressed.connect(_on_cancel_quick_match)
 
 	_refresh_profile()
 	_initialise_character()
@@ -427,14 +431,28 @@ func _on_quick_match() -> void:
 	if not _validate_account_name():
 		return
 
+	_quick_match_cancelled = false
 	_set_busy(true, "Searching for an opponent…")
+	_cancel_queue_button.show()
+	_cancel_queue_button.disabled = false
 	Telemetry.track("matchmaking_entered")
 
 	var success := await LobbyMatchmakingManager.quick_match(
 		GameManager.player_name
 	)
-	if not success:
+	if not LobbyMatchmakingManager.is_quick_match_active():
+		_cancel_queue_button.hide()
+	if not success and not _quick_match_cancelled:
 		_set_busy(false, "Quick Match failed. Try again.")
+
+
+func _on_cancel_quick_match() -> void:
+	_quick_match_cancelled = true
+	_cancel_queue_button.disabled = true
+	_status_label.text = "Cancelling search…"
+	await LobbyMatchmakingManager.cancel_quick_match()
+	_cancel_queue_button.hide()
+	_set_busy(false, "Search cancelled.")
 
 
 func _on_create_lobby() -> void:
@@ -613,3 +631,8 @@ func _on_lobby_action_failed(reason: String) -> void:
 
 func _on_quick_match_status(message: String) -> void:
 	_status_label.text = message
+	if (
+		message == "Opponent found. Connecting…"
+		or message.begins_with("Creating a match.")
+	):
+		_cancel_queue_button.disabled = true

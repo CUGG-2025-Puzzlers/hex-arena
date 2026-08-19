@@ -12,7 +12,7 @@ const POSTHOG_PROJECT_TOKEN := "phc_nPaiAZZf8KVBFzU6pHLLu5fRtmC9f8q62mgtZA3ccSXd
 const POSTHOG_HOST := "https://us.i.posthog.com"
 const POSTHOG_BATCH_SIZE := 25
 const POSTHOG_FLUSH_SECONDS := 15.0
-const SCHEMA_VERSION := 1
+const SCHEMA_VERSION := 2
 
 # Sparse checkpoints make first-session length measurable even if the game is
 # force-closed before session_ended can be sent.
@@ -37,6 +37,11 @@ var current_match_id: String = ""
 var current_match_mode: String = ""
 var current_match_started_msec: int = 0
 var duel_number: int = 0
+var last_match_report: Dictionary = {}
+
+var _match_context: Dictionary = {}
+var _player_match_stats: Dictionary = {}
+var _ability_match_stats: Dictionary = {}
 
 var _focused := true
 var _engaged_msec := 0
@@ -98,7 +103,7 @@ func track(event_name: String, properties: Dictionary = {}) -> void:
 	# instrumentation is required there.
 	if event_name == "matchmaking_entered":
 		_matchmaking_started_msec = Time.get_ticks_msec()
-	elif event_name == "matchmaking_connection_failed":
+	elif event_name in ["matchmaking_connection_failed", "matchmaking_cancelled"]:
 		_attach_and_clear_queue_duration(event_properties)
 
 	var base := _base_properties()
@@ -134,6 +139,10 @@ func start_match(mode: String, properties: Dictionary = {}) -> void:
 	current_match_id = _generate_id()
 	current_match_mode = mode
 	current_match_started_msec = Time.get_ticks_msec()
+	_match_context = properties.duplicate(true)
+	_player_match_stats.clear()
+	_ability_match_stats.clear()
+	last_match_report = {}
 
 	if mode != "tutorial":
 		duel_number += 1
@@ -145,11 +154,147 @@ func start_match(mode: String, properties: Dictionary = {}) -> void:
 	track("match_started", match_properties)
 
 
+func register_match_player(player_id: int, character: String) -> void:
+	if current_match_id.is_empty() or player_id < 0:
+		return
+	var stats := _get_player_stats(player_id)
+	stats["character"] = character
+	_player_match_stats[player_id] = stats
+
+
+func record_ability_cast(player_id: int, ability: String) -> void:
+	if current_match_id.is_empty() or player_id < 0 or ability.is_empty():
+		return
+	_get_ability_stats(player_id, ability)["casts"] += 1
+
+
+func record_kill(winner_player_id: int, defeated_player_id: int) -> void:
+	if current_match_id.is_empty():
+		return
+	if winner_player_id >= 0:
+		_get_player_stats(winner_player_id)["kills"] += 1
+	if defeated_player_id >= 0:
+		_get_player_stats(defeated_player_id)["deaths"] += 1
+
+
+func record_damage(
+	source_player_id: int,
+	target_player_id: int,
+	amount: float,
+	ability: String = ""
+) -> void:
+	if current_match_id.is_empty() or amount <= 0.0:
+		return
+
+	var target := _get_player_stats(target_player_id)
+	target["damage_taken"] += amount
+
+	if source_player_id >= 0:
+		var source := _get_player_stats(source_player_id)
+		source["damage_dealt"] += amount
+		if not ability.is_empty():
+			var ability_stats := _get_ability_stats(source_player_id, ability)
+			ability_stats["hits"] += 1
+			ability_stats["damage_dealt"] += amount
+
+
+func record_heal(source_player_id: int, amount: float, ability: String = "") -> void:
+	if current_match_id.is_empty() or source_player_id < 0 or amount <= 0.0:
+		return
+	var source := _get_player_stats(source_player_id)
+	source["healing_done"] += amount
+	if not ability.is_empty():
+		var ability_stats := _get_ability_stats(source_player_id, ability)
+		ability_stats["healing_done"] += amount
+
+
+func record_mana_spent(player_id: int, amount: float) -> void:
+	if current_match_id.is_empty() or amount <= 0.0:
+		return
+	_get_player_stats(player_id)["mana_spent"] += amount
+
+
+func record_magic_placed(player_id: int, ability: String) -> void:
+	if current_match_id.is_empty():
+		return
+	_get_player_stats(player_id)["magic_placed"] += 1
+	if not ability.is_empty():
+		_get_ability_stats(player_id, ability)["placements"] += 1
+
+
+func record_magic_transformed(player_id: int, ability: String) -> void:
+	if current_match_id.is_empty():
+		return
+	_get_player_stats(player_id)["magic_transformed"] += 1
+	if not ability.is_empty():
+		_get_ability_stats(player_id, ability)["transforms"] += 1
+
+
+func record_magic_fired(player_id: int, ability: String) -> void:
+	if current_match_id.is_empty():
+		return
+	_get_player_stats(player_id)["magic_fired"] += 1
+	if not ability.is_empty():
+		_get_ability_stats(player_id, ability)["casts"] += 1
+
+
+func record_cc(
+	source_player_id: int,
+	target_player_id: int,
+	duration: float,
+	ability: String = ""
+) -> void:
+	if current_match_id.is_empty() or duration <= 0.0:
+		return
+	_get_player_stats(target_player_id)["cc_received_seconds"] += duration
+	if source_player_id >= 0:
+		_get_player_stats(source_player_id)["cc_inflicted_seconds"] += duration
+		if not ability.is_empty():
+			_get_ability_stats(source_player_id, ability)["cc_seconds"] += duration
+
+
+func record_damage_blocked(
+	player_id: int,
+	amount: float,
+	ability: String = ""
+) -> void:
+	if current_match_id.is_empty() or amount <= 0.0:
+		return
+	_get_player_stats(player_id)["damage_blocked"] += amount
+	if not ability.is_empty():
+		_get_ability_stats(player_id, ability)["damage_blocked"] += amount
+
+
 func end_match(properties: Dictionary = {}) -> void:
 	if current_match_id.is_empty():
 		return
 
 	var match_properties := properties.duplicate(true)
+	var winner_player_id := int(match_properties.get("winner_player_id", -1))
+	match_properties.erase("winner_player_id")
+
+	for key in _match_context:
+		if not match_properties.has(key):
+			match_properties[key] = _match_context[key]
+
+	var local_id := multiplayer.get_unique_id()
+	var opponent_id := _find_opponent_id(local_id)
+	var local_stats := _get_player_stats(local_id).duplicate(true)
+	var opponent_stats := (
+		_get_player_stats(opponent_id).duplicate(true)
+		if opponent_id >= 0
+		else {}
+	)
+
+	_append_stats(match_properties, local_stats, "")
+	if not opponent_stats.is_empty():
+		_append_stats(match_properties, opponent_stats, "opponent_")
+
+	if winner_player_id >= 0 and _player_match_stats.has(winner_player_id):
+		match_properties["winner_character"] = str(
+			_get_player_stats(winner_player_id).get("character", "")
+		)
+
 	match_properties["match_id"] = current_match_id
 	match_properties["mode"] = current_match_mode
 	match_properties["duel_number"] = duel_number
@@ -157,12 +302,92 @@ func end_match(properties: Dictionary = {}) -> void:
 		0.0,
 		float(Time.get_ticks_msec() - current_match_started_msec) / 1000.0
 	)
+
+	_emit_local_ability_summaries(local_id, str(match_properties.get("result", "")))
+
+	last_match_report = {
+		"result": str(match_properties.get("result", "")),
+		"winner_character": str(match_properties.get("winner_character", "")),
+		"match_duration_seconds": match_properties["match_duration_seconds"],
+		"local": local_stats,
+		"opponent": opponent_stats,
+	}
+
 	track("match_ended", match_properties)
 
 	current_match_id = ""
 	current_match_mode = ""
 	current_match_started_msec = 0
+	_match_context.clear()
+	_player_match_stats.clear()
+	_ability_match_stats.clear()
 	flush()
+
+
+func _get_player_stats(player_id: int) -> Dictionary:
+	if not _player_match_stats.has(player_id):
+		_player_match_stats[player_id] = {
+			"character": "",
+			"kills": 0,
+			"deaths": 0,
+			"damage_dealt": 0.0,
+			"damage_taken": 0.0,
+			"healing_done": 0.0,
+			"damage_blocked": 0.0,
+			"mana_spent": 0.0,
+			"magic_placed": 0,
+			"magic_transformed": 0,
+			"magic_fired": 0,
+			"cc_inflicted_seconds": 0.0,
+			"cc_received_seconds": 0.0,
+		}
+	return _player_match_stats[player_id]
+
+
+func _get_ability_stats(player_id: int, ability: String) -> Dictionary:
+	if not _ability_match_stats.has(player_id):
+		_ability_match_stats[player_id] = {}
+	var player_abilities: Dictionary = _ability_match_stats[player_id]
+	if not player_abilities.has(ability):
+		player_abilities[ability] = {
+			"placements": 0,
+			"transforms": 0,
+			"casts": 0,
+			"hits": 0,
+			"damage_dealt": 0.0,
+			"healing_done": 0.0,
+			"damage_blocked": 0.0,
+			"cc_seconds": 0.0,
+		}
+	return player_abilities[ability]
+
+
+func _find_opponent_id(local_id: int) -> int:
+	for player_id in _player_match_stats:
+		if int(player_id) != local_id:
+			return int(player_id)
+	return -1
+
+
+func _append_stats(target: Dictionary, stats: Dictionary, prefix: String) -> void:
+	for key in stats:
+		target[prefix + str(key)] = stats[key]
+
+
+func _emit_local_ability_summaries(player_id: int, result: String) -> void:
+	if not _ability_match_stats.has(player_id):
+		return
+	var character := str(_get_player_stats(player_id).get("character", ""))
+	for ability in _ability_match_stats[player_id]:
+		var stats: Dictionary = _ability_match_stats[player_id][ability]
+		var properties := stats.duplicate(true)
+		properties["match_id"] = current_match_id
+		properties["mode"] = current_match_mode
+		properties["duel_number"] = duel_number
+		properties["character"] = character
+		properties["ability"] = ability
+		properties["result"] = result
+		track("ability_match_summary", properties)
 
 
 func get_events_path() -> String:
@@ -252,6 +477,9 @@ func _base_properties() -> Dictionary:
 		),
 		"build_type": "debug" if OS.is_debug_build() else "release",
 		"schema_version": SCHEMA_VERSION,
+		"control_scheme": GameManager.control_scheme,
+		"camera_profile": GameManager.camera_profile,
+		"camera_locked": GameManager.camera_locked,
 	}
 
 

@@ -458,6 +458,17 @@ func get_other_player_info():
 			return players[player_id]
 	return null
 
+func _register_telemetry_players() -> void:
+	for id in players:
+		var character: Util.Character = players[id].get(
+			"character", Util.Character.None
+		)
+		Telemetry.register_match_player(
+			int(id),
+			Util.get_character_display_name(character)
+		)
+
+
 # Prints out the players for debugging purposes
 func _print_players():
 	for player in players:
@@ -465,7 +476,7 @@ func _print_players():
 			print("*Local Client*")
 		print("Name: %s\nSelected Character: %s\n" % [players[player].name, Util.Character.keys()[players[player].character]])
 
-func _on_player_died(dead_player_id : int) -> void:
+func _on_player_died(dead_player_id: int, end_reason: String = "normal") -> void:
 	var winner_name := ""
 	var winner_id := -1
 
@@ -478,9 +489,29 @@ func _on_player_died(dead_player_id : int) -> void:
 	var winner_health_pct := _get_player_health_pct(winner_id)
 
 	if multiplayer.has_multiplayer_peer():
-		_end_game.rpc(winner_name, winner_id, winner_health_pct)
+		_end_game.rpc(winner_name, winner_id, winner_health_pct, end_reason)
 	else:
-		_end_game(winner_name, winner_id, winner_health_pct)
+		_end_game(winner_name, winner_id, winner_health_pct, end_reason)
+
+
+func concede_match() -> void:
+	if players.size() < 2:
+		return
+
+	if multiplayer.is_server():
+		_on_player_died(multiplayer.get_unique_id(), "concede")
+	else:
+		_request_concede.rpc_id(1)
+
+
+@rpc("any_peer", "reliable")
+func _request_concede() -> void:
+	if not multiplayer.is_server():
+		return
+
+	var conceding_id := multiplayer.get_remote_sender_id()
+	if players.has(conceding_id):
+		_on_player_died(conceding_id, "concede")
 
 
 func _get_player_health_pct(player_id: int) -> float:
@@ -505,18 +536,27 @@ func _get_player_health_pct(player_id: int) -> float:
 func _end_game(
 	winner_name: String,
 	winner_id: int,
-	winner_health_pct: float
-):
+	winner_health_pct: float,
+	end_reason: String = "normal"
+) -> void:
 	var local_id := multiplayer.get_unique_id()
 	var match_properties := {
 		"winner_name_present": not winner_name.is_empty(),
+		"winner_player_id": winner_id,
 		"result": "win" if local_id == winner_id else "loss",
+		"match_end_reason": end_reason,
 	}
 
 	if winner_health_pct >= 0.0:
 		match_properties["winner_health_pct"] = winner_health_pct
 		match_properties["close_match"] = winner_health_pct <= 0.25
 
+	var defeated_id := -1
+	for id in players:
+		if int(id) != winner_id:
+			defeated_id = int(id)
+			break
+	Telemetry.record_kill(winner_id, defeated_id)
 	Telemetry.end_match(match_properties)
 	SceneManager.load_end_scene(winner_name)
 
@@ -525,9 +565,15 @@ func _start_game() -> void:
 	var local_character: Util.Character = player_info.get(
 		"character", Util.Character.None
 	)
+	var other_info = get_other_player_info()
+	var opponent_character: Util.Character = Util.Character.None
+	if other_info != null:
+		opponent_character = other_info.get("character", Util.Character.None)
 	Telemetry.start_match("online_1v1", {
 		"character": Util.get_character_display_name(local_character),
+		"opponent_character": Util.get_character_display_name(opponent_character),
 	})
+	_register_telemetry_players()
 
 	var spawner: MultiplayerSpawner = (
 		get_tree().get_current_scene().get_node("MultiplayerSpawner")
@@ -662,9 +708,10 @@ func _start_bot_match():
 	_setup_tutorial_camera_and_hud(player_node, bot_node)
 	_setup_bot_controller(bot_node, player_node)
 	Telemetry.start_match("bot", {
-		"player_character": Util.get_character_display_name(player_character),
-		"bot_character": Util.get_character_display_name(bot_character),
+		"character": Util.get_character_display_name(player_character),
+		"opponent_character": Util.get_character_display_name(bot_character),
 	})
+	_register_telemetry_players()
 
 	if player_node.stats_update != null:
 		player_node.stats_update.deadgeLol.connect(_on_player_died.bind(player_id))
@@ -698,6 +745,7 @@ func _start_tutorial():
 		"name": "Hekaset",
 		"character": character,
 	}
+	_register_telemetry_players()
 
 	var spawn_data := {
 		"id": tutorial_player_id,
@@ -781,9 +829,11 @@ func _setup_tutorial_camera_and_hud(
 
 	var camera := current_scene.get_node_or_null("Camera2D") as Camera2D
 	if camera != null:
-		camera.reparent(player_node)
-		camera.position = Vector2.ZERO
-		camera.make_current()
+		if camera.has_method("configure_players"):
+			camera.call("configure_players", player_node, opponent_node)
+		else:
+			camera.global_position = player_node.global_position
+			camera.make_current()
 
 	var hud = current_scene.get_node_or_null("HUD")
 	if hud != null:

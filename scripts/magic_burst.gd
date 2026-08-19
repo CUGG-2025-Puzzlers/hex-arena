@@ -67,7 +67,7 @@ func _resolve_hits() -> void:
 
 		if multiplayer.is_server():
 			var damage_amount := damage / randf_range(3.3, 3.5)
-			target._apply_damage.rpc(damage_amount)
+			target._apply_damage.rpc(damage_amount, player_id, get_telemetry_name())
 
 func _draw() -> void:
 	var core_red := Color(0.93, 0.828, 0.829, 1.0)

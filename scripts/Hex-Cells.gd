@@ -166,6 +166,9 @@ func change_magic_in_cell_for_player(cell: Vector2i, new_state: Magic.MagicType,
 		push_error('Unable to get the player who changed the magic')
 
 	var magic_instance: Magic = cell_dict[cell]
+	var next_stats := magic_instance.own_transforms.get(new_state) as MagicStats
+	if next_stats != null:
+		Telemetry.record_magic_transformed(player_id, next_stats.magic_name)
 	magic_instance.change_state_for_player(new_state, player_owner)
 
 
@@ -216,6 +219,7 @@ func place_magic_in_cell_for_player(cell: Vector2i, type: Magic.MagicType, playe
 	var magic_instance: Magic = player_owner.preset.magics[type].scene.instantiate()
 
 	magic_instance.place_instance_for_player(cell, player_owner, player_owner.preset.magics[type])
+	Telemetry.record_magic_placed(player_id, magic_instance.get_telemetry_name())
 
 	if multiplayer.is_server():
 		player_owner._use_mana.rpc(magic_instance.own_cost)
@@ -230,6 +234,7 @@ func place_magic_in_cell_for_player(cell: Vector2i, type: Magic.MagicType, playe
 func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array, player_id: int):
 	for magic_instance in get_tree().get_nodes_in_group('magic'):
 		if is_instance_valid(magic_instance) and magic_instance.player_id==player_id and magic_instance.self_cell == cell:
+			Telemetry.record_magic_fired(player_id, magic_instance.get_telemetry_name())
 			magic_instance.start_rolling(wiggly_path_points)
 
 

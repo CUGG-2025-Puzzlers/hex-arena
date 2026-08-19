@@ -12,58 +12,116 @@ grow_vertical = 2
 script = ExtResource("1")
 
 [node name="Background" type="ColorRect" parent="."]
-color = Color(0.0470588, 0.0666667, 0.0901961, 1)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+color = Color(0.0470588, 0.0666667, 0.0901961, 1)
+
 [node name="Panel" type="PanelContainer" parent="."]
-theme_type_variation = &"ModePanelContainer"
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -350.0
-offset_top = -190.0
-offset_right = 350.0
-offset_bottom = 210.0
+offset_left = -410.0
+offset_top = -330.0
+offset_right = 410.0
+offset_bottom = 330.0
 grow_horizontal = 2
 grow_vertical = 2
+
 [node name="VBox" type="VBoxContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/separation = 22
+theme_override_constants/separation = 16
 alignment = 1
 
 [node name="ResultHeading" type="Label" parent="Panel/VBox"]
-theme_type_variation = &"MutedLabel"
 layout_mode = 2
-theme_override_font_sizes/font_size = 25
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 22
 text = "DUEL COMPLETE"
 horizontal_alignment = 1
+
 [node name="WinnerLabel" type="Label" parent="Panel/VBox"]
-theme_type_variation = &"HeadingLabel"
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
-theme_override_font_sizes/font_size = 50
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 42
 text = "Player wins!"
 horizontal_alignment = 1
 vertical_alignment = 1
-[node name="PlayAgainButton" type="Button" parent="Panel/VBox"]
+
+[node name="StatsPanel" type="PanelContainer" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/StatsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CharacterRow" type="HBoxContainer" parent="Panel/VBox/StatsPanel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="LocalCharacterLabel" type="Label" parent="Panel/VBox/StatsPanel/VBox/CharacterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 36)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+text = "YOU"
+horizontal_alignment = 1
+
+[node name="VsLabel" type="Label" parent="Panel/VBox/StatsPanel/VBox/CharacterRow"]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "VS"
+horizontal_alignment = 1
+
+[node name="OpponentCharacterLabel" type="Label" parent="Panel/VBox/StatsPanel/VBox/CharacterRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 36)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+text = "OPPONENT"
+horizontal_alignment = 1
+
+[node name="StatsGrid" type="GridContainer" parent="Panel/VBox/StatsPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 7
+
+[node name="MatchTimeLabel" type="Label" parent="Panel/VBox/StatsPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "MATCH TIME  0:00"
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="PlayAgainButton" type="Button" parent="Panel/VBox/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 64)
+layout_mode = 2
 theme_type_variation = &"PlayButton"
-unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 68)
-layout_mode = 2
-theme_override_font_sizes/font_size = 27
+theme_override_font_sizes/font_size = 25
 text = "Play Again"
-[node name="MainMenuButton" type="Button" parent="Panel/VBox"]
-theme_type_variation = &"TealButton"
+
+[node name="MainMenuButton" type="Button" parent="Panel/VBox/Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 62)
+custom_minimum_size = Vector2(260, 64)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_type_variation = &"TealButton"
+theme_override_font_sizes/font_size = 22
 text = "Main Menu"

@@ -205,7 +205,7 @@ func _handle_player_entered(target: Player) -> void:
 	players_inside[target_id] = true
 
 	if multiplayer.is_server():
-		target._apply_damage.rpc(crossing_damage)
+		target._apply_damage.rpc(crossing_damage, player_id, "Razor Current")
 
 
 func _handle_magic_entered(projectile: Magic) -> void:

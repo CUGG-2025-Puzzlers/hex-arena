@@ -18,7 +18,6 @@ const SELECT_CHARACTER := "Select Character"
 @onready var _selection_target_container: HBoxContainer = %SelectionTargetContainer
 @onready var _choose_player_button: Button = %ChoosePlayerButton
 @onready var _choose_bot_button: Button = %ChooseBotButton
-@onready var _selection_instruction: Label = %SelectionInstruction
 
 @export var texture_list: Array[Texture2D]
 
@@ -50,6 +49,7 @@ func _ready() -> void:
 		_setup_online_mode()
 
 	_check_players_ready()
+	_update_back_button_text()
 	Telemetry.track("character_select_viewed", {
 		"mode": "bot" if _bot_mode else "online",
 	})
@@ -114,14 +114,12 @@ func _select_player_slot() -> void:
 	_selection_target_id = 1
 	_choose_player_button.disabled = true
 	_choose_bot_button.disabled = false
-	_selection_instruction.text = "Selecting your character"
 
 
 func _select_bot_slot() -> void:
 	_selection_target_id = MultiplayerManager.BOT_PLAYER_ID
 	_choose_player_button.disabled = false
 	_choose_bot_button.disabled = true
-	_selection_instruction.text = "Selecting the training bot"
 
 
 func _on_player_connected(_id, info) -> void:
@@ -134,6 +132,7 @@ func _on_player_connected(_id, info) -> void:
 	# A player may arrive with a character already selected on the main menu.
 	# Re-check readiness here instead of waiting for another selection event.
 	_check_players_ready()
+	_update_back_button_text()
 
 
 func _on_player_disconnected(_id) -> void:
@@ -143,6 +142,7 @@ func _on_player_disconnected(_id) -> void:
 	_remote_player_name.text = WAITING_FOR_PLAYER
 	_set_character_info(Util.Character.None, false)
 	_check_players_ready()
+	_update_back_button_text()
 
 
 func _on_character_selected(
@@ -181,7 +181,10 @@ func _on_back_pressed() -> void:
 	# Wait for the lobby operation before changing scenes. This prevents an
 	# abandoned advertised lobby when the final member returns to the menu.
 	if not _bot_mode:
-		await LobbyMatchmakingManager.cleanup_lobby()
+		if LobbyMatchmakingManager.is_quick_match_active():
+			await LobbyMatchmakingManager.cancel_quick_match()
+		else:
+			await LobbyMatchmakingManager.cleanup_lobby()
 
 	MultiplayerManager.reset_character_select_mode()
 	SceneManager.load_title()
@@ -212,6 +215,14 @@ func _set_character_info(
 	else:
 		_remote_character_name.text = character_name
 		_remote_character_art.texture = character_texture
+
+
+func _update_back_button_text() -> void:
+	_back_button.text = (
+		"CANCEL SEARCH"
+		if not _bot_mode and LobbyMatchmakingManager.is_quick_match_active()
+		else "BACK"
+	)
 
 
 func _check_players_ready() -> void:

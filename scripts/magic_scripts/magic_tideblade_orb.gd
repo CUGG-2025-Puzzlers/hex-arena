@@ -314,7 +314,7 @@ func _resolve_player_hits(
 			* damage_multiplier
 		)
 
-		target._apply_damage.rpc(actual_damage)
+		target._apply_damage.rpc(actual_damage, player_id, get_telemetry_name())
 
 
 func _does_shape_intersect_slash(

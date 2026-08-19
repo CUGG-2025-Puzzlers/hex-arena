@@ -140,8 +140,8 @@ func _resolve_swept_hits(previous_front: float, current_front: float) -> void:
 			continue
 
 		hit_player_ids[target.player_id] = true
-		target._apply_damage.rpc(damage)
-		target._apply_silence.rpc(silence_duration)
+		target._apply_damage.rpc(damage, player_id, get_telemetry_name())
+		target._apply_silence.rpc(silence_duration, player_id, get_telemetry_name())
 		target._apply_fading_slow.rpc(
 			"hush_wave_%s_%s" % [player_id, get_instance_id()],
 			starting_slow_multiplier,

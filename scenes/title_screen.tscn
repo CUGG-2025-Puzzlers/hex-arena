@@ -974,6 +974,24 @@ theme_type_variation = &"RedLabel"
 text = "Set a valid player name in Account first."
 horizontal_alignment = 1
 
+[node name="CancelQueueButton" type="Button" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -95.0
+offset_top = -96.0
+offset_right = 95.0
+offset_bottom = -52.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"TealButton"
+text = "CANCEL SEARCH"
+
 [node name="StatusLabel" type="Label" parent="." unique_id=1226645375]
 unique_name_in_owner = true
 layout_mode = 1
