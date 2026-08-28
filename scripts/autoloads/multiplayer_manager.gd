@@ -83,7 +83,6 @@ func create_eos_game(player_name: String) -> bool:
 	player_info["name"] = player_name
 	players[1] = player_info
 	player_connected.emit(1, player_info)
-	SceneManager.load_character_select()
 	
 	return true
 	
@@ -183,7 +182,10 @@ func _on_peer_disconnected(id: int):
 func _on_connected_to_server():
 	print("Successfully connected to server!")
 	players[multiplayer.get_unique_id()] = player_info
-	SceneManager.load_character_select()
+	if multiplayer.multiplayer_peer is EOSGMultiplayerPeer:
+		SceneManager.load_lobby_room()
+	else:
+		SceneManager.load_character_select()
 
 func _on_connection_failed():
 	print("Failed to connect to server: Double-check IP, Port, and Firewall settings")

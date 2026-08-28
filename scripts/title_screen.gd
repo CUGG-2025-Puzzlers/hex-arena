@@ -74,6 +74,8 @@ func _on_create_lobby() -> void:
 	var success := await LobbyMatchmakingManager.create_lobby(player_name)
 	if not success:
 		_set_menu_buttons_disabled(false)
+		return
+	SceneManager.load_lobby_room()
 
 
 func _on_find_lobbies() -> void:
