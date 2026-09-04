@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bwvdthar585v4"]
 
 [ext_resource type="Script" uid="uid://b2xoe2fn7jbee" path="res://scripts/lobby_room_screen.gd" id="1_auptr"]
+[ext_resource type="PackedScene" uid="uid://ckwv1eporf8qk" path="res://scenes/lobby_player_card.tscn" id="2_5k41x"]
 
 [node name="LobbyRoomScreen" type="Control" unique_id=500601008]
 layout_mode = 3
@@ -39,6 +40,25 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
+
+[node name="CenterContainer" type="CenterContainer" parent="Background/MarginContainer/HBoxContainer/PlayerView" unique_id=1437170700]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/MarginContainer/HBoxContainer/PlayerView/CenterContainer" unique_id=199549234]
+layout_mode = 2
+alignment = 1
+
+[node name="HostPlayerCard" parent="Background/MarginContainer/HBoxContainer/PlayerView/CenterContainer/HBoxContainer" unique_id=715285779 instance=ExtResource("2_5k41x")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VSLabel" type="Label" parent="Background/MarginContainer/HBoxContainer/PlayerView/CenterContainer/HBoxContainer" unique_id=1341790963]
+layout_mode = 2
+text = "VS"
+
+[node name="OtherPlayerCard" parent="Background/MarginContainer/HBoxContainer/PlayerView/CenterContainer/HBoxContainer" unique_id=51733037 instance=ExtResource("2_5k41x")]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="RightPanel" type="PanelContainer" parent="Background/MarginContainer/HBoxContainer" unique_id=1031901736]
 layout_mode = 2
