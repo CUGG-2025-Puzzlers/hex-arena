@@ -19,4 +19,4 @@ func load_end_scene(winner: String) -> void:
 	get_tree().call_deferred("change_scene_to_file","res://scenes/EndScene.tscn") 
 	
 func load_lobby_room():
-	get_tree().change_scene_to_file("res://scenes/lobby_room_screen.tscn")
+	get_tree().change_scene_to_file("res://scenes/lobby_screen.tscn")
