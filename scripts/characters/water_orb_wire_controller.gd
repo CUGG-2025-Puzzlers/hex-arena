@@ -32,7 +32,7 @@ func _request_create_wire() -> void:
 	if not multiplayer.is_server():
 		return
 
-	if player == null or player.preset == null:
+	if player == null or player.preset == null or player.is_gameplay_input_blocked():
 		return
 
 	# The client may invoke only the controller attached to its own player.
@@ -105,6 +105,7 @@ func _request_create_wire() -> void:
 	# There is intentionally no duplicate-pair check and no clear-existing
 	# operation. Every successful Q press creates another independent wire.
 	player._use_mana.rpc(connection_cost)
+	player.spawn_protection = 0.0
 
 	next_wire_id += 1
 	_spawn_wire.rpc(

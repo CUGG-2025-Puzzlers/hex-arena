@@ -31,7 +31,7 @@ func move_cell(_player_ind:int, new_cell: Vector2i):
 	reorder()
 
 func reorder():
-	if player_parent.player_id!=multiplayer.get_unique_id():
+	if not Overhaul.local_friendly(player_parent.player_id):
 		if get_parent().get_child_count()>1:
 			get_parent().move_child(self,-2)
 		if line.get_parent().get_child_count()>1:
@@ -71,7 +71,7 @@ func draw_range(new_rad_cells):
 	
 	"""
 	# Multiply for enemies
-	if player_parent.player_id!=multiplayer.get_unique_id():
+	if not Overhaul.local_friendly(player_parent.player_id):
 		var material : CanvasItemMaterial = focus.material.duplicate()
 		focus.material = material
 		material.blend_mode=CanvasItemMaterial.BLEND_MODE_MUL
@@ -79,7 +79,7 @@ func draw_range(new_rad_cells):
 
 func _draw() -> void:
 	var color: Color = line.colors['purple'] #Color.MAGENTA
-	if player_parent.player_id!=multiplayer.get_unique_id():
+	if not Overhaul.local_friendly(player_parent.player_id):
 		color = line.colors['orange'] #Color.TOMATO
 	
 	
@@ -97,6 +97,11 @@ func _draw() -> void:
 	drawn = true
 
 func _process(delta: float) -> void:
+	if Overhaul.active() and is_instance_valid(player_parent):
+		var reveal: bool = player_parent.is_alive and (Overhaul.local_friendly(player_parent.player_id) or Overhaul.can_see(player_parent.global_position))
+		visible = reveal
+		if is_instance_valid(line):
+			line.visible = reveal
 	animation_timer+=delta/animation_full_time
 	if animation_timer>=1:
 		animation_timer=fmod(animation_timer,1)

@@ -40,6 +40,11 @@ func initialize(
 	for point in boundary_global:
 		boundary_local.append(point - centroid)
 
+	if Overhaul.active():
+		add_to_group("overhaul_effect")
+		set_meta("vision_owner", owner_player_id)
+		set_meta("vision_points", boundary_global)
+		visible = Overhaul.local_friendly(owner_player_id)
 	initialized = boundary_global.size() >= 3
 	queue_redraw()
 
@@ -70,6 +75,8 @@ func _update_player_effects() -> void:
 			continue
 
 		var target := child as Player
+		if not target.is_alive:
+			continue
 		var target_position := _get_player_hurtbox_position(target)
 		var inside := Geometry2D.is_point_in_polygon(
 			target_position,
@@ -121,7 +128,7 @@ func _get_player_hurtbox_position(target: Player) -> Vector2:
 
 
 func _apply_multiplier(target: Player, opening: bool) -> void:
-	var friendly := target.player_id == owner_player_id
+	var friendly: bool = Overhaul.friendly(target.player_id, owner_player_id)
 	var multiplier: float
 
 	if friendly:

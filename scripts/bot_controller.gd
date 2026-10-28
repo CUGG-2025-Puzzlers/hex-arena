@@ -252,10 +252,8 @@ func _place_basic_magic() -> void:
 	if bot.stats_update.current_mana < magic_stats.cost:
 		return
 
-	hex_cells.place_magic_in_cell_for_player.rpc(
-		cell,
-		place_type,
-		bot_player_id
+	hex_cells.try_place_magic_for_player.rpc_id(
+		1, HexCells.map_to_local(cell), place_type, bot.cell, bot.radius_cells, bot_player_id
 	)
 
 func _transform_neutral_magic(new_type: Magic.MagicType) -> void:

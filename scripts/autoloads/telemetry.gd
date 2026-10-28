@@ -40,6 +40,7 @@ var duel_number: int = 0
 var last_match_report: Dictionary = {}
 
 var _match_context: Dictionary = {}
+var _match_local_id: int = 1
 var _player_match_stats: Dictionary = {}
 var _ability_match_stats: Dictionary = {}
 
@@ -136,6 +137,7 @@ func mark_matchmaking_connected(role: String) -> void:
 
 
 func start_match(mode: String, properties: Dictionary = {}) -> void:
+	_match_local_id = multiplayer.get_unique_id()
 	current_match_id = _generate_id()
 	current_match_mode = mode
 	current_match_started_msec = Time.get_ticks_msec()
@@ -287,7 +289,7 @@ func end_match(properties: Dictionary = {}) -> void:
 		if not match_properties.has(key):
 			match_properties[key] = _match_context[key]
 
-	var local_id := multiplayer.get_unique_id()
+	var local_id := _match_local_id
 	var opponent_id := _find_opponent_id(local_id)
 	var local_stats := _get_player_stats(local_id).duplicate(true)
 	var opponent_stats := (

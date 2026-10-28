@@ -25,6 +25,8 @@ var bot_controller_script = preload("res://scripts/bot_controller.gd")
 
 var _players_spawn_node
 var arena_ready_peers: Dictionary = {}
+var _match_ended: bool = false
+var _players_spawned: bool = false
 
 # Local player info
 # Set these fields using some UI before creating/joining a game
@@ -54,6 +56,7 @@ func _ready() -> void:
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
+	multiplayer.server_disconnected.connect(_on_server_left)
 
 	local_ip = _find_local_ipv4()
 
@@ -99,8 +102,12 @@ func create_game(player_name: String):
 	print("Creating new game as host")
 
 	var server_peer = ENetMultiplayerPeer.new()
-	server_peer.create_server(DEFAULT_PORT, 2)
+	var error := server_peer.create_server(DEFAULT_PORT, 3)
+	if error != OK:
+		push_error("Could not host LAN match: " + error_string(error))
+		return
 	multiplayer.multiplayer_peer = server_peer
+	_active_transport = "enet_server"
 
 	player_info["name"] = player_name
 	players[1] = player_info
@@ -262,8 +269,14 @@ func setup_upnp(_port: int):
 @rpc("any_peer", "reliable")
 func _register_player(info):
 	var id = multiplayer.get_remote_sender_id()
+	if not info is Dictionary:
+		return
+	if players.has(id):
+		return
 	players[id] = info
 	player_connected.emit(id, info)
+	if multiplayer.is_server():
+		Overhaul.sync_to(id)
 
 # Unregisters a player
 # Removes a player from the player list
@@ -287,6 +300,8 @@ func _on_peer_disconnected(id: int):
 	print("Player %s left..." % id)
 
 	_unregister_player(id)
+	if multiplayer.is_server() and Overhaul.active():
+		Overhaul.get_match().finish(-1, "disconnect")
 
 func _on_connected_to_server():
 	var elapsed_ms := Time.get_ticks_msec() - _connection_started_msec
@@ -433,6 +448,12 @@ func select_character(character: Util.Character):
 @rpc("call_local", "any_peer", "reliable")
 func _set_character(character: Util.Character):
 	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id == 0:
+		sender_id = multiplayer.get_unique_id()
+	if not players.has(sender_id) or character not in [Util.Character.Zilo, Util.Character.Hekaset, Util.Character.WaterOrbA, Util.Character.WaterOrbB, Util.Character.Aurora]:
+		return
+	if Overhaul.active():
+		return
 	var _sender_is_local_client = sender_id == multiplayer.get_unique_id()
 	print("%s selected %s" % [MultiplayerManager.players[sender_id].name, Util.Character.keys()[character]])
 	_set_player_character(sender_id, character)
@@ -477,6 +498,15 @@ func _print_players():
 		print("Name: %s\nSelected Character: %s\n" % [players[player].name, Util.Character.keys()[players[player].character]])
 
 func _on_player_died(dead_player_id: int, end_reason: String = "normal") -> void:
+	if not multiplayer.is_server() or _match_ended:
+		return
+	if Overhaul.active():
+		if end_reason == "concede":
+			Overhaul.get_match().finish(1 - Overhaul.team_for(dead_player_id), "concede")
+		else:
+			Overhaul.get_match().on_death(dead_player_id)
+		return
+	_match_ended = true
 	var winner_name := ""
 	var winner_id := -1
 
@@ -532,7 +562,7 @@ func _get_player_health_pct(player_id: int) -> float:
 	)
 
 
-@rpc("any_peer", "call_local", "reliable")
+@rpc("authority", "call_local", "reliable")
 func _end_game(
 	winner_name: String,
 	winner_id: int,
@@ -561,6 +591,9 @@ func _end_game(
 	SceneManager.load_end_scene(winner_name)
 
 func _start_game() -> void:
+	Overhaul.local_peer_id = multiplayer.get_unique_id()
+	_match_ended = false
+	_players_spawned = false
 	_players_spawn_node = get_tree().get_current_scene().get_node("Players")
 	var local_character: Util.Character = player_info.get(
 		"character", Util.Character.None
@@ -569,7 +602,7 @@ func _start_game() -> void:
 	var opponent_character: Util.Character = Util.Character.None
 	if other_info != null:
 		opponent_character = other_info.get("character", Util.Character.None)
-	Telemetry.start_match("online_1v1", {
+	Telemetry.start_match("overhaul_2v2" if Overhaul.session_enabled and Overhaul.rules.player_count() == 4 else "online_1v1", {
 		"character": Util.get_character_display_name(local_character),
 		"opponent_character": Util.get_character_display_name(opponent_character),
 	})
@@ -610,6 +643,9 @@ func _mark_arena_ready(peer_id: int) -> void:
 
 
 func _spawn_players() -> void:
+	if _players_spawned:
+		return
+	_players_spawned = true
 	if not multiplayer.is_server():
 		return
 
@@ -618,7 +654,12 @@ func _spawn_players() -> void:
 		as MultiplayerSpawner
 	)
 
-	for player in players:
+	var spawn_ids := players.keys()
+	spawn_ids.sort()
+	for index in range(spawn_ids.size()):
+		var player = spawn_ids[index]
+		var team: int = index % 2
+		var slot: int = index / 2
 		var spawn_position := Vector2.ZERO
 
 		if player == 1:
@@ -626,7 +667,11 @@ func _spawn_players() -> void:
 		else:
 			spawn_position = Vector2(-200, -200)
 
+		if Overhaul.session_enabled:
+			spawn_position = Overhaul.spawn_position(team, slot)
 		var spawn_data := {
+			"team_id": team,
+			"spawn_slot": slot,
 			"id": player,
 			"name": players[player].name,
 			"character": players[player].character,
@@ -643,6 +688,7 @@ func _spawn_players() -> void:
 	arena_ready_peers.clear()
 
 func _start_bot_match():
+	_match_ended = false
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
 	var player_id := 1
@@ -792,6 +838,10 @@ func _spawn_player_from_data(data: Dictionary) -> Player:
 		_:
 			player_node = zilo.instantiate()
 
+	player_node.team_id = int(data.get("team_id", int(data["id"])))
+	player_node.spawn_slot = int(data.get("spawn_slot", 0))
+	if players.has(int(data["id"])):
+		players[int(data["id"])]["team_id"] = player_node.team_id
 	player_node.player_id = int(data["id"])
 	player_node.name = str(data["id"])
 	player_node.position = data.get("position", Vector2.ZERO)
@@ -800,6 +850,12 @@ func _spawn_player_from_data(data: Dictionary) -> Player:
 
 	# Server owns the actual player state.
 	player_node.set_multiplayer_authority(1)
+
+	if Overhaul.session_enabled:
+		for sync_name in ["PlayerSynchronizer", "InputSynchronizer"]:
+			var sync: MultiplayerSynchronizer = player_node.get_node(sync_name)
+			sync.set_meta("playtest_config", sync.replication_config)
+			sync.replication_config = SceneReplicationConfig.new()
 
 	# The owning client controls its input synchronizer.
 	var input_sync := player_node.get_node_or_null("InputSynchronizer")
@@ -843,3 +899,11 @@ func _setup_tutorial_camera_and_hud(
 			hud.call("connect_to_players", player_node, opponent_node)
 		else:
 			hud.connect_to_player(player_node)
+
+
+func _on_server_left() -> void:
+	server_disconnected.emit()
+	if Overhaul.active():
+		Overhaul.result_text = "Match ended: host disconnected"
+		Telemetry.end_match({"match_end_reason": "disconnect"})
+		Overhaul.get_match().show_disconnected()

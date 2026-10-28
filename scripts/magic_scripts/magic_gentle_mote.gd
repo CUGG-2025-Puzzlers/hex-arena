@@ -96,7 +96,7 @@ func _try_consume_player_area(area: Area2D) -> bool:
 		return false
 
 	var target := area.get_parent() as Player
-	if target == null:
+	if target == null or not target.is_alive:
 		return false
 
 	# The grace period only protects the caster from immediately catching a mote
@@ -123,6 +123,8 @@ func _find_homing_target() -> Player:
 			continue
 
 		var candidate := child as Player
+		if not candidate.is_alive:
+			continue
 		if candidate.player_id == player_id and lifetime_elapsed < self_hit_grace:
 			continue
 

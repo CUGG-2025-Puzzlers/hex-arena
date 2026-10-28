@@ -53,8 +53,9 @@ func _on_overhead_mana_changed(current: float, maximum: float) -> void:
 
 #==================== Health =====================
 func take_damage(amount: float) -> void:
+	var was_alive := current_health > 0.0
 	set_health(current_health - amount)
-	if current_health <= 0.0:
+	if was_alive and current_health <= 0.0:
 		deadgeLol.emit()
 
 func heal(amount: float) -> void:
@@ -66,13 +67,18 @@ func set_health(value: float) -> void:
 
 #==================== Mana =====================
 func use_mana(amount: float) -> bool:
-	if current_mana < amount:
+	if amount < 0.0 or current_mana < amount:
 		return false
 	set_mana(current_mana - amount)
 	return true
 
 # Inert, call from outside
 func _process(delta: float) -> void:
+	if Overhaul.active():
+		if Overhaul.get_match().phase != "active" or not get_parent().is_alive:
+			return
+		if not multiplayer.is_server():
+			return
 	# slowly regen mana
 	if current_mana < max_mana:
 		set_mana(current_mana + mana_regen_rate * delta)

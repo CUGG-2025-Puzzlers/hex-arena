@@ -278,7 +278,7 @@ func _resolve_player_hits(
 
 		var target: Player = child as Player
 
-		if target.player_id == player_id:
+		if Overhaul.friendly(target.player_id, player_id):
 			continue
 
 		var target_shape := (
@@ -469,7 +469,7 @@ func _resolve_magic_hits(
 			continue
 
 		var should_collide: bool = (
-			target.player_id != player_id
+			not Overhaul.friendly(target.player_id, player_id)
 			or collides_w_own
 			or target.collides_w_own
 		)

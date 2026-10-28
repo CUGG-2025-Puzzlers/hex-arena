@@ -17,13 +17,14 @@ func load_account_page() -> void:
 
 func load_arena() -> void:
 	var tree := get_tree()
-	tree.change_scene_to_file("res://scenes/arena.tscn")
+	tree.change_scene_to_file("res://scenes/rework_arena.tscn" if Overhaul.session_enabled else "res://scenes/arena.tscn")
 	await tree.scene_changed
 	await tree.process_frame
 	MultiplayerManager._start_game()
 
 
 func load_bot_match() -> void:
+	Overhaul.reset_for_legacy()
 	var tree := get_tree()
 	tree.change_scene_to_file("res://scenes/arena.tscn")
 	await tree.scene_changed
@@ -32,6 +33,7 @@ func load_bot_match() -> void:
 
 
 func load_tutorial() -> void:
+	Overhaul.reset_for_legacy()
 	var tree := get_tree()
 	tree.change_scene_to_file("res://scenes/tutorial/tutorial_arena.tscn")
 	await tree.scene_changed

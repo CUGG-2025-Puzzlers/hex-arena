@@ -48,7 +48,7 @@ func visualize_shield():
 	shield_animated_texture = find_child("Shield Glow").texture.duplicate()
 	find_child("Shield Glow").texture = shield_animated_texture
 	
-	if player_id!=multiplayer.get_unique_id():
+	if not Overhaul.local_friendly(player_id):
 		var pattern: Polygon2D = find_child("Shield Pattern")
 		var glow: Polygon2D = find_child("Shield Glow")
 		

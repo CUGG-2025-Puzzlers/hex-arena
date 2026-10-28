@@ -23,6 +23,10 @@ const SELECT_CHARACTER := "Select Character"
 
 var _bot_mode := false
 var _selection_target_id := 1
+var _preset_select: OptionButton
+var _vision_check: CheckButton
+var _team_roster: Label
+var _refresh_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -48,6 +52,8 @@ func _ready() -> void:
 	else:
 		_setup_online_mode()
 
+	if not _bot_mode:
+		_build_playtest_controls()
 	_check_players_ready()
 	_update_back_button_text()
 	Telemetry.track("character_select_viewed", {
@@ -171,7 +177,7 @@ func _on_start_pressed() -> void:
 	if _bot_mode:
 		Telemetry.track("bot_match_confirmed")
 		SceneManager.load_bot_match()
-	else:
+	elif multiplayer.is_server() and _players_are_ready():
 		_start_game.rpc()
 
 
@@ -190,7 +196,7 @@ func _on_back_pressed() -> void:
 	SceneManager.load_title()
 
 
-@rpc("call_local", "any_peer", "reliable")
+@rpc("call_local", "authority", "reliable")
 func _start_game() -> void:
 	SceneManager.load_arena()
 
@@ -225,17 +231,63 @@ func _update_back_button_text() -> void:
 	)
 
 
+func _players_are_ready() -> bool:
+	var expected: int = 2 if _bot_mode else Overhaul.rules.player_count()
+	if MultiplayerManager.players.size() != expected:
+		return false
+	for id in MultiplayerManager.players:
+		if MultiplayerManager.players[id].character == Util.Character.None:
+			return false
+	return true
+
 func _check_players_ready() -> void:
-	if MultiplayerManager.players.size() < 2:
-		_start_button.hide()
+	_start_button.visible = (_bot_mode or multiplayer.is_server()) and _players_are_ready()
+
+func _build_playtest_controls() -> void:
+	var layer := CanvasLayer.new()
+	add_child(layer)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(650, 35)
+	panel.custom_minimum_size = Vector2(620, 150)
+	layer.add_child(panel)
+	var box := VBoxContainer.new()
+	panel.add_child(box)
+	_preset_select = OptionButton.new()
+	for title in ["A — Original duel", "B — Vision duel / new map", "C — 2v2 control / respawns"]:
+		_preset_select.add_item(title)
+	_preset_select.set_item_disabled(2, MultiplayerManager._active_transport.begins_with("eos"))
+	_preset_select.disabled = not multiplayer.is_server()
+	box.add_child(_preset_select)
+	_vision_check = CheckButton.new()
+	_vision_check.text = "Limited vision (uncheck for same-map comparison)"
+	_vision_check.disabled = not multiplayer.is_server()
+	box.add_child(_vision_check)
+	_team_roster = Label.new()
+	_team_roster.add_theme_font_size_override("font_size", 19)
+	box.add_child(_team_roster)
+	_preset_select.item_selected.connect(func(value: int): Overhaul.set_preset(value, _vision_check.button_pressed))
+	_vision_check.toggled.connect(func(value: bool): Overhaul.set_preset(_preset_select.selected, value))
+	Overhaul.settings_changed.connect(_refresh_playtest_controls)
+	_refresh_playtest_controls()
+
+func _process(delta: float) -> void:
+	if _bot_mode or _team_roster == null:
 		return
+	_refresh_timer -= delta
+	if _refresh_timer <= 0.0:
+		_refresh_timer = 0.25
+		_refresh_playtest_controls()
 
-	for player_id in MultiplayerManager.players:
-		if (
-			MultiplayerManager.players[player_id].character
-			== Util.Character.None
-		):
-			_start_button.hide()
-			return
-
-	_start_button.show()
+func _refresh_playtest_controls() -> void:
+	if _preset_select == null:
+		return
+	_preset_select.select(Overhaul.rules.preset)
+	_vision_check.set_pressed_no_signal(Overhaul.rules.limited_vision)
+	var ids := MultiplayerManager.players.keys()
+	ids.sort()
+	var lines := PackedStringArray()
+	for i in range(ids.size()):
+		var info: Dictionary = MultiplayerManager.players[ids[i]]
+		lines.append("%s · %s — %s" % ["Blue" if i % 2 == 0 else "Red", info.name, Util.get_character_display_name(info.character)])
+	_team_roster.text = "2v2 uses LAN / direct connect\n" + "\n".join(lines) + "\n%d / %d players · host starts when everyone selects" % [ids.size(), Overhaul.rules.player_count()]
+	_check_players_ready()

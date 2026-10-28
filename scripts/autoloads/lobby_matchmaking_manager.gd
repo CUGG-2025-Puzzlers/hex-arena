@@ -6,7 +6,7 @@ signal lobby_joined(lobby: HLobby)
 signal lobby_hidden(lobby: HLobby)
 signal quick_match_status(message: String)
 
-const EosCredentials = preload("res://scripts/eos/EosCredentials.gd")
+var EosCredentials: Script = load("res://scripts/eos/EosCredentials.gd") if FileAccess.file_exists("res://scripts/eos/EosCredentials.gd") else preload("res://scripts/eos/EosCredentialsTemplate.gd")
 
 const BUCKET_ID := "hex_arena_duel_v1"
 const MODE := "duel"

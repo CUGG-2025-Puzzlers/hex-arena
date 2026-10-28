@@ -179,6 +179,9 @@ func _refresh_gameplay_state() -> void:
 	if players_node == null:
 		return
 
+	var peer := multiplayer.multiplayer_peer
+	if peer == null or peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
 	var local_id := multiplayer.get_unique_id()
 	for child: Node in players_node.get_children():
 		if child is Player and (child as Player).player_id == local_id:

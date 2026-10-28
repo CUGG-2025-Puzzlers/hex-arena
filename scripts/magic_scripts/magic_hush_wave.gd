@@ -134,7 +134,7 @@ func _resolve_swept_hits(previous_front: float, current_front: float) -> void:
 
 		if target == null:
 			continue
-		if target.player_id == player_id:
+		if Overhaul.friendly(target.player_id, player_id):
 			continue
 		if hit_player_ids.has(target.player_id):
 			continue

@@ -13,7 +13,7 @@ var EosSetup = false
 
 var local_lobby: HLobby
 
-const EosCredentials = preload("res://scripts/eos/EosCredentials.gd")
+var EosCredentials: Script = load("res://scripts/eos/EosCredentials.gd") if FileAccess.file_exists("res://scripts/eos/EosCredentials.gd") else preload("res://scripts/eos/EosCredentialsTemplate.gd")
 
 func _ready() -> void:
 	display.text = "Starting"

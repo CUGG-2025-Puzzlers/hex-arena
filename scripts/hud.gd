@@ -40,7 +40,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	player_status_label.text = _get_status_text(player)
+	player_status_label.text = _get_status_text(player) if is_instance_valid(player) else ""
 
 
 func _unhandled_input(event: InputEvent) -> void:

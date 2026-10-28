@@ -24,6 +24,10 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if not Overhaul.accepts_input(player_id):
+		direction = Vector2.ZERO
+		use_ability = false
+		return
 	direction = Input.get_vector("left", "right", "up", "down")
 
 

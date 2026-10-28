@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 			cooldown_finished.emit()
 
 func try_activate() -> bool:
-	if is_on_cooldown or is_active:
+	if is_on_cooldown or is_active or player.is_gameplay_input_blocked():
 		return false
 	if not can_activate():
 		return false
@@ -75,3 +75,18 @@ func get_aim_direction() -> Vector2:
 func get_aim_distance() -> float:
 	var mouse_pos = player.get_global_mouse_position()
 	return player.global_position.distance_to(mouse_pos)
+
+
+func reset_for_respawn() -> void:
+	if self is DashAbility:
+		(self as DashAbility).cancel_dash()
+	if self is GhostAbility:
+		(self as GhostAbility)._deactivate()
+	if self is TeleportAbility:
+		(self as TeleportAbility)._cleanup_channel()
+	if self is PrismaticStillness:
+		(self as PrismaticStillness)._set_visual(false)
+	is_active = false
+	is_on_cooldown = false
+	cooldown_remaining = 0.0
+	cooldown_finished.emit()

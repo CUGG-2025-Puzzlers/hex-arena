@@ -61,7 +61,7 @@ func _draw() -> void:
 	var red := Color(0.92, 0.874, 0.876, 1.0)
 	var dark_red := Color(0.77, 0.0, 0.077, 1.0)
 
-	if is_active:
+	if is_active and (not Overhaul.active() or Overhaul.can_see(_cast_origin_global)):
 		var origin_local := to_local(_cast_origin_global)
 		draw_line(origin_local, Vector2(-8.0, 0.0), dark_red, 11.0, true)
 		draw_line(origin_local, Vector2(-8.0, 0.0), red, 6.0, true)

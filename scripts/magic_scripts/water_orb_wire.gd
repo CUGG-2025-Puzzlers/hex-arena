@@ -47,6 +47,11 @@ func configure(
 
 	add_to_group("water_orb_wire")
 	_update_geometry()
+	if Overhaul.active():
+		add_to_group("overhaul_effect")
+		set_meta("vision_owner", player_id)
+		set_meta("vision_points", PackedVector2Array([endpoint_a.global_position, endpoint_b.global_position]))
+		visible = Overhaul.local_friendly(player_id) or (Overhaul.can_see(endpoint_a.global_position) and Overhaul.can_see(endpoint_b.global_position))
 	queue_redraw()
 
 
@@ -61,6 +66,11 @@ func _process(delta: float) -> void:
 		return
 
 	_update_geometry()
+	if Overhaul.active():
+		add_to_group("overhaul_effect")
+		set_meta("vision_owner", player_id)
+		set_meta("vision_points", PackedVector2Array([endpoint_a.global_position, endpoint_b.global_position]))
+		visible = Overhaul.local_friendly(player_id) or (Overhaul.can_see(endpoint_a.global_position) and Overhaul.can_see(endpoint_b.global_position))
 	queue_redraw()
 
 
@@ -193,7 +203,7 @@ func _on_area_exited(area: Area2D) -> void:
 func _handle_player_entered(target: Player) -> void:
 	if variant != WireVariant.RAZOR_CURRENT:
 		return
-	if target.player_id == player_id:
+	if Overhaul.friendly(target.player_id, player_id):
 		return
 
 	var target_id := target.get_instance_id()
@@ -209,7 +219,7 @@ func _handle_player_entered(target: Player) -> void:
 
 
 func _handle_magic_entered(projectile: Magic) -> void:
-	if projectile.player_id == player_id:
+	if Overhaul.friendly(projectile.player_id, player_id):
 		return
 	if not projectile.can_be_cut_by_wire():
 		return

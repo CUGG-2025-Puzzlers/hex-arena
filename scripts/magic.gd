@@ -22,6 +22,8 @@ var self_cell: Vector2i
 var player_owner : Player
 var player_id : int = -1
 var telemetry_name: String = ""
+var _last_wall_position: Vector2
+var _wall_tracking_ready: bool = false
 
 const ENEMY_MAGIC_TINT := Color(0.819, 0.205, 0.204, 1.0)
 
@@ -114,14 +116,14 @@ func _apply_readability_style(style: String) -> void:
 	if player_id <= 0:
 		return
 
-	var is_enemy := player_id != multiplayer.get_unique_id()
-	var outline_enabled := style == GameManager.READABILITY_STYLE_OUTLINE
+	var is_enemy: bool = not Overhaul.local_friendly(player_id)
+	var outline_enabled: bool = style == GameManager.READABILITY_STYLE_OUTLINE
 
 	# Baseline reproduces the current full red modulation exactly. Outline mode
 	# restores authored colors and communicates ownership only at sprite edges.
 	modulate = Color.WHITE if outline_enabled or not is_enemy else ENEMY_MAGIC_TINT
 
-	var outline_color := (
+	var outline_color: Color = (
 		GameManager.ENEMY_OUTLINE_COLOR
 		if is_enemy
 		else GameManager.LOCAL_OUTLINE_COLOR
@@ -230,8 +232,14 @@ func _advance_rolling(delta: float):
 
 # Update each callable function in process_callables every frame
 func _process(delta: float) -> void:
+	var previous := _last_wall_position if _wall_tracking_ready else global_position
 	for custom_function in process_callables:
 		custom_function.call(delta)
+	if rolling and Overhaul.active() and not is_queued_for_deletion():
+		if not PlaytestVisionMask.has_line_of_sight(previous, global_position, Overhaul.get_match().walls):
+			fizzle()
+	_last_wall_position = global_position
+	_wall_tracking_ready = true
 
 # Creates a path to (dir * dist) with random deviations
 static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
@@ -280,7 +288,7 @@ static func create_wiggly_path(dir: Vector2, dist: float) -> PackedVector2Array:
 # Take damage when colliding with other magic
 func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group('magic') and \
-	(not area.player_id==player_id \
+	(not Overhaul.friendly(area.player_id, player_id) \
 	or collides_w_own or area.collides_w_own):
 		take_damage(area.damage)
 
@@ -299,6 +307,10 @@ func fizzle():
 	
 	if is_instance_valid(get_tree()) and is_instance_valid(get_tree().current_scene):
 		magic_particles_instance.reparent(get_tree().current_scene)
+		if Overhaul.active():
+			magic_particles_instance.add_to_group("overhaul_effect")
+			magic_particles_instance.set_meta("vision_owner", player_id)
+			magic_particles_instance.visible = Overhaul.local_friendly(player_id) or Overhaul.can_see(global_position)
 		magic_particles_instance.finished.connect(magic_particles_instance.queue_free)
 		magic_particles_instance.restart()
 	

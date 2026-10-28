@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/arena.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/playtest/playtest_match.gd" id="2"]
+
+[node name="Arena" instance=ExtResource("1")]
+
+[node name="MultiplayerSpawner" parent="." index="4"]
+spawn_limit = 4
+
+[node name="PlaytestMatch" type="Node2D" parent="."]
+script = ExtResource("2")

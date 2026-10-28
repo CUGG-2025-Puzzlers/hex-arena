@@ -28,6 +28,11 @@ var _move_modifiers: Dictionary = {}
 var _fading_modifier_versions: Dictionary = {}
 
 var display_name: String = "Player"
+var team_id: int = -1
+var spawn_slot: int = 0
+var is_alive: bool = true
+var spawn_protection: float = 0.0
+var last_damage_time: float = -100.0
 
 var player_id: int:
 	set(value):
@@ -63,9 +68,9 @@ func _apply_readability_style(style: String) -> void:
 	if sprite == null:
 		return
 
-	var outline_enabled := style == GameManager.READABILITY_STYLE_OUTLINE
-	var is_enemy := player_id != multiplayer.get_unique_id()
-	var outline_color := (
+	var outline_enabled: bool = style == GameManager.READABILITY_STYLE_OUTLINE
+	var is_enemy: bool = not Overhaul.local_friendly(player_id)
+	var outline_color: Color = (
 		GameManager.ENEMY_OUTLINE_COLOR
 		if is_enemy
 		else GameManager.LOCAL_OUTLINE_COLOR
@@ -74,6 +79,9 @@ func _apply_readability_style(style: String) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not is_alive or not Overhaul.accepts_input(player_id):
+		velocity = Vector2.ZERO
+		return
 	# Root stops movement but does not disable MultiplayerInput, so the player
 	# can still place, transform, and fire magic.
 	if is_rooted():
@@ -187,6 +195,8 @@ func is_dashing() -> bool:
 
 
 func is_invulnerable() -> bool:
+	if not is_alive or spawn_protection > 0.0:
+		return true
 	if _ability != null and _ability.grants_invulnerability():
 		return true
 
@@ -205,14 +215,15 @@ func is_silenced() -> bool:
 
 func is_gameplay_input_blocked() -> bool:
 	return (
-		is_silenced()
+		not is_alive
+		or not Overhaul.accepts_input(player_id)
+		or is_silenced()
 		or (_ability != null and _ability.blocks_gameplay_input())
 	)
 
 
 func is_friendly_to(other: Player) -> bool:
-	# Current game is 1v1. Replace this comparison with team_id later.
-	return other != null and player_id == other.player_id
+	return other != null and Overhaul.friendly(player_id, other.player_id)
 
 
 func get_move_speed_multiplier() -> float:
@@ -227,6 +238,8 @@ func is_rooted() -> bool:
 
 
 func _on_area_entered(area: Area2D) -> void:
+	if not is_alive or (area is Magic and Overhaul.friendly(area.player_id, player_id)):
+		return
 	# Reform behaves as a brief liquid/untargetable dash. Zilo's ordinary
 	# Dash does not enter this branch because it is not a ReformAbility.
 	if area is Magic:
@@ -293,6 +306,8 @@ func _apply_root(
 	source_player_id: int = -1,
 	source_ability: String = ""
 ) -> void:
+	if not is_alive or (source_player_id > 0 and Overhaul.friendly(source_player_id, player_id)):
+		return
 	var now := Time.get_ticks_msec()
 	var old_until := rooted_until_msec
 	rooted_until_msec = maxi(old_until, now + int(duration * 1000.0))
@@ -314,8 +329,10 @@ func _apply_damage(
 ) -> void:
 	# Explicit attacks such as Tideblade, Pressure Lance, Burst, and Razor Wire
 	# call this directly, so the Reform invulnerability check belongs here too.
-	if is_invulnerable() or amount <= 0.0:
+	if is_invulnerable() or amount <= 0.0 or (source_player_id > 0 and Overhaul.friendly(source_player_id, player_id)):
 		return
+	if Overhaul.active():
+		last_damage_time = Overhaul.get_match().elapsed
 
 	var actual_damage := minf(amount, stats_update.current_health)
 	Telemetry.record_damage(source_player_id, player_id, actual_damage, source_ability)
@@ -335,7 +352,7 @@ func _apply_heal(
 	source_player_id: int = -1,
 	source_ability: String = ""
 ) -> void:
-	if amount <= 0.0:
+	if not is_alive or amount <= 0.0:
 		return
 	var before := stats_update.current_health
 	stats_update.heal(amount)
@@ -358,6 +375,8 @@ func _apply_silence(
 	source_player_id: int = -1,
 	source_ability: String = ""
 ) -> void:
+	if not is_alive or (source_player_id > 0 and Overhaul.friendly(source_player_id, player_id)):
+		return
 	if duration <= 0.0:
 		return
 	var now := Time.get_ticks_msec()

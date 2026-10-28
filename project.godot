@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Hex Arena"
 config/version="0.1.0-dev"
-run/main_scene="uid://bxue7p844nv7d"
+run/main_scene="res://scenes/title_screen.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/image="uid://deca7ssjqvdbx"
 config/icon="uid://bscr3k6xsv6oy"
@@ -24,25 +24,26 @@ boot_splash/minimum_display_time=1600
 
 [autoload]
 
-Util="*uid://bu4y4hlan006c"
-SceneManager="*uid://bosapdapain4b"
-MultiplayerManager="*uid://dhwwc4t2mdyga"
-GameManager="*uid://cvimhpwolfbnu"
-Events="*uid://brxpdvd1ijwfd"
+Util="*res://scripts/autoloads/util.gd"
+SceneManager="*res://scripts/autoloads/scene_manager.gd"
+MultiplayerManager="*res://scripts/autoloads/multiplayer_manager.gd"
+GameManager="*res://scripts/autoloads/game_manager.gd"
+Events="*res://scripts/autoloads/events.gd"
+Overhaul="*res://scripts/playtest/overhaul.gd"
 Telemetry="*res://scripts/autoloads/telemetry.gd"
 FireDirectionDebug="*res://debug/fire_direction_debug.tscn"
-Music="*uid://cqx5k3psrd4xg"
+Music="*res://scenes/music.tscn"
 LobbyMatchmakingManager="*res://scripts/autoloads/lobby_matchmaking_manager.gd"
-EOSGRuntime="*uid://7saywdx0ipep"
-HPlatform="*uid://yl2muvqrdiud"
-HAuth="*uid://786t1jiowvvg"
-HAchievements="*uid://bis404dty5u5c"
-HFriends="*uid://uumqbey8ji5t"
-HStats="*uid://dbckdip83oone"
-HLeaderboards="*uid://b06khhf20mplm"
-HLobbies="*uid://6iqvm33q0tb1"
-HP2P="*uid://u6ae5fpm6l8q"
-HSessions="*uid://bieh2rxxahuu2"
+EOSGRuntime="*res://addons/epic-online-services-godot/runtime.gd"
+HPlatform="*res://addons/epic-online-services-godot/heos/hplatform.gd"
+HAuth="*res://addons/epic-online-services-godot/heos/hauth.gd"
+HAchievements="*res://addons/epic-online-services-godot/heos/hachievements.gd"
+HFriends="*res://addons/epic-online-services-godot/heos/hfriends.gd"
+HStats="*res://addons/epic-online-services-godot/heos/hstats.gd"
+HLeaderboards="*res://addons/epic-online-services-godot/heos/hleaderboards.gd"
+HLobbies="*res://addons/epic-online-services-godot/heos/hlobbies.gd"
+HP2P="*res://addons/epic-online-services-godot/heos/hp2p.gd"
+HSessions="*res://addons/epic-online-services-godot/heos/hsessions.gd"
 
 [display]
 

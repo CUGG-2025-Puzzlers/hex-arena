@@ -87,6 +87,9 @@ func _set_firing_progress(value: float) -> void:
 
 func _fire_lance() -> void:
 	beam_visible = true
+	if Overhaul.active():
+		var endpoint := PlaytestVisionMask.clip_segment(global_position, global_position + firing_direction * beam_range, Overhaul.get_match().walls)
+		effective_beam_range = global_position.distance_to(endpoint)
 	var blocker := _find_blocking_shield()
 	if blocker != null:
 		var offset := blocker.global_position - global_position
@@ -114,7 +117,7 @@ func _find_blocking_shield() -> MagicShield:
 
 		var offset := shield.global_position - global_position
 		var forward_distance := offset.dot(firing_direction)
-		if forward_distance <= 0.0 or forward_distance > beam_range:
+		if forward_distance <= 0.0 or forward_distance > effective_beam_range:
 			continue
 
 		var perpendicular_distance := absf(firing_direction.cross(offset))
@@ -146,7 +149,7 @@ func _resolve_player_hits() -> void:
 			continue
 
 		var target := child as Player
-		if target.player_id == player_id:
+		if Overhaul.friendly(target.player_id, player_id):
 			continue
 
 		var target_position := target.global_position
@@ -169,7 +172,7 @@ func _resolve_magic_hits(blocker: MagicShield) -> void:
 			continue
 
 		var target := node as Magic
-		if target == self or target == blocker or target.player_id == player_id:
+		if target == self or target == blocker or Overhaul.friendly(target.player_id, player_id):
 			continue
 		if target.is_queued_for_deletion():
 			continue

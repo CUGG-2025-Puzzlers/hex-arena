@@ -21,7 +21,7 @@ func _activate_if_ready() -> void:
 	activation_pending = false
 
 	var owner := get_parent() as Player
-	if owner == null:
+	if owner == null or not owner.is_alive:
 		return
 
 	var cells: Array[Vector2i] = []

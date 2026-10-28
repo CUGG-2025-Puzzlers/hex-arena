@@ -106,16 +106,18 @@ func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_stat
 	if not multiplayer.is_server():
 		return false
 
-	var change_around_cell = local_to_map(pos)
-
-	var player_owner: Player = null
-	var player_cell: Vector2i = local_to_map(pos)
-	var other_player_cells = []
-	for player in get_tree().current_scene.find_child("Players").get_children():
-		if player.player_id == player_id:
-			player_owner = player
-		else:
-			other_player_cells.append(local_to_map(player.get_node("CollisionShape2D").global_position))
+	var player_owner := _validated_owner(player_id)
+	if player_owner == null:
+		return false
+	pos = player_owner.get_node("CollisionShape2D").global_position
+	radius_cells = player_owner.radius_cells
+	mana = player_owner.stats_update.current_mana
+	var change_around_cell := local_to_map(pos)
+	var player_cell := change_around_cell
+	var other_player_cells: Array = []
+	for other in get_tree().current_scene.get_node("Players").get_children():
+		if other is Player and other.is_alive and not player_owner.is_friendly_to(other):
+			other_player_cells.append(local_to_map(other.global_position))
 
 	var surrounding_cells = radius_cells.duplicate()
 	for i in range(len(surrounding_cells)):
@@ -148,9 +150,9 @@ func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_stat
 			not (cell_to_check==player_cell and new_state==Magic.MagicType.PASSIVE):
 				var cost = magic_instance.change_state_cost(new_state)
 				if cost>=0 and mana>=cost:
-					change_magic_in_cell_for_player.rpc(cell_to_check, new_state, player_id)
-
 					player_owner._use_mana.rpc(cost)
+					player_owner.spawn_protection = 0.0
+					change_magic_in_cell_for_player.rpc(cell_to_check, new_state, player_id)
 					mana-=cost
 				else:
 					continue
@@ -178,6 +180,16 @@ player_cell:Vector2i, radius_cells: Array, _player_id: int):
 	if not multiplayer.is_server():
 		return false
 
+	var owner := _validated_owner(_player_id)
+	if owner == null or type != owner.preset.default_state_to_place:
+		return false
+	var stats := owner.preset.magics.get(type) as MagicStats
+	if stats == null or owner.stats_update.current_mana < stats.cost:
+		return false
+	player_cell = local_to_map(owner.get_node("CollisionShape2D").global_position)
+	radius_cells = owner.radius_cells
+	if Overhaul.active() and Overhaul.get_match().point_blocked(map_to_local(local_to_map(mouse_pos))):
+		return false
 	var player_pos = map_to_local(player_cell)
 	var cell_to_place = local_to_map(mouse_pos)
 
@@ -204,6 +216,8 @@ player_cell:Vector2i, radius_cells: Array, _player_id: int):
 		return false
 	"""
 
+	owner._use_mana.rpc(stats.cost)
+	owner.spawn_protection = 0.0
 	place_magic_in_cell_for_player.rpc(cell_to_place, type, _player_id)
 	return true
 
@@ -221,8 +235,6 @@ func place_magic_in_cell_for_player(cell: Vector2i, type: Magic.MagicType, playe
 	magic_instance.place_instance_for_player(cell, player_owner, player_owner.preset.magics[type])
 	Telemetry.record_magic_placed(player_id, magic_instance.get_telemetry_name())
 
-	if multiplayer.is_server():
-		player_owner._use_mana.rpc(magic_instance.own_cost)
 
 	if player_id == multiplayer.get_unique_id():
 		Magic.last_placed_cell = cell
@@ -230,12 +242,37 @@ func place_magic_in_cell_for_player(cell: Vector2i, type: Magic.MagicType, playe
 		last_magic.visible = true
 		last_magic.reset_timer(cell)
 
-@rpc("call_local","any_peer","reliable")
-func launch_magic_in_cell(cell: Vector2i, wiggly_path_points: PackedVector2Array, player_id: int):
-	for magic_instance in get_tree().get_nodes_in_group('magic'):
-		if is_instance_valid(magic_instance) and magic_instance.player_id==player_id and magic_instance.self_cell == cell:
+func _validated_owner(id: int) -> Player:
+	var sender := multiplayer.get_remote_sender_id()
+	# Local host/bot commands report 0. Remote peers cannot act as another player.
+	var server_bot: bool = multiplayer.is_server() and sender == multiplayer.get_unique_id() and MultiplayerManager.players.get(id, {}).get("is_bot", false)
+	if sender != 0 and sender != id and not server_bot:
+		return null
+	var owner := get_node_or_null("../Players/" + str(id)) as Player
+	if owner == null or owner.is_gameplay_input_blocked():
+		return null
+	return owner
+
+@rpc("call_local", "any_peer", "reliable")
+func launch_magic_in_cell(cell: Vector2i, points: PackedVector2Array, player_id: int) -> void:
+	if not multiplayer.is_server() or _validated_owner(player_id) == null:
+		return
+	if points.size() < 2 or points.size() > 128:
+		return
+	for point in points:
+		if not point.is_finite() or point.length() > 3200.0:
+			return
+	if not points[0].is_zero_approx():
+		return
+	_validated_owner(player_id).spawn_protection = 0.0
+	_launch_approved.rpc(cell, points, player_id)
+
+@rpc("call_local", "authority", "reliable")
+func _launch_approved(cell: Vector2i, points: PackedVector2Array, player_id: int) -> void:
+	for magic_instance in get_tree().get_nodes_in_group("magic"):
+		if magic_instance is Magic and magic_instance.player_id == player_id and magic_instance.self_cell == cell and not magic_instance.rolling:
 			Telemetry.record_magic_fired(player_id, magic_instance.get_telemetry_name())
-			magic_instance.start_rolling(wiggly_path_points)
+			magic_instance.start_rolling(points)
 
 
 static func get_hex_points_around(pos: Vector2i):

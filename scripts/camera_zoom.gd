@@ -61,6 +61,8 @@ func _wait_for_players() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Overhaul.active():
+		return
 	if not camera_ready or GameManager.camera_profile != GameManager.CAMERA_PROFILE_LEAGUE:
 		_dragging = false
 		return
@@ -89,6 +91,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	if Overhaul.active() and is_instance_valid(this_player):
+		zoom = Vector2.ONE
+		if this_player.is_alive:
+			global_position = this_player.global_position
+		return
 	if not camera_ready or not is_instance_valid(this_player):
 		return
 

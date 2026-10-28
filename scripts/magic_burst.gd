@@ -49,7 +49,7 @@ func _resolve_hits() -> void:
 			continue
 
 		var target := child as Player
-		if target.player_id == player_id:
+		if Overhaul.friendly(target.player_id, player_id):
 			continue
 
 		var target_position := target.global_position
@@ -81,7 +81,7 @@ func _resolve_magic_breaks(blast_radius: float) -> void:
 		var target := node as Magic
 		if (
 			target == self
-			or target.player_id == player_id
+			or Overhaul.friendly(target.player_id, player_id)
 			or target.is_queued_for_deletion()
 			or global_position.distance_to(target.global_position) > blast_radius
 		):
