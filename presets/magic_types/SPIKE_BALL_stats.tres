@@ -10,6 +10,6 @@ magic_name = "Spikes"
 cost = 10.0
 scene = ExtResource("1_lnpw5")
 health = 40.0
-damage = 100.0
+damage = 80.0
 speed = 270.0
 metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

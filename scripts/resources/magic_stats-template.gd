@@ -6,8 +6,10 @@ class_name MagicStats
 @export var type: Magic.MagicType = Magic.MagicType.NONE
 
 @export var magic_name : String = ""
+@export var icon: Texture2D
 
 @export var cost: float = 0.
+@export var cost_text: String = ""
 
 @export var scene: PackedScene = null
 
@@ -27,10 +29,9 @@ class_name MagicStats
 		for key in val:
 			var value = val[key]
 			if value and not (value is MagicStats):
-				if Engine.is_editor_hint():
-					var dialog = AcceptDialog.new()
-					dialog.dialog_text = "Bad Value Assignment!\nThis slot only accepts MagicStats resources."
-					EditorInterface.get_base_control().add_child(dialog)
-					dialog.popup_centered()
+				push_warning(
+					"Bad Value Assignment! "
+					+ "This slot only accepts MagicStats resources."
+				)
 				val[key] = null
 		transform_dict = val

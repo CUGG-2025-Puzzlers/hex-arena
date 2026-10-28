@@ -1,14 +1,37 @@
-[gd_scene format=3 uid="uid://g25v82bkmahc"]
+[gd_scene load_steps=6 format=3 uid="uid://g25v82bkmahc"]
 
 [ext_resource type="Script" uid="uid://bmfw4hrvppjof" path="res://scripts/characters/stats_component.gd" id="1_24taq"]
 [ext_resource type="PackedScene" uid="uid://dbkuln5v5ie2q" path="res://scenes/character_scenes/overhead_hp.tscn" id="2_0cxdj"]
 
-[node name="StatsComponent" type="Control" unique_id=446455754 node_paths=PackedStringArray("OverheadHp", "NameLabel")]
+[sub_resource type="StyleBoxFlat" id="BarsBacking"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0.01, 0.01, 0.015, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="ManaBackground"]
+bg_color = Color(0.025, 0.025, 0.03, 1)
+
+[sub_resource type="StyleBoxFlat" id="ManaFill"]
+bg_color = Color(0.16, 0.43, 0.95, 1)
+
+[node name="StatsComponent" type="Control" unique_id=446455754 node_paths=PackedStringArray("OverheadHp", "OverheadMana", "NameLabel")]
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1_24taq")
-OverheadHp = NodePath("MarginContainer/VBoxContainer/OverheadHp")
+OverheadHp = NodePath("MarginContainer/VBoxContainer/BarsBacking/Bars/OverheadHp")
+OverheadMana = NodePath("MarginContainer/VBoxContainer/BarsBacking/Bars/OverheadMana")
 NameLabel = NodePath("MarginContainer/VBoxContainer/NameLabel")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=739327049]
@@ -29,6 +52,7 @@ theme_override_constants/margin_bottom = 92
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+theme_override_constants/separation = 1
 
 [node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=627219388]
 custom_minimum_size = Vector2(150, 23)
@@ -38,8 +62,25 @@ text = "abc"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="OverheadHp" parent="MarginContainer/VBoxContainer" unique_id=1343235313 instance=ExtResource("2_0cxdj")]
+[node name="BarsBacking" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("BarsBacking")
+
+[node name="Bars" type="VBoxContainer" parent="MarginContainer/VBoxContainer/BarsBacking"]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="OverheadHp" parent="MarginContainer/VBoxContainer/BarsBacking/Bars" unique_id=1343235313 instance=ExtResource("2_0cxdj")]
 z_index = 10
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 8
+
+[node name="OverheadMana" type="ProgressBar" parent="MarginContainer/VBoxContainer/BarsBacking/Bars"]
+custom_minimum_size = Vector2(104, 4)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("ManaBackground")
+theme_override_styles/fill = SubResource("ManaFill")
+value = 100.0
+show_percentage = false

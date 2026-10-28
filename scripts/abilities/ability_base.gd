@@ -10,6 +10,7 @@ signal ability_ended
 
 @export var cooldown_duration : float = 250.0
 @export var ability_name : String = "mobility_buff"
+@export var ability_icon: Texture2D = preload("res://assets/ui/icons/shift_ability.svg")
 @export var input_action : String = ""
 
 var is_on_cooldown: bool = false
@@ -40,6 +41,7 @@ func try_activate() -> bool:
 	if not can_activate():
 		return false
 	_execute()
+	Telemetry.record_ability_cast(player.player_id, ability_name)
 	ability_activated.emit()
 	_start_cooldown()
 	return true
@@ -54,6 +56,17 @@ func can_activate() -> bool:
 
 func _execute() -> void:
 	pass
+
+# Optional capability hooks. Character-specific abilities override only the
+# behavior they actually need; Player does not need to know their class names.
+func blocks_movement() -> bool:
+	return false
+
+func blocks_gameplay_input() -> bool:
+	return false
+
+func grants_invulnerability() -> bool:
+	return false
 
 func get_aim_direction() -> Vector2:
 	var mouse_pos = %InputSynchronizer.mouse_pos

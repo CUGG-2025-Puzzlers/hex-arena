@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/magic_scripts/aurora_field.gd" id="1_script"]
+
+[node name="AuroraField" type="Node2D"]
+z_index = 0
+z_as_relative = false
+script = ExtResource("1_script")

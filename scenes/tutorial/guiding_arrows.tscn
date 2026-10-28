@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c0r53oj3cl6xr"]
+
+[ext_resource type="Script" uid="uid://dnnvax10gdoc2" path="res://scenes/tutorial/guiding_arrows.gd" id="1_f1xv5"]
+
+[node name="GuidingArrows" type="Node2D" unique_id=661504265]
+script = ExtResource("1_f1xv5")

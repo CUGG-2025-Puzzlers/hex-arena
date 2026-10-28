@@ -40,8 +40,12 @@ func _on_mouse_exited():
 func _on_mouse_pressed():
 	if locked:
 		return
-	
-	MultiplayerManager.select_character(character)
+
+	var screen := get_tree().current_scene
+	if screen != null and screen.has_method("handle_character_card_pressed"):
+		screen.call("handle_character_card_pressed", character)
+	else:
+		MultiplayerManager.select_character(character)
 
 #endregion
 
@@ -51,4 +55,4 @@ func _set_display_icon():
 	%Icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _set_display_name():
-	%Name.text = Util.Character.keys()[character]
+	%Name.text = Util.get_character_display_name(character)

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MagicStats" format=3 uid="uid://f5640rqap220"]
+
+[ext_resource type="PackedScene" path="res://scenes/magic_types/magic_root_hand.tscn" id="1_jlpm8"]
+[ext_resource type="Script" uid="uid://bhmcq8y4bsnx3" path="res://scripts/resources/magic_stats-template.gd" id="2_qess5"]
+
+[resource]
+script = ExtResource("2_qess5")
+type = 3
+magic_name = "Hand"
+cost = 10.0
+scene = ExtResource("1_jlpm8")
+health = 25.0
+metadata/_custom_type_script = "uid://bhmcq8y4bsnx3"

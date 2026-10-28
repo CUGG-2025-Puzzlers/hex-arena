@@ -1,0 +1,16 @@
+
+[gd_resource type="Resource" script_class="MagicStats" load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/magic_types/magic_gentle_mote.tscn" id="1_scene"]
+[ext_resource type="Script" path="res://scripts/resources/magic_stats-template.gd" id="2_script"]
+
+[resource]
+script = ExtResource("2_script")
+type = 2
+magic_name = "Gentle Mote"
+cost = 10.0
+scene = ExtResource("1_scene")
+health = 18.0
+damage = 7.0
+speed = 420.0
+transform_dict = Dictionary[int, Resource]({1: null, 2: null, 3: null, 4: null})

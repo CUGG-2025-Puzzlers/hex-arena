@@ -1,0 +1,195 @@
+[gd_scene format=3 uid="uid://c6wowp8fghmag"]
+
+[ext_resource type="Script" uid="uid://ci3cylwmfymap" path="res://scenes/tutorial/walk_objective.gd" id="1_48cp3"]
+[ext_resource type="Texture2D" uid="uid://dcm8pb6gd3088" path="res://assets/textures/neutral_magic.tres" id="2_wi8ox"]
+[ext_resource type="Texture2D" uid="uid://bgkrluc4yfisl" path="res://assets/textures/shield-pattern1.png" id="3_1nwyo"]
+[ext_resource type="Texture2D" uid="uid://3gwi6dh8pf74" path="res://assets/textures/shield_texture2.tres" id="4_6wr0h"]
+[ext_resource type="Texture2D" uid="uid://delpg5nhsxa7e" path="res://assets/textures/eye.png" id="5_48gts"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="6_g0qxh"]
+[ext_resource type="Texture2D" uid="uid://fs4nj03e7j1t" path="res://assets/textures/magic.tres" id="7_iufri"]
+[ext_resource type="Texture2D" uid="uid://dk6inwsyt8inh" path="res://assets/particles/star_06_a.png" id="8_wi8ox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fggut"]
+radius = 18.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mgv3p"]
+blend_mode = 3
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_87hvv"]
+blend_mode = 1
+
+[sub_resource type="Curve" id="Curve_hug0r"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.48612148), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.7469652, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_87hvv"]
+offsets = PackedFloat32Array(0.4392971, 0.71565497, 0.8769968, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.5999999, 0, 1, 1, 0.39069343, 0.98, 0.11760001, 1, 0.39069343, 0.98, 0.11760001, 0)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_hug0r"]
+
+[sub_resource type="Curve" id="Curve_mgv3p"]
+_limits = [0.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 0.4925651), 0.0, 0.7901357, 0, 0, Vector2(0.26764706, 0.5115242), 0.0, 0.0, 0, 0, Vector2(0.6220588, 0.62750936), 0.25944108, 0.25944108, 0, 0, Vector2(1, 0.430979), 0.45105314, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Gradient" id="Gradient_wwhys"]
+offsets = PackedFloat32Array(0, 0.17092651, 0.34504792, 0.5543131, 0.5942492, 0.6645367, 0.74440897)
+colors = PackedColorArray(1.3025239, 2.037959, 2.7259471, 1, 1.8759707, 1.4488999, 0, 1, 0, 0, 0, 0, 0.97, 0, 0.87299967, 0.6627451, 0.46199986, 0, 0.63, 1, 0.608, 0.95, 0.8246, 1, 0.9215, 0.95, 0.93955, 0.9843137)
+
+[sub_resource type="Curve" id="Curve_wi8ox"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.81403863), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="Walk Objective" type="Area2D" unique_id=627565832]
+script = ExtResource("1_48cp3")
+
+[node name="Arrow" type="Sprite2D" parent="." unique_id=84948946]
+scale = Vector2(0.7, 0.7)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=415175278]
+texture_repeat = 3
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_wi8ox")
+
+[node name="ChildLight1" type="Sprite2D" parent="Sprite2D" unique_id=141704045]
+texture_repeat = 3
+position = Vector2(20, 0)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("2_wi8ox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=29718005]
+shape = SubResource("CircleShape2D_fggut")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1483890363]
+position = Vector2(-0.499998, -0.499998)
+scale = Vector2(4.55, 4.55)
+rect = Rect2(-6, -6, 12, 12)
+
+[node name="Shield Pattern" type="Polygon2D" parent="." unique_id=201908227]
+visible = false
+clip_children = 2
+texture_repeat = 3
+material = SubResource("CanvasItemMaterial_mgv3p")
+texture = ExtResource("3_1nwyo")
+texture_scale = Vector2(15, 15)
+polygon = PackedVector2Array(-7, -88, 97, -25, 85, 78, -33, 104, -101, -30)
+
+[node name="Shield Glow" type="Polygon2D" parent="Shield Pattern" unique_id=784304187]
+texture_repeat = 3
+material = SubResource("CanvasItemMaterial_87hvv")
+texture = ExtResource("4_6wr0h")
+polygon = PackedVector2Array(-7, -88, 97, -25, 85, 78, -33, 104, -101, -30)
+
+[node name="EyeSprite" type="Sprite2D" parent="." unique_id=491687938]
+visible = false
+position = Vector2(2.5629997e-06, 1.4901161e-07)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("5_48gts")
+
+[node name="ArrowParticles" type="Node2D" parent="." unique_id=458787119]
+visible = false
+
+[node name="ArrowL" type="CPUParticles2D" parent="ArrowParticles" unique_id=543708223]
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 30
+texture = ExtResource("6_g0qxh")
+local_coords = true
+direction = Vector2(-0.94, -0.342)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 150.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+scale_amount_curve = SubResource("Curve_hug0r")
+color_ramp = SubResource("Gradient_87hvv")
+
+[node name="ArrowR" type="CPUParticles2D" parent="ArrowParticles" unique_id=2128713303]
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 30
+texture = ExtResource("6_g0qxh")
+local_coords = true
+direction = Vector2(-0.94, 0.342)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 150.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+scale_amount_curve = SubResource("Curve_hug0r")
+color_ramp = SubResource("Gradient_87hvv")
+
+[node name="ArrowH" type="CPUParticles2D" parent="ArrowParticles" unique_id=1011908754]
+material = SubResource("CanvasItemMaterial_hug0r")
+position = Vector2(8, 0)
+scale = Vector2(0.25, 0.25)
+amount = 40
+texture = ExtResource("6_g0qxh")
+local_coords = true
+direction = Vector2(-1, 0)
+spread = 0.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 250.0
+initial_velocity_max = 300.0
+angle_max = 180.0
+scale_amount_min = 4.0
+scale_amount_max = 8.0
+scale_amount_curve = SubResource("Curve_mgv3p")
+color_ramp = SubResource("Gradient_87hvv")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1907923882]
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=1158731197]
+emitting = false
+amount = 15
+texture = ExtResource("7_iufri")
+lifetime = 0.52
+one_shot = true
+explosiveness = 0.71
+randomness = 0.26
+lifetime_randomness = 0.67
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 15.0
+direction = Vector2(0, -1)
+spread = 80.57
+initial_velocity_min = 56.66
+initial_velocity_max = 178.47
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.0
+scale_amount_max = 0.1
+color_ramp = SubResource("Gradient_wwhys")
+
+[node name="Glow" type="Sprite2D" parent="." unique_id=981246921]
+visible = false
+modulate = Color(1, 1, 1, 0.19215687)
+scale = Vector2(1.4, 1.4)
+texture = ExtResource("2_wi8ox")
+
+[node name="Sparkles" type="CPUParticles2D" parent="." unique_id=764648147]
+visible = false
+scale = Vector2(0.065, 0.065)
+emitting = false
+amount = 6
+texture = ExtResource("8_wi8ox")
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 1200.0
+initial_velocity_max = 1400.0
+damping_min = 250.0
+damping_max = 500.0
+damping_curve = SubResource("Curve_wi8ox")
+scale_amount_min = 0.05
+scale_amount_max = 0.05
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

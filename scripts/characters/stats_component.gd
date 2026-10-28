@@ -3,15 +3,13 @@ extends Control
 class_name StatsUpdate
 
 
-@export var OverheadHp : ProgressBar
-@export var NameLabel : Label
+@export var OverheadHp: ProgressBar
+@export var OverheadMana: ProgressBar
+@export var NameLabel: Label
 
 var max_health: float
 var max_mana: float 
 var mana_regen_rate: float  # /second
-
-## emits signals (put in like a hud or something) 
-## to react to change in mana and hp
 
 signal health_changed(current : float, maximum : float)
 signal mana_changed(current : float, maximum : float)
@@ -33,7 +31,9 @@ func _ready() -> void:
 	current_mana = max_mana
 	
 	health_changed.connect(_on_overhead_hp_changed)
+	mana_changed.connect(_on_overhead_mana_changed)
 	_on_overhead_hp_changed.call_deferred(current_health, max_health)
+	_on_overhead_mana_changed.call_deferred(current_mana, max_mana)
 
 func update_name(new_name: String):
 	NameLabel.text = new_name
@@ -41,10 +41,15 @@ func update_name(new_name: String):
 func _on_overhead_hp_changed(current: float, maximum: float) -> void:
 	if not OverheadHp:
 		return
-		
-	#print("Overhead HP update: ", current, " / ", maximum)
+
 	OverheadHp.max_value = maximum
 	OverheadHp.value = current
+
+func _on_overhead_mana_changed(current: float, maximum: float) -> void:
+	if not OverheadMana:
+		return
+	OverheadMana.max_value = maximum
+	OverheadMana.value = current
 
 #==================== Health =====================
 func take_damage(amount: float) -> void:
@@ -78,19 +83,3 @@ func restore_mana(amount: float) -> void:
 func set_mana(value: float) -> void:
 	current_mana = clampf(value, 0.0, max_mana)
 	mana_changed.emit(current_mana, max_mana)
-
-"""
-# For testing damage, heal, mana use
-func _unhandled_input(event: InputEvent) -> void:
-	if %InputSynchronizer.get_multiplayer_authority() != player_id:
-		return
-
-
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_K:
-			take_damage(10.0)
-		elif event.keycode == KEY_L:
-			heal(10.0)
-		elif event.keycode == KEY_M:
-			use_mana(20.0)
-"""

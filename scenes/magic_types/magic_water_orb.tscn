@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://dw0rbneutral01"]
+
+[ext_resource type="Script" path="res://scripts/magic_scripts/magic_water_orb.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape_water_orb"]
+radius = 20.0
+
+[node name="MagicWaterOrb" type="Area2D" groups=["magic"]]
+script = ExtResource("1_script")
+state = 1
+own_cost = 4.0
+own_health = 24.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape_water_orb")
+
+[node name="FizzleParticles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 18
+lifetime = 0.45
+one_shot = true
+explosiveness = 0.9
+emission_shape = 1
+emission_sphere_radius = 18.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 45.0
+initial_velocity_max = 125.0
+scale_amount_min = 1.0
+scale_amount_max = 3.5
+color = Color(0.42, 0.86, 1, 1)
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://larod3lr0ch5"]
+
+[ext_resource type="Script" uid="uid://ba0dnoofhsew8" path="res://scripts/characters/player.gd" id="1_player"]
+[ext_resource type="Resource" path="res://presets/character_presets/Aurora_stats.tres" id="2_preset"]
+[ext_resource type="Script" uid="uid://d3ga8nsg6e61v" path="res://scripts/multiplayer_input.gd" id="3_input"]
+[ext_resource type="Texture2D" uid="uid://bbtjiyh1ymh7r" path="res://assets/textures/aurora/aurora_model.png" id="4_model"]
+[ext_resource type="PackedScene" uid="uid://g25v82bkmahc" path="res://scenes/character_scenes/stats_component_scene.tscn" id="5_stats"]
+[ext_resource type="Script" uid="uid://di3rnm204ihm3" path="res://scripts/abilities/prismatic_stillness.gd" id="6_ability"]
+[ext_resource type="Script" path="res://scripts/resources/draw_range.gd" id="7_range"]
+[ext_resource type="PackedScene" uid="uid://cub773k4uxu8h" path="res://scenes/cells_bold_outline.tscn" id="8_outline"]
+[ext_resource type="Texture2D" uid="uid://b8gp3sb0ms3sd" path="res://assets/textures/cloud_noise.tres" id="9_particles"]
+[ext_resource type="Script" uid="uid://dtuifjuy1jxx4" path="res://scripts/characters/aurora_field_controller.gd" id="10_controller"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_player"]
+properties/0/path = NodePath(".:player_id")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_input"]
+properties/0/path = NodePath("InputSynchronizer:direction")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath("InputSynchronizer:mouse_pos")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("InputSynchronizer:use_ability")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[sub_resource type="RectangleShape2D" id="RectangleShape_feet"]
+size = Vector2(38, 12)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape_hurtbox"]
+radius = 19.0
+height = 116.0
+
+[sub_resource type="Gradient" id="Gradient_hurt"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(0.72, 0.58, 1, 1, 1, 0.76, 0.9, 1, 0.55, 0.86, 1, 0)
+
+[node name="Aurora" type="CharacterBody2D" unique_id=761915153 node_paths=PackedStringArray("stats_update")]
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("1_player")
+base_speed = 220.0
+uses_directional_animation = false
+radius = 2
+preset = ExtResource("2_preset")
+stats_update = NodePath("StatsComponent")
+
+[node name="PlayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1072588074]
+replication_config = SubResource("SceneReplicationConfig_player")
+
+[node name="InputSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1243695614]
+unique_name_in_owner = true
+replication_config = SubResource("SceneReplicationConfig_input")
+script = ExtResource("3_input")
+
+[node name="AuroraFieldController" type="Node" parent="." unique_id=759580498]
+script = ExtResource("10_controller")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1981076701]
+shape = SubResource("RectangleShape_feet")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1066685372]
+unique_name_in_owner = true
+position = Vector2(2, -43)
+scale = Vector2(0.105014004, 0.105014)
+texture = ExtResource("4_model")
+
+[node name="StatsComponent" parent="." unique_id=1496178499 instance=ExtResource("5_stats")]
+
+[node name="Ability" type="Node" parent="." unique_id=1007926667]
+unique_name_in_owner = true
+script = ExtResource("6_ability")
+cooldown_duration = 10.0
+ability_name = "Prismatic Stillness"
+
+[node name="Drawing range" type="Node2D" parent="." unique_id=1305056144]
+script = ExtResource("7_range")
+
+[node name="RangeOutline" parent="Drawing range" unique_id=1531089673 instance=ExtResource("8_outline")]
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1271078163]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1506229174]
+position = Vector2(0, -42)
+shape = SubResource("CapsuleShape_hurtbox")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Area2D" unique_id=1977102288]
+position = Vector2(0, -58)
+emitting = false
+amount = 18
+texture = ExtResource("9_particles")
+lifetime = 0.52
+one_shot = true
+explosiveness = 0.71
+randomness = 0.26
+lifetime_randomness = 0.67
+emission_shape = 1
+emission_sphere_radius = 18.0
+direction = Vector2(0, -1)
+spread = 80.57
+initial_velocity_min = 56.66
+initial_velocity_max = 178.47
+color_ramp = SubResource("Gradient_hurt")
+
+[editable path="StatsComponent"]
