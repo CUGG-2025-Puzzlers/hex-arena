@@ -1,11 +1,13 @@
 extends Node2D
 
-const WALLS: Array[Rect2] = [
-	Rect2(-450, -380, 180, 220), Rect2(270, 160, 180, 220),
-	Rect2(-450, 160, 180, 220), Rect2(270, -380, 180, 220),
+const WALL_CELLS: Array[Vector2i] = [
+	Vector2i(-4, -3), Vector2i(-3, -3), Vector2i(-4, -2), Vector2i(-3, -2),
+	Vector2i(-4, 2), Vector2i(-3, 2), Vector2i(-4, 3), Vector2i(-3, 3),
+	Vector2i(3, -3), Vector2i(2, -3), Vector2i(4, -2), Vector2i(3, -2),
+	Vector2i(4, 2), Vector2i(3, 2), Vector2i(3, 3), Vector2i(2, 3),
 ]
 const TEAM_COLORS: Array[Color] = [Color("69dfff"), Color("ff727b")]
-var walls: Array[Rect2] = []
+var walls: Array[PackedVector2Array] = []
 var phase: String = "waiting"
 var elapsed: float = 0.0
 var scores: Array[float] = [0.0, 0.0]
@@ -29,7 +31,6 @@ var _reported_spawn_ready: bool = false
 
 func _ready() -> void:
 	z_index = 3
-	walls.assign(WALLS)
 	_build_walls()
 	objective_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, 2)
 	_build_hud()
@@ -41,21 +42,14 @@ func _ready() -> void:
 		var path := "user://overhaul-%s.jsonl" % Time.get_unix_time_from_system()
 		_log = FileAccess.open(path, FileAccess.WRITE)
 		log_event("settings", {"preset": Overhaul.rules.preset, "limited_vision": Overhaul.rules.limited_vision,
-			"sight_radius": Overhaul.rules.sight_radius, "map": "crossroads-v1"})
+			"sight_radius": Overhaul.rules.sight_radius, "magic_sight_radius": Overhaul.rules.magic_sight_radius, "map": "hex-crossroads-v2"})
 	_update_vision()
 	queue_redraw()
 
 func _build_walls() -> void:
-	for rect in walls:
-		var body := StaticBody2D.new()
-		body.collision_layer = 1
-		body.position = rect.get_center()
-		var shape := CollisionShape2D.new()
-		var rectangle := RectangleShape2D.new()
-		rectangle.size = rect.size
-		shape.shape = rectangle
-		body.add_child(shape)
-		add_child(body)
+	for cell in WALL_CELLS:
+		HexCells.player_unique_instance.add_wall(cell)
+	walls.assign(HexCells.get_wall_polygons())
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
@@ -306,12 +300,6 @@ func _finish(team: int, reason: String, points: Array) -> void:
 		"result": "draw" if team < 0 else ("win" if team == Overhaul.team_for(multiplayer.get_unique_id()) else "loss")})
 	_show_result()
 
-func point_blocked(point: Vector2) -> bool:
-	for wall in walls:
-		if wall.has_point(point):
-			return true
-	return false
-
 func can_see(point: Vector2) -> bool:
 	if not Overhaul.rules.limited_vision:
 		return true
@@ -321,14 +309,28 @@ func can_see(point: Vector2) -> bool:
 func _update_vision() -> void:
 	visible_cells.clear()
 	var observers: Array[Vector2] = []
+	var radii: Array[float] = []
 	for node in get_players():
 		var player := node as Player
 		if player != null and player.is_alive and Overhaul.local_friendly(player.player_id):
 			observers.append(player.global_position)
+			radii.append(Overhaul.rules.sight_radius)
+	# Prepared and travelling magic reveal a smaller area for their owner's team.
+	# Unclaimed, hostile, fizzled, and dead-owner magic never contributes sight.
+	for node in get_tree().get_nodes_in_group("magic"):
+		var magic := node as Magic
+		if magic == null or magic.is_queued_for_deletion() or not Overhaul.local_friendly(magic.player_id):
+			continue
+		var owner := get_player(magic.player_id)
+		if owner == null or not owner.is_alive:
+			continue
+		observers.append(magic.global_position)
+		radii.append(Overhaul.rules.magic_sight_radius)
 	for cell in HexCells.cell_dict:
 		var point := HexCells.map_to_local(cell)
-		for origin in observers:
-			if origin.distance_to(point) <= Overhaul.rules.sight_radius and PlaytestVisionMask.has_line_of_sight(origin, point, walls):
+		for i in range(observers.size()):
+			var origin := observers[i]
+			if origin.distance_to(point) <= radii[i] and PlaytestVisionMask.has_line_of_sight(origin, point, walls):
 				visible_cells[cell] = true
 				break
 	_fog.queue_redraw() if _fog != null else queue_redraw()
@@ -395,9 +397,6 @@ func _update_hud() -> void:
 		_hint.text += "  |  PROTECTED (casting ends protection)"
 
 func _draw() -> void:
-	for wall in walls:
-		draw_rect(wall, Color("253849"))
-		draw_rect(wall, Color("93aabe"), false, 3)
 	if Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE:
 		for cell in objective_cells:
 			var points := PackedVector2Array(HexCells.get_hex_points_around(cell))

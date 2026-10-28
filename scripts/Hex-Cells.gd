@@ -29,6 +29,7 @@ var vertical_n : int
 var horizontal_n : int
 
 static var cell_dict: Dictionary = {}
+static var wall_cells: Dictionary = {}
 static var players_cells: Dictionary = {1: Vector2i()}
 static var curr_cell: Vector2i = Vector2i()
 
@@ -61,6 +62,7 @@ func recalculate() -> void:
 	vertical_n = max(int(height/(hex_height))-1,0)+1
 	horizontal_n = max(int(width/(hex_width))-1,0)+1
 
+	wall_cells.clear()
 	cell_dict = Dictionary()
 
 	for j in range(vertical_n):
@@ -139,7 +141,7 @@ func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_stat
 
 	while not surrounding_cells.is_empty():
 		var cell_to_check = surrounding_cells.pop_back()
-		if cell_dict.has(cell_to_check) and is_instance_valid(cell_dict[cell_to_check]):
+		if cell_dict.get(cell_to_check) is Magic:
 			var magic_instance : Magic = cell_dict[cell_to_check]
 
 			# Spawn logic: can turn unclaimed or own magic
@@ -159,7 +161,7 @@ func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_stat
 
 @rpc("call_local", "authority", "reliable")
 func change_magic_in_cell_for_player(cell: Vector2i, new_state: Magic.MagicType, player_id: int):
-	if not (cell_dict.has(cell) and is_instance_valid(cell_dict[cell])):
+	if not cell_dict.get(cell) is Magic:
 		push_error('Could not get the magic instance for changing')
 		return
 
@@ -188,8 +190,6 @@ player_cell:Vector2i, radius_cells: Array, _player_id: int):
 		return false
 	player_cell = local_to_map(owner.get_node("CollisionShape2D").global_position)
 	radius_cells = owner.radius_cells
-	if Overhaul.active() and Overhaul.get_match().point_blocked(map_to_local(local_to_map(mouse_pos))):
-		return false
 	var player_pos = map_to_local(player_cell)
 	var cell_to_place = local_to_map(mouse_pos)
 
@@ -223,6 +223,8 @@ player_cell:Vector2i, radius_cells: Array, _player_id: int):
 
 @rpc("call_local", "authority", "reliable")
 func place_magic_in_cell_for_player(cell: Vector2i, type: Magic.MagicType, player_id: int):
+	if wall_cells.has(cell):
+		return
 	if is_instance_valid(cell_dict[cell]):
 		cell_dict[cell].queue_free()
 
@@ -446,3 +448,26 @@ static func vw_to_map_int(pos: Vector2i)->Vector2i:
 	var x = floori(pos.y/2.)
 	var y = int((x-pos.x+0.5*posmod(pos.y,2))*2/3)
 	return Vector2i(x,y)
+
+
+func add_wall(cell: Vector2i) -> HexWall:
+	if not cell_dict.has(cell) or is_instance_valid(cell_dict[cell]):
+		return null
+	var wall := HexWall.new()
+	wall.cell = cell
+	wall.name = "Wall_%d_%d" % [cell.x, cell.y]
+	cell_dict[cell] = wall
+	wall_cells[cell] = wall
+	add_child(wall)
+	return wall
+
+static func get_wall_polygons() -> Array[PackedVector2Array]:
+	var polygons: Array[PackedVector2Array] = []
+	for wall in wall_cells.values():
+		if not is_instance_valid(wall):
+			continue
+		var points := PackedVector2Array()
+		for point in hex_polygon_shape.points:
+			points.append(wall.to_global(point))
+		polygons.append(points)
+	return polygons

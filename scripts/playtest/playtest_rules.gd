@@ -6,6 +6,7 @@ enum Preset { BASELINE, VISION_DUEL, TEAM_OBJECTIVE }
 @export var preset: Preset = Preset.BASELINE
 @export var limited_vision: bool = true
 @export var sight_radius: float = 500.0
+@export var magic_sight_radius: float = 180.0
 @export var score_to_win: float = 60.0
 @export var objective_delay: float = 15.0
 @export var time_limit: float = 480.0

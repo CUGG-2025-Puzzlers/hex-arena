@@ -17,7 +17,7 @@ This branch tests whether concealed preparation, route choices, and teamwork giv
 
 ## Rules
 
-- Living teammates share wall-blocked sight, approximately 500 world units. Enemy players, labels, ranges and prepared magic are concealed outside sight. Moving projectiles appear when entering visible cells. Visibility does not disable collision or damage.
+- Living teammates share wall-blocked sight, approximately 500 world units. Allied placed and travelling magic also reveals 180 world units around itself; unclaimed or enemy magic grants no vision, and fizzled/dead-owner magic loses its sight. Enemy players, labels, ranges and prepared magic are concealed outside sight. Moving projectiles appear when entering visible cells. Visibility does not disable collision or damage.
 - The rework camera follows the living local player at fixed zoom. It cannot pan or zoom from enemy position. Dead players follow a living ally or their base and contribute no sight.
 - Magic remains individually owned. Players cannot transform or launch teammates' preparations. Player damage and hostile special effects are team-aware; friendly shields still block movement and ordinary projectiles under the existing shield rules.
 - The central radius-two hex zone opens after 15 seconds. Sole-team occupancy scores one point/second. Extra occupants do not accelerate scoring; empty/contested zones pause it. Dead and protected players do not score.
@@ -26,7 +26,7 @@ This branch tests whether concealed preparation, route choices, and teamwork giv
 - At your base, health and mana recover at 20/second after three seconds without damage. Base recovery does not grant immunity.
 - Results stay inside the arena. The host can rematch without reconnecting, reselecting characters or rebuilding the networked player tree. Main Menu leaves the session.
 
-Tune the values in `scripts/playtest/playtest_rules.gd`. Wall rectangles in `playtest_match.gd` define physics, vision blocking, drawing and blocked placement from a common source. The original arena and tutorial are retained.
+Tune the values in `scripts/playtest/playtest_rules.gd`. `WALL_CELLS` in `playtest_match.gd` selects occupied hex coordinates. `HexCells.add_wall()` registers permanent `HexWall` terrain in the existing cell registry, reusing `map_to_local`, `hex_shape` and `hex_polygon_shape` for placement, drawing and collision. Vision and projectile blocking use the exact polygons derived from those same cells. The original arena and tutorial are retained.
 
 ## Compare deliberately
 
@@ -58,3 +58,5 @@ On October 28, 2026, using Godot 4.6 stable on Linux:
 - Full-art headless rule/scene smoke test reached `PLAYTEST_SMOKE_COMPLETE failures=0`.
 - Four actual ENet peers completed two rounds and an in-place rematch, including death/respawn synchronization, using the reduced-art fixture. The runner returned success with no gameplay/script errors, and reported the known EOS native shutdown abort for each process separately.
 - Whitespace/diff checks passed. Rendered UI and group gameplay feel still require a manual playtest; no visual QA is claimed by these headless checks.
+
+Magic-sight and hex-wall follow-up: regression coverage includes allied stationary/travelling magic sight, radius limits, hostile/fizzled sources, hex-corner LOS, projectile clipping, occupied terrain placement/transformation, and wall persistence through rematches.

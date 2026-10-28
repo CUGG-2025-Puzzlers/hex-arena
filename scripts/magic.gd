@@ -86,6 +86,9 @@ func reset_stats(stats_reference: MagicStats):
 
 func place_instance_for_player(cell: Vector2i, _player_owner: Player = null, _stats_reference: MagicStats = null) -> void:
 	var hex_cells: HexCells = HexCells.player_unique_instance
+	if HexCells.wall_cells.has(cell):
+		queue_free()
+		return
 	
 	if is_instance_valid(HexCells.cell_dict[cell]):
 		HexCells.cell_dict[cell].queue_free()
