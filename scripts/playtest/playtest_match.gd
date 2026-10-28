@@ -10,7 +10,12 @@ const TEAM_COLORS: Array[Color] = [Color("69dfff"), Color("ff727b")]
 var walls: Array[PackedVector2Array] = []
 var phase: String = "waiting"
 var elapsed: float = 0.0
-var scores: Array[float] = [0.0, 0.0]
+var control := ControlPointState.new()
+var scores: Array[float] = control.percentages
+var round_wins: Array[int] = [0, 0]
+var round_number: int = 1
+var round_time: float = 0.0
+var round_pause: float = 0.0
 var occupants: Array = []
 var respawns: Dictionary = {}
 var visible_cells: Dictionary = {}
@@ -20,6 +25,8 @@ var _log: FileAccess
 var _status: Label
 var _rematch_button: Button
 var _leave_button: Button
+var _capture_bar: ProgressBar
+var _overtime_bar: ProgressBar
 var _hint: Label
 var _fog: Node2D
 var _last_sight: bool = false
@@ -32,6 +39,8 @@ var _reported_spawn_ready: bool = false
 func _ready() -> void:
 	z_index = 3
 	_build_walls()
+	control.capture_seconds = Overhaul.rules.capture_seconds
+	control.percent_per_second = Overhaul.rules.control_percent_per_second
 	objective_cells = HexCells.get_surrounding_cells_in_radius(Vector2i.ZERO, 2)
 	_build_hud()
 	_fog = Node2D.new()
@@ -68,8 +77,21 @@ func _build_hud() -> void:
 	box.add_child(_status)
 	_hint = Label.new()
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hint.custom_minimum_size.x = 860.0
 	_hint.add_theme_font_size_override("font_size", 18)
 	box.add_child(_hint)
+	_capture_bar = ProgressBar.new()
+	_capture_bar.max_value = 1.0
+	_capture_bar.show_percentage = false
+	_capture_bar.custom_minimum_size.y = 8.0
+	box.add_child(_capture_bar)
+	_overtime_bar = ProgressBar.new()
+	_overtime_bar.max_value = 5.0
+	_overtime_bar.show_percentage = false
+	_overtime_bar.custom_minimum_size.y = 8.0
+	_overtime_bar.modulate = Color("ffb347")
+	box.add_child(_overtime_bar)
 	var buttons := HBoxContainer.new()
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(buttons)
@@ -117,6 +139,8 @@ func _process(delta: float) -> void:
 	if phase == "waiting" and not _reported_spawn_ready and get_players().size() == Overhaul.rules.player_count():
 		_reported_spawn_ready = true
 		_report_spawn_ready.rpc_id(1)
+	if phase == "intermission" and not multiplayer.is_server():
+		round_pause = maxf(0.0, round_pause - delta)
 	# Entity visibility is checked every frame, including fast projectiles.
 	_fog_timer -= delta
 	if _fog_timer <= 0.0:
@@ -127,9 +151,16 @@ func _process(delta: float) -> void:
 	_update_hud()
 
 func _physics_process(delta: float) -> void:
+	if phase == "intermission":
+		if multiplayer.is_server():
+			round_pause = maxf(0.0, round_pause - delta)
+			if round_pause <= 0.0:
+				_start_round.rpc()
+		return
 	if phase != "active" or not multiplayer.is_server():
 		return
 	elapsed += delta
+	round_time += delta
 	for id in respawns.keys():
 		respawns[id] = maxf(0.0, float(respawns[id]) - delta)
 		if float(respawns[id]) <= 0.0:
@@ -148,32 +179,56 @@ func _physics_process(delta: float) -> void:
 	_sync_timer -= delta
 	if _sync_timer <= 0.0:
 		_sync_timer = 0.1
-		_sync_snapshot.rpc(elapsed, scores, occupants, respawns, _player_states())
+		_sync_snapshot.rpc(elapsed, scores, occupants, respawns, _player_states(), control.snapshot(), round_wins, round_time)
 
 func _tick_objective(delta: float) -> void:
 	occupants.clear()
-	if elapsed >= Overhaul.rules.objective_delay:
-		for node in get_players():
-			var player := node as Player
-			if player != null and player.is_alive and player.spawn_protection <= 0.0:
-				if objective_cells.has(HexCells.player_unique_instance.local_to_map(player.global_position)):
-					if not occupants.has(player.team_id):
-						occupants.append(player.team_id)
-	var owner := PlaytestRules.score_owner(occupants)
-	if owner >= 0:
-		scores[owner] += delta
+	var counts: Array[int] = [0, 0]
+	if round_time < Overhaul.rules.objective_delay:
+		return
+	for node in get_players():
+		var player := node as Player
+		if player != null and player.is_alive and not player.is_invulnerable():
+			if objective_cells.has(HexCells.player_unique_instance.local_to_map(player.global_position)):
+				counts[player.team_id] += 1
+	for team in range(2):
+		if counts[team] > 0:
+			occupants.append(team)
+	var previous_owner := control.owner
+	var winner := control.tick(delta, counts)
+	if previous_owner != control.owner:
+		queue_redraw()
+		log_event("point_captured", {"owner": control.owner, "round": round_number})
 	if occupants != _last_occupants:
 		log_event("objective_occupancy", {"teams": occupants.duplicate()})
 		_last_occupants = occupants.duplicate()
 	if int(scores[0] + scores[1]) != _last_score:
 		_last_score = int(scores[0] + scores[1])
-		log_event("score", {"scores": scores.duplicate()})
-	for team in range(2):
-		if scores[team] >= Overhaul.rules.score_to_win:
-			finish(team, "score")
-			return
-	if elapsed >= Overhaul.rules.time_limit:
-		finish(-1 if is_equal_approx(scores[0], scores[1]) else (0 if scores[0] > scores[1] else 1), "time_limit")
+		log_event("score", {"scores": scores.duplicate(), "round": round_number})
+	if winner >= 0:
+		round_wins[winner] += 1
+		log_event("round_ended", {"winner": winner, "round": round_number, "round_wins": round_wins.duplicate()})
+		if round_wins[winner] >= Overhaul.rules.rounds_to_win:
+			finish(winner, "control_rounds")
+		else:
+			_end_round.rpc(round_wins, control.snapshot())
+
+@rpc("authority", "call_local", "reliable")
+func _end_round(wins: Array, point: Dictionary) -> void:
+	round_wins.assign(wins)
+	control.load_snapshot(point)
+	phase = "intermission"
+	round_pause = Overhaul.rules.round_break
+	for player in get_players():
+		player._ability.process_mode = Node.PROCESS_MODE_DISABLED
+
+@rpc("authority", "call_local", "reliable")
+func _start_round() -> void:
+	if phase != "intermission":
+		return
+	round_number += 1
+	_reset_round()
+	log_event("round_started", {"round": round_number})
 
 func _player_states() -> Array:
 	var states: Array = []
@@ -184,8 +239,14 @@ func _player_states() -> Array:
 	return states
 
 @rpc("authority", "call_remote", "reliable")
-func _sync_snapshot(time: float, points: Array, teams: Array, timers: Dictionary, states: Array) -> void:
+func _sync_snapshot(time: float, points: Array, teams: Array, timers: Dictionary, states: Array, point: Dictionary, wins: Array, round_elapsed: float) -> void:
 	elapsed = time
+	var previous_owner := control.owner
+	control.load_snapshot(point)
+	if previous_owner != control.owner:
+		queue_redraw()
+	round_wins.assign(wins)
+	round_time = round_elapsed
 	scores.assign(points)
 	occupants = teams
 	respawns = timers
@@ -286,17 +347,18 @@ func finish(team: int, reason: String) -> void:
 		return
 	phase = "ended"
 	log_event("match_ended", {"winner": team, "reason": reason, "scores": scores.duplicate()})
-	_finish.rpc(team, reason, scores)
+	_finish.rpc(team, reason, scores, round_wins)
 
 @rpc("authority", "call_local", "reliable")
-func _finish(team: int, reason: String, points: Array) -> void:
+func _finish(team: int, reason: String, points: Array, wins: Array) -> void:
+	round_wins.assign(wins)
 	scores.assign(points)
 	phase = "ended"
 	Overhaul.result_team = team
 	Overhaul.result_text = "Draw" if team < 0 else "Team %s wins" % ("Blue" if team == 0 else "Red")
 	if reason == "disconnect":
 		Overhaul.result_text = "Match ended: player disconnected"
-	Telemetry.end_match({"winner_team": team, "scores": points, "match_end_reason": reason,
+	Telemetry.end_match({"winner_team": team, "scores": points, "round_wins": round_wins, "match_end_reason": reason,
 		"result": "draw" if team < 0 else ("win" if team == Overhaul.team_for(multiplayer.get_unique_id()) else "loss")})
 	_show_result()
 
@@ -381,27 +443,43 @@ func _update_hud() -> void:
 	var mode := "2v2 CONTROL" if Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE else "VISION DUEL"
 	var visibility := "LIMITED VISION" if Overhaul.rules.limited_vision else "FULL VISION"
 	_status.text = "%s  |  %s  |  TEAM %s" % [mode, visibility, "BLUE" if team == 0 else "RED"]
+	_capture_bar.visible = control.capture_team >= 0 and phase == "active"
+	_capture_bar.value = control.capture_progress
+	if control.capture_team >= 0:
+		_capture_bar.modulate = TEAM_COLORS[control.capture_team]
+	_overtime_bar.visible = control.overtime and phase == "active"
+	_overtime_bar.value = control.overtime_remaining
 	if Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE:
-		var remaining := maxi(0, ceili(Overhaul.rules.time_limit - elapsed))
-		var state := "CONTESTED" if occupants.size() == 2 else ("EMPTY" if occupants.is_empty() else "BLUE CONTROLS" if occupants.has(0) else "RED CONTROLS")
-		if elapsed < Overhaul.rules.objective_delay:
-			state = "OPENS IN %ds" % ceili(Overhaul.rules.objective_delay - elapsed)
-		_hint.text = "BLUE %d — %d RED  |  %d:%02d  |  %s" % [int(scores[0]), int(scores[1]), remaining / 60, remaining % 60, state]
+		var state := "NEUTRAL" if control.owner < 0 else "%s OWNS" % ("BLUE" if control.owner == 0 else "RED")
+		if control.capture_team >= 0:
+			state += " · %s CAPTURING %d%%" % ["BLUE" if control.capture_team == 0 else "RED", int(control.capture_progress * 100.0)]
+		if occupants.size() == 2:
+			state += " · CONTESTED"
+		if control.overtime:
+			state += " · OVERTIME %.1fs" % control.overtime_remaining
+		if round_time < Overhaul.rules.objective_delay:
+			state = "OPENS IN %ds" % ceili(Overhaul.rules.objective_delay - round_time)
+		if phase == "intermission":
+			state = "NEXT ROUND IN %ds" % ceili(round_pause)
+		var blue_percent := mini(int(scores[0]), 99) if control.overtime and control.winner < 0 and control.owner == 0 else int(scores[0])
+		var red_percent := mini(int(scores[1]), 99) if control.overtime and control.winner < 0 and control.owner == 1 else int(scores[1])
+		_hint.text = "ROUNDS %d—%d · BLUE %d%% — %d%% RED · %s" % [round_wins[0], round_wins[1], blue_percent, red_percent, state]
 	else:
 		_hint.text = "Eliminate the opponent • Walls conceal players and prepared magic"
 	if phase == "waiting":
 		_hint.text = "Waiting for all players to load…"
-	elif local != null and not local.is_alive:
+	elif phase == "active" and local != null and not local.is_alive:
 		_hint.text += "  |  RESPAWN %.1fs" % float(respawns.get(local.player_id, Overhaul.rules.respawn_delay))
-	elif local != null and local.spawn_protection > 0.0:
+	elif phase == "active" and local != null and local.spawn_protection > 0.0:
 		_hint.text += "  |  PROTECTED (casting ends protection)"
 
 func _draw() -> void:
 	if Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE:
+		var point_color: Color = Color("dfca6b") if control.owner < 0 else TEAM_COLORS[control.owner]
 		for cell in objective_cells:
 			var points := PackedVector2Array(HexCells.get_hex_points_around(cell))
-			draw_colored_polygon(points, Color(0.8, 0.7, 0.2, 0.12))
-			draw_polyline(points, Color("dfca6b"), 2, true)
+			draw_colored_polygon(points, Color(point_color, 0.12))
+			draw_polyline(points, point_color, 2, true)
 		for team in range(2):
 			var center := Overhaul.spawn_position(team, 0) * Vector2(1, 0)
 			draw_circle(center, 180, Color(TEAM_COLORS[team], 0.12))
@@ -439,11 +517,13 @@ func _report_spawn_ready() -> void:
 
 
 func _show_result() -> void:
+	_capture_bar.hide()
+	_overtime_bar.hide()
 	var peer := multiplayer.multiplayer_peer
 	var connected: bool = peer != null and peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
 	var host: bool = connected and multiplayer.is_server()
 	_status.text = Overhaul.result_text
-	_hint.text = "Blue %d — %d Red · %s" % [int(scores[0]), int(scores[1]), "Host can start the next match" if host else "Waiting for host"]
+	_hint.text = "Rounds: Blue %d — %d Red · %s" % [round_wins[0], round_wins[1], "Host can start the next match" if host else "Waiting for host"]
 	_rematch_button.visible = host and MultiplayerManager.players.size() == Overhaul.rules.player_count()
 	_leave_button.show()
 	for player in get_players():
@@ -465,22 +545,12 @@ func _leave_match() -> void:
 func _restart() -> void:
 	if phase != "ended":
 		return
-	for player in get_players():
-		_set_dead(player.player_id)
-		_restore_player(player.player_id, Overhaul.spawn_position(player.team_id, player.spawn_slot))
-		player.spawn_protection = 0.0
-		player.last_damage_time = -100.0
-	for effect in get_tree().get_nodes_in_group("overhaul_effect"):
-		effect.queue_free()
-	respawns.clear()
-	scores = [0.0, 0.0]
-	occupants.clear()
+	round_wins.assign([0, 0])
+	round_number = 1
 	elapsed = 0.0
-	_last_score = -1
-	_last_occupants.clear()
+	_reset_round()
 	_rematch_button.hide()
 	_leave_button.hide()
-	phase = "active"
 	Telemetry.start_match("overhaul_2v2" if Overhaul.rules.player_count() == 4 else "vision_duel",
 		{"preset": Overhaul.rules.preset, "limited_vision": Overhaul.rules.limited_vision})
 	MultiplayerManager._register_telemetry_players()
@@ -489,4 +559,24 @@ func _restart() -> void:
 			_log.close()
 		_log = FileAccess.open("user://overhaul-%s.jsonl" % Time.get_unix_time_from_system(), FileAccess.WRITE)
 		log_event("match_started", {"rematch": true, "preset": Overhaul.rules.preset, "limited_vision": Overhaul.rules.limited_vision})
+	_update_vision()
+
+
+func _reset_round() -> void:
+	for player in get_players():
+		_set_dead(player.player_id)
+		_restore_player(player.player_id, Overhaul.spawn_position(player.team_id, player.spawn_slot))
+		player.spawn_protection = 0.0
+		player.last_damage_time = -100.0
+	for effect in get_tree().get_nodes_in_group("overhaul_effect"):
+		effect.queue_free()
+	respawns.clear()
+	control.reset()
+	occupants.clear()
+	round_time = 0.0
+	round_pause = 0.0
+	_last_score = -1
+	_last_occupants.clear()
+	phase = "active"
+	queue_redraw()
 	_update_vision()

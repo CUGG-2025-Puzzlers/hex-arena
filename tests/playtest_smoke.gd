@@ -20,9 +20,7 @@ func run() -> void:
 	check(not PlaytestVisionMask.has_line_of_sight(Vector2(0, -100), Vector2(0, 100), walls), "vertical ray blocks")
 	check(PlaytestVisionMask.has_line_of_sight(Vector2(45, -58), Vector2(65, -58), walls), "hex corner stays open instead of using a bounding rectangle")
 	check(PlaytestVisionMask.clip_segment(Vector2(-100, 0), Vector2(100, 0), walls).is_equal_approx(Vector2(-sqrt(3.0) * 30.0, 0)), "projectile clips at actual hex edge")
-	check(PlaytestRules.score_owner([0, 0]) == 0, "occupant count does not multiply scoring")
-	check(PlaytestRules.score_owner([0, 1]) == -1, "contested scoring pauses")
-	check(PlaytestRules.score_owner([]) == -1, "empty scoring pauses")
+	_test_control_rules()
 	Overhaul.session_enabled = true
 	Overhaul.rules.preset = PlaytestRules.Preset.TEAM_OBJECTIVE
 	MultiplayerManager.players.clear()
@@ -62,6 +60,14 @@ func run() -> void:
 	match_node._update_presentations()
 	check(red.visible, "teammate shares sight")
 	var grid: Node = arena.get_node("Path2D")
+	var stale_cell: Vector2i = grid.local_to_map(blue.global_position)
+	var stale = Node2D.new()
+	stale.free()
+	HexCells.cell_dict[stale_cell] = stale
+	var mana_before_stale := blue.stats_update.current_mana
+	grid.try_and_change_magic_for_player(blue.position, [], Magic.MagicType.LIGHT, 1, 100)
+	check(HexCells.cell_dict[stale_cell] == null and blue.stats_update.current_mana == mana_before_stale, "freed cell occupant is cleaned before type checking or charging mana")
+	grid.change_magic_in_cell_for_player(stale_cell, Magic.MagicType.LIGHT, 1)
 	check(HexCells.wall_cells.size() == match_node.WALL_CELLS.size(), "wall layout occupies grid cells")
 	for cell in HexCells.wall_cells:
 		var wall: HexWall = HexCells.wall_cells[cell]
@@ -100,6 +106,7 @@ func run() -> void:
 	match_node._update_vision()
 	check(match_node.can_see(red.position), "travelling magic carries its vision")
 	scout.fizzle()
+	check(HexCells.get_magic_in_cell(Vector2i(4, 0)) == null, "fizzle leaves no stale cell reference")
 	grid.place_magic_in_cell_for_player(Vector2i(7, 0), Magic.MagicType.NEUTRAL, 2)
 	match_node._update_vision()
 	check(not match_node.can_see(red.position), "fizzled allied magic loses sight and hostile magic grants none")
@@ -132,16 +139,84 @@ func run() -> void:
 	blue.position = Vector2.ZERO
 	red.position = Vector2(700, 300)
 	match_node.get_player(4).position = red.position
-	match_node.elapsed = 20
+	match_node.round_time = Overhaul.rules.objective_delay
+	match_node._tick_objective(4)
+	check(match_node.control.owner == -1 and match_node.control.capture_progress > 0.0, "point requires capture before ownership")
+	match_node._tick_objective(4)
+	check(match_node.control.owner == 0, "uncontested capture gives ownership")
+	red.position = Vector2.ZERO
 	var score: float = match_node.scores[0]
 	match_node._tick_objective(1)
-	check(is_equal_approx(match_node.scores[0], score + 1), "solo team occupancy scores")
-	red.position = Vector2.ZERO
-	score = match_node.scores[0]
-	match_node._tick_objective(1)
-	check(is_equal_approx(match_node.scores[0], score), "enemy occupancy contests")
-	match_node.finish(-1, "test")
+	check(match_node.scores[0] > score, "contesting freezes capture but not owner's percentage")
+	match_node.control.winner = 0
+	match_node._tick_objective(0.1)
+	check(match_node.phase == "intermission" and match_node.round_wins[0] == 1, "first round win starts intermission")
+	match_node._start_round()
+	check(match_node.phase == "active" and match_node.round_number == 2 and match_node.control.owner == -1 and match_node.scores[0] == 0.0, "next round resets point and keeps round wins")
+	check(HexCells.wall_cells.size() == match_node.WALL_CELLS.size() and HexCells.cell_dict[wall_cell] == wall_reference, "round reset preserves wall cells")
+	match_node.round_time = Overhaul.rules.objective_delay
+	match_node.control.winner = 0
+	match_node._tick_objective(0.1)
+	check(match_node.phase == "ended" and match_node.round_wins[0] == 2, "two round wins end the match")
 	match_node._restart()
-	check(HexCells.wall_cells.size() == match_node.WALL_CELLS.size() and HexCells.cell_dict[wall_cell] == wall_reference, "rematch preserves permanent wall cells")
+	check(match_node.round_wins[0] == 0 and match_node.control.owner == -1 and match_node.round_number == 1, "rematch clears round score and point ownership")
 	print("PLAYTEST_SMOKE_COMPLETE failures=", failures)
 	get_tree().quit(failures)
+
+
+func _test_control_rules() -> void:
+	var point := ControlPointState.new()
+	point.tick(4.0, [1, 0])
+	check(point.owner == -1 and is_equal_approx(point.capture_progress, 0.5), "partial capture does not own neutral point")
+	point.tick(2.0, [1, 1])
+	check(is_equal_approx(point.capture_progress, 0.5), "contesting freezes capture")
+	point.tick(4.0, [1, 0])
+	check(point.owner == 0, "capture finishes after uncontested progress")
+	var before := point.percentages[0]
+	point.tick(1.0, [0, 0])
+	check(point.percentages[0] > before, "empty owned point still scores")
+	before = point.percentages[0]
+	point.tick(1.0, [1, 1])
+	check(point.percentages[0] > before, "contested owned point still scores")
+	point.tick(5.4, [0, 2])
+	check(point.owner == 1, "two capturers flip ownership faster")
+	before = point.percentages[0]
+	point.tick(1.0, [0, 0])
+	check(point.percentages[0] == before and point.percentages[1] > 0.0, "only current owner earns percentage")
+	point.reset()
+	point.tick(2.0, [1, 0])
+	point.tick(5.0, [0, 0])
+	check(point.capture_team == -1 and point.capture_progress == 0.0, "abandoned capture decays without checkpoints")
+	point.reset()
+	point.owner = 0
+	point.percentages[0] = 99.5
+	point.tick(2.0, [1, 1])
+	check(point.overtime and point.winner == -1 and point.percentages[0] == 100.0, "late contest extends round at 100 percent")
+	point.tick(4.0, [1, 0])
+	check(point.winner == -1, "overtime allows a return to point")
+	point.tick(0.1, [1, 1])
+	check(point.overtime_remaining > 4.8, "enemy retouch refreshes overtime")
+	point.tick(5.1, [1, 0])
+	check(point.winner == 0, "clearing overtime awards round")
+	point.reset()
+	point.owner = 0
+	point.percentages[0] = 99.5
+	point.tick(1.0, [0, 0])
+	check(point.winner == 0 and not point.overtime, "uncontested 100 percent wins without overtime")
+	point.reset()
+	point.owner = 0
+	point.percentages[0] = 98.5
+	point.tick(0.1, [0, 1])
+	point.tick(2.0, [0, 0])
+	check(point.overtime and point.winner == -1, "recent enemy touch qualifies for overtime")
+	point.reset()
+	point.owner = 0
+	point.percentages[0] = 99.5
+	point.tick(8.0, [0, 1])
+	check(point.owner == 1 and not point.overtime and point.winner == -1, "full capture flips ownership and cancels old owner's overtime")
+	point.percentages[0] = 100.0
+	point.tick(8.0, [1, 0])
+	check(point.owner == 0 and point.overtime and point.winner == -1, "retaking at 100 percent provides displaced team an overtime window")
+	var restored := ControlPointState.new()
+	restored.load_snapshot(point.snapshot())
+	check(restored.owner == point.owner and restored.overtime and restored.percentages == point.percentages, "point snapshot preserves public state")

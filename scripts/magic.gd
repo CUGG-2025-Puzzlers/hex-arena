@@ -305,6 +305,7 @@ func take_damage(damage_to_take: float):
 
 # Destroys this object and its associated path
 func fizzle():
+	_release_grid_cell()
 	if is_queued_for_deletion() or not is_inside_tree():
 		return
 	
@@ -324,3 +325,12 @@ func fizzle():
 			rolling_pathfollow.queue_free()
 	
 	queue_free()
+
+
+func _release_grid_cell() -> void:
+	# A replacement may already occupy this cell; never clear its registration.
+	if HexCells.cell_dict.get(self_cell) == self:
+		HexCells.cell_dict[self_cell] = null
+
+func _exit_tree() -> void:
+	_release_grid_cell()

@@ -75,6 +75,27 @@ func _validate_later(match_node: Node) -> void:
 	assert(not dead.is_alive)
 	await get_tree().create_timer(5.5).timeout
 	assert(dead.is_alive)
+	if role == "host":
+		match_node.round_time = 31.0
+		match_node.control.owner = 0
+		match_node.control.percentages[0] = 42.0
+		match_node.control.capture_team = 1
+		match_node.control.capture_progress = 0.5
+		match_node.control.capture_idle = 0.0
+	await get_tree().create_timer(0.4).timeout
+	assert(match_node.control.owner == 0 and match_node.scores[0] >= 42.0)
+	assert(match_node.control.capture_team == 1 and match_node.control.capture_progress > 0.4)
+	if role == "host":
+		match_node.control.winner = 0
+		match_node._tick_objective(0.01)
+	await get_tree().create_timer(0.8 if role == "host" else 0.4).timeout
+	assert(match_node.phase == "intermission" and match_node.round_wins[0] == 1)
+	if role == "host":
+		match_node._start_round.rpc()
+	await get_tree().create_timer(0.4 if role == "host" else 0.9).timeout
+	assert(match_node.phase == "active" and match_node.round_number == 2)
+	assert(match_node.control.owner == -1 and match_node.scores[0] == 0.0)
+	assert(match_node.round_wins[0] == 1)
 	print("NETWORK_ROUND_OK ", role, " generation=", generation)
 	generation += 1
 	_round_done.rpc_id(1, generation)

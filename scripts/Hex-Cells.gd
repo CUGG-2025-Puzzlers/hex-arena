@@ -141,8 +141,8 @@ func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_stat
 
 	while not surrounding_cells.is_empty():
 		var cell_to_check = surrounding_cells.pop_back()
-		if cell_dict.get(cell_to_check) is Magic:
-			var magic_instance : Magic = cell_dict[cell_to_check]
+		var magic_instance := get_magic_in_cell(cell_to_check)
+		if magic_instance != null:
 
 			# Spawn logic: can turn unclaimed or own magic
 			# Cannot change any magic on opponents' cells
@@ -161,15 +161,14 @@ func try_and_change_magic_for_player(pos: Vector2, radius_cells: Array, new_stat
 
 @rpc("call_local", "authority", "reliable")
 func change_magic_in_cell_for_player(cell: Vector2i, new_state: Magic.MagicType, player_id: int):
-	if not cell_dict.get(cell) is Magic:
-		push_error('Could not get the magic instance for changing')
+	var magic_instance := get_magic_in_cell(cell)
+	if magic_instance == null:
 		return
 
 	var player_owner: Player = get_node("../Players/"+str(player_id))
 	if player_owner == null or player_owner.player_id!=player_id:
 		push_error('Unable to get the player who changed the magic')
 
-	var magic_instance: Magic = cell_dict[cell]
 	var next_stats := magic_instance.own_transforms.get(new_state) as MagicStats
 	if next_stats != null:
 		Telemetry.record_magic_transformed(player_id, next_stats.magic_name)
@@ -471,3 +470,15 @@ static func get_wall_polygons() -> Array[PackedVector2Array]:
 			points.append(wall.to_global(point))
 		polygons.append(points)
 	return polygons
+
+
+static func get_magic_in_cell(cell: Vector2i) -> Magic:
+	var occupant = cell_dict.get(cell)
+	# Test validity BEFORE a type check: `is` itself errors on a freed Object.
+	if not is_instance_valid(occupant):
+		if cell_dict.has(cell):
+			cell_dict[cell] = null
+		return null
+	if not occupant is Magic or occupant.is_queued_for_deletion():
+		return null
+	return occupant as Magic
