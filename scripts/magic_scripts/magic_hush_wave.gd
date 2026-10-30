@@ -66,7 +66,7 @@ func _advance_cast(delta: float) -> void:
 
 	var total_duration := pre_sweep_delay + sweep_duration + linger_duration
 	if cast_elapsed >= total_duration:
-		fizzle()
+		fizzle("completed")
 
 
 func _get_sweep_progress(time: float) -> float:

@@ -5,6 +5,8 @@ var direction: Vector2
 var use_ability: bool
 var mouse_pos: Vector2
 
+var ui_input_blocked: bool = false
+
 var player_id: int
 
 @onready var player_preset: CharacterStats = get_parent().preset
@@ -24,14 +26,24 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if not Overhaul.accepts_input(player_id):
+	if ui_input_blocked or not Overhaul.accepts_input(player_id):
 		direction = Vector2.ZERO
 		use_ability = false
 		return
 	direction = Input.get_vector("left", "right", "up", "down")
 
 
+func set_ui_input_blocked(blocked: bool) -> void:
+	ui_input_blocked = blocked
+	if blocked:
+		direction = Vector2.ZERO
+		use_ability = false
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if ui_input_blocked:
+		use_ability = false
+		return
 	mouse_pos = get_parent().get_global_mouse_position()
 	use_ability = event.is_action_pressed("ability")
 

@@ -7,6 +7,7 @@ class_name DashAbility
 @export var dash_speed_curve: float = 2.0  # Decelerate.
 
 var is_dashing: bool = false
+var _feedback_cancelled: bool = false
 var dash_elapsed: float = 0.0
 var dash_direction: Vector2 = Vector2.ZERO
 var dash_start_pos: Vector2 = Vector2.ZERO
@@ -42,12 +43,16 @@ func _execute() -> void:
 		dash_direction = get_aim_direction()
 
 	dash_start_pos = player.global_position
+	_feedback_cancelled = false
 	dash_elapsed = 0.0
 	is_dashing = true
 	is_active = true
+	Juice.world("depart", player.global_position, player.player_id, dash_direction)
 
 
 func _end_dash() -> void:
+	if is_dashing and player.is_alive and Overhaul.accepts_input(player.player_id):
+		Juice.world("interrupted" if _feedback_cancelled else "arrive", player.global_position, player.player_id, dash_direction)
 	is_dashing = false
 	is_active = false
 	player.velocity = Vector2.ZERO
@@ -56,6 +61,7 @@ func _end_dash() -> void:
 
 func cancel_dash() -> void:
 	if is_dashing:
+		_feedback_cancelled = true
 		_end_dash()
 
 

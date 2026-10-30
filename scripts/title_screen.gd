@@ -42,26 +42,9 @@ const HERO_ICONS := {
 	),
 }
 
-const HERO_ROLES := {
-	Util.Character.Hekaset: "ARCANE MAGE",
-	Util.Character.Zilo: "CLOSE-RANGE DUELIST",
-	Util.Character.WaterOrbA: "RAZOR CURRENT",
-	Util.Character.WaterOrbB: "FLOW CONTROLLER",
-	Util.Character.Aurora: "LIGHT CONTROLLER",
-}
+const HERO_ROLES = preload("res://scripts/ui/hero_catalog.gd").ROLES
 
-const HERO_DESCRIPTIONS := {
-	Util.Character.Hekaset:
-		"Places light and heavy magic, then changes it to control space.",
-	Util.Character.Zilo:
-		"Roots a target, closes the gap, and deals high close-range damage.",
-	Util.Character.WaterOrbA:
-		"Shapes water into fast, sharp attacks and close-range pressure.",
-	Util.Character.WaterOrbB:
-		"Uses flowing water magic to redirect fights and control lanes.",
-	Util.Character.Aurora:
-		"Uses silence, slowing fields, healing light, and stasis.",
-}
+const HERO_DESCRIPTIONS = preload("res://scripts/ui/hero_catalog.gd").DESCRIPTIONS
 
 const MODE_NAMES := {
 	MODE_QUICK: "QUICK MATCH",
@@ -150,13 +133,14 @@ func _ready() -> void:
 	_initialise_character()
 	_update_mode_display()
 	_show_view(_home_view)
+	Juice.settings_button(_home_view, Vector2(80, 950))
 
 	Telemetry.track("main_menu_viewed")
 
 
 func _initialise_theme() -> void:
 	var custom_theme := load(
-		"res://ui/themes/hex_red_teal.tres"
+		"res://ui/themes/pregame.tres"
 	) as Theme
 
 	if custom_theme == null:
@@ -178,7 +162,6 @@ func _connect_navigation() -> void:
 	%PatchTabButton.pressed.connect(_show_patch)
 	%AccountButton.pressed.connect(_on_account_pressed)
 	%ChangeHeroButton.pressed.connect(_show_heroes)
-	%ChooseModeButton.pressed.connect(_show_play)
 	%ViewPatchButton.pressed.connect(_show_patch)
 	%PlayBackButton.pressed.connect(_show_home)
 	%HeroesBackButton.pressed.connect(_show_home)
@@ -186,22 +169,15 @@ func _connect_navigation() -> void:
 	%MainPlayButton.pressed.connect(_launch_selected_mode)
 
 
+func _mode_buttons() -> Dictionary:
+	return {MODE_QUICK: %QuickMatchModeButton, MODE_CUSTOM: %CustomLobbyModeButton, MODE_BOT: %BotModeButton, MODE_TUTORIAL: %TutorialModeButton, MODE_LOCAL: %LocalModeButton}
+
+
 func _connect_modes() -> void:
-	%QuickMatchModeButton.pressed.connect(
-		_select_mode.bind(MODE_QUICK)
-	)
-	%CustomLobbyModeButton.pressed.connect(
-		_select_mode.bind(MODE_CUSTOM)
-	)
-	%BotModeButton.pressed.connect(
-		_select_mode.bind(MODE_BOT)
-	)
-	%TutorialModeButton.pressed.connect(
-		_select_mode.bind(MODE_TUTORIAL)
-	)
-	%LocalModeButton.pressed.connect(
-		_select_mode.bind(MODE_LOCAL)
-	)
+	for mode in _mode_buttons():
+		var button: Button = _mode_buttons()[mode]
+		button.toggle_mode = true
+		button.pressed.connect(_select_mode.bind(mode))
 
 
 func _connect_heroes() -> void:
@@ -217,6 +193,7 @@ func _connect_heroes() -> void:
 		var button: Button = hero_buttons[character]
 		button.icon = HERO_ICONS[character]
 		button.expand_icon = true
+		button.toggle_mode = true
 		button.add_theme_constant_override(
 			&"icon_max_width",
 			48
@@ -286,6 +263,11 @@ func _show_view(view: Control) -> void:
 	]:
 		candidate.visible = candidate == view
 
+	%HomeNavigation.visible = view == _home_view
+	%MenuBrand.visible = view == _home_view
+	%SmallBrand.visible = view != _home_view
+	%HomeTabButton.visible = view != _home_view
+	%BuildCaption.visible = view == _home_view
 	_status_label.text = ""
 	_update_navigation_state(view)
 
@@ -335,20 +317,19 @@ func _select_mode(mode: String) -> void:
 	_selected_mode = mode
 	_update_mode_display()
 	Telemetry.track("mode_selected", {"mode": mode})
-	_show_home()
+	_show_play()
 
 
 func _update_mode_display() -> void:
 	_selected_mode_label.text = MODE_NAMES[_selected_mode]
 	_selected_mode_description.text = MODE_DESCRIPTIONS[_selected_mode]
 
-	match _selected_mode:
-		MODE_CUSTOM, MODE_LOCAL:
-			_main_play_button.text = "OPEN"
-		MODE_TUTORIAL:
-			_main_play_button.text = "START"
-		_:
-			_main_play_button.text = "PLAY"
+	var actions := {MODE_QUICK: "FIND MATCH", MODE_CUSTOM: "OPEN LOBBY", MODE_BOT: "CHOOSE HEROES", MODE_TUTORIAL: "START TUTORIAL", MODE_LOCAL: "OPEN LAN"}
+	_main_play_button.text = actions[_selected_mode]
+	for mode in _mode_buttons():
+		var button: Button = _mode_buttons()[mode]
+		button.set_pressed_no_signal(mode == _selected_mode)
+		button.call("refresh_visual")
 
 
 func _launch_selected_mode() -> void:
@@ -402,6 +383,9 @@ func _update_selected_hero() -> void:
 
 
 func _update_preview_hero() -> void:
+	var buttons := {Util.Character.Hekaset: %HekasetHeroButton, Util.Character.Zilo: %ZiloHeroButton, Util.Character.WaterOrbA: %AquaAHeroButton, Util.Character.WaterOrbB: %AquaBHeroButton, Util.Character.Aurora: %AuroraHeroButton}
+	for character in buttons:
+		buttons[character].set_pressed_no_signal(character == _preview_character)
 	_preview_art.texture = HERO_SPLASHES[_preview_character]
 	_preview_name_label.text = Util.get_character_display_name(
 		_preview_character
@@ -623,6 +607,8 @@ func _set_busy(busy: bool, message: String) -> void:
 		"menu_action"
 	):
 		button.disabled = busy
+		if button.has_method("refresh_visual"):
+			button.call("refresh_visual")
 
 
 func _on_lobby_action_failed(reason: String) -> void:

@@ -29,6 +29,8 @@ func _process(delta: float) -> void:
 
 	if not firing and charge_progress < 1.0:
 		charge_progress = minf(charge_progress + delta / maxf(charge_time, 0.01), 1.0)
+		if charge_progress >= 1.0:
+			Juice.world("ready", global_position, player_id)
 
 	queue_redraw()
 
@@ -77,7 +79,7 @@ func start_rolling(direction_path: PackedVector2Array) -> void:
 	)
 	firing_tween.tween_callback(_fire_lance)
 	firing_tween.tween_interval(beam_visible_time)
-	firing_tween.tween_callback(fizzle)
+	firing_tween.tween_callback(fizzle.bind("completed"))
 
 
 func _set_firing_progress(value: float) -> void:

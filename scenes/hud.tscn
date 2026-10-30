@@ -1,305 +1,527 @@
 [gd_scene format=3 uid="uid://dkis3bnrh1b7d"]
 
-[ext_resource type="Script" uid="uid://bscgkyr277i63" path="res://scripts/hud.gd" id="1_hud"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/hud_health_bar.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/hud_resource_ring.gd" id="3"]
 
-[sub_resource type="StyleBoxFlat" id="PanelMain"]
-content_margin_left = 14.0
-content_margin_top = 10.0
-content_margin_right = 14.0
-content_margin_bottom = 10.0
-bg_color = Color(0.0666667, 0.101961, 0.133333, 0.94)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.168627, 0.235294, 0.270588, 0.92)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[sub_resource type="SystemFont" id="HUDfont"]
+font_names = PackedStringArray("Bahnschrift SemiCondensed", "Bahnschrift", "Arial")
+font_weight = 600
 
-[sub_resource type="StyleBoxFlat" id="CardQ"]
-content_margin_left = 8.0
-content_margin_top = 7.0
-content_margin_right = 8.0
-content_margin_bottom = 7.0
-bg_color = Color(0.0666667, 0.101961, 0.133333, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.141176, 0.717647, 0.690196, 0.9)
-corner_radius_top_left = 9
-corner_radius_top_right = 9
-corner_radius_bottom_right = 9
-corner_radius_bottom_left = 9
+[sub_resource type="Theme" id="HUDtheme"]
+default_font = SubResource("HUDfont")
+default_font_size = 16
+Label/colors/font_color = Color(0.95, 0.97, 1, 1)
+Label/colors/font_outline_color = Color(0.02, 0.03, 0.05, 0.8)
+Label/constants/outline_size = 2
 
-[sub_resource type="StyleBoxFlat" id="CardE"]
-content_margin_left = 8.0
-content_margin_top = 7.0
-content_margin_right = 8.0
-content_margin_bottom = 7.0
-bg_color = Color(0.0666667, 0.101961, 0.133333, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.141176, 0.717647, 0.690196, 0.9)
-corner_radius_top_left = 9
-corner_radius_top_right = 9
-corner_radius_bottom_right = 9
-corner_radius_bottom_left = 9
+[sub_resource type="StyleBoxFlat" id="AbilityPlate"]
+bg_color = Color(0.035, 0.06, 0.09, 0.52)
+border_width_bottom = 3
+border_color = Color(0.92, 0.96, 1, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_left = 2
+corner_radius_bottom_right = 2
+skew = Vector2(-0.08, 0)
 
-[sub_resource type="StyleBoxFlat" id="CardR"]
-content_margin_left = 8.0
-content_margin_top = 7.0
-content_margin_right = 8.0
-content_margin_bottom = 7.0
-bg_color = Color(0.0862745, 0.101961, 0.152941, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.85098, 0.290196, 0.341176, 0.9)
-corner_radius_top_left = 9
-corner_radius_top_right = 9
-corner_radius_bottom_right = 9
-corner_radius_bottom_left = 9
+[sub_resource type="StyleBoxFlat" id="PortraitPlate"]
+bg_color = Color(0.07, 0.11, 0.17, 0.55)
+border_width_bottom = 4
+border_color = Color(0.85, 0.94, 1, 1)
+skew = Vector2(-0.08, 0)
 
-[sub_resource type="StyleBoxFlat" id="CardShift"]
-content_margin_left = 8.0
-content_margin_top = 7.0
-content_margin_right = 8.0
-content_margin_bottom = 7.0
-bg_color = Color(0.0666667, 0.101961, 0.133333, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.545098, 0.890196, 0.870588, 0.9)
-corner_radius_top_left = 9
-corner_radius_top_right = 9
-corner_radius_bottom_right = 9
-corner_radius_bottom_left = 9
+[sub_resource type="StyleBoxFlat" id="KeyPlate"]
+content_margin_left = 6.0
+content_margin_right = 6.0
+bg_color = Color(0.94, 0.97, 1, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_left = 2
+corner_radius_bottom_right = 2
 
-[node name="HUD" type="CanvasLayer" unique_id=1264066907]
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[node name="HUD" type="CanvasLayer"]
 layer = 10
-script = ExtResource("1_hud")
+script = ExtResource("1")
 
-[node name="PlayerMargin" type="MarginContainer" parent="." unique_id=1369091946]
-anchors_preset = 12
+[node name="PlayerMargin" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("HUDtheme")
+
+[node name="Vitals" type="Control" parent="PlayerMargin"]
+layout_mode = 0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 64.0
+offset_top = -208.0
+offset_right = 510.0
+offset_bottom = -36.0
+grow_vertical = 0
+
+[node name="PortraitFrame" type="Panel" parent="PlayerMargin/Vitals"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 18.0
+offset_right = 108.0
+offset_bottom = 146.0
+theme_override_styles/panel = SubResource("PortraitPlate")
+
+[node name="PlayerPortrait" type="TextureRect" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 4.0
+offset_top = 21.0
+offset_right = 104.0
+offset_bottom = 141.0
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HeroName" type="Label" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 130.0
+offset_top = 2.0
+offset_right = 396.0
+offset_bottom = 26.0
+theme_override_font_sizes/font_size = 20
+text = "HEKASET"
+
+
+[node name="PlayerHPLabel" type="Label" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 128.0
+offset_top = 28.0
+offset_right = 256.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 54
+text = "80"
+
+
+[node name="PlayerHPMaxLabel" type="Label" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 238.0
+offset_top = 57.0
+offset_right = 368.0
+offset_bottom = 85.0
+theme_override_font_sizes/font_size = 22
+text = "/ 80"
+modulate = Color(0.85, 0.89, 0.96, 0.8)
+
+[node name="PlayerHPBar" type="ProgressBar" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 130.0
+offset_top = 94.0
+offset_right = 396.0
+offset_bottom = 112.0
+script = ExtResource("2")
+theme_override_styles/background = SubResource("Empty")
+theme_override_styles/fill = SubResource("Empty")
+value = 100.0
+show_percentage = false
+
+[node name="PlayerManaBar" type="ProgressBar" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 130.0
+offset_top = 128.0
+offset_right = 396.0
+offset_bottom = 132.0
+value = 100.0
+show_percentage = false
+
+[node name="PlayerManaLabel" type="Label" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 130.0
+offset_top = 139.0
+offset_right = 396.0
+offset_bottom = 161.0
+theme_override_font_sizes/font_size = 15
+text = "100 / 100 MANA"
+modulate = Color(0.65, 0.9, 1, 1)
+
+[node name="PlayerStatusLabel" type="Label" parent="PlayerMargin/Vitals"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = -23.0
+offset_right = 446.0
+offset_bottom = 0.0
+theme_override_font_sizes/font_size = 16
+text = ""
+theme_override_colors/font_color = Color(1, 0.62, 0.3, 1)
+
+[node name="ManaGauge" type="Control" parent="PlayerMargin"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -66.0
+offset_top = -179.0
+offset_right = 66.0
+offset_bottom = -47.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ManaRing" type="Control" parent="PlayerMargin/ManaGauge"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 132.0
+offset_bottom = 132.0
+script = ExtResource("3")
+
+[node name="ManaPercent" type="Label" parent="PlayerMargin/ManaGauge"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 37.0
+offset_right = 126.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 33
+text = "100%"
+horizontal_alignment = 1
+
+[node name="ManaCaption" type="Label" parent="PlayerMargin/ManaGauge"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 80.0
+offset_right = 132.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 14
+text = "MANA"
+horizontal_alignment = 1
+
+[node name="AbilityContainer" type="HBoxContainer" parent="PlayerMargin"]
+layout_mode = 0
+anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 205.0
-offset_top = -200.0
-offset_right = -215.0
-offset_bottom = 3.0
-grow_horizontal = 2
+offset_left = -526.0
+offset_top = -197.0
+offset_right = -60.0
+offset_bottom = -37.0
+grow_horizontal = 0
 grow_vertical = 0
-theme_override_constants/margin_left = 485
-theme_override_constants/margin_right = 485
+theme_override_constants/separation = 14
 
-[node name="PlayerPanel" type="PanelContainer" parent="PlayerMargin" unique_id=1978607614]
-layout_mode = 2
-theme_override_styles/panel = SubResource("PanelMain")
-
-[node name="VBox" type="VBoxContainer" parent="PlayerMargin/PlayerPanel" unique_id=620810204]
-layout_mode = 2
-theme_override_constants/separation = 7
-
-[node name="AbilityContainer" type="HBoxContainer" parent="PlayerMargin/PlayerPanel/VBox" unique_id=474886937]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="PassiveMagic" type="PanelContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer" unique_id=729014387]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-theme_override_styles/panel = SubResource("CardQ")
-
-[node name="VBox" type="VBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/PassiveMagic" unique_id=1692719348]
+[node name="PassiveMagic" type="Control" parent="PlayerMargin/AbilityContainer"]
+custom_minimum_size = Vector2(106, 160)
 layout_mode = 2
 
-[node name="Top" type="HBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/PassiveMagic/VBox" unique_id=734317318]
-layout_mode = 2
-
-[node name="PassiveMagicCost" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/PassiveMagic/VBox/Top" unique_id=828312648]
+[node name="PassiveMagicName" type="Label" parent="PlayerMargin/AbilityContainer/PassiveMagic"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
+layout_mode = 0
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 20.0
 theme_override_font_sizes/font_size = 14
-text = "15"
-horizontal_alignment = 2
-
-[node name="PassiveMagicIcon" type="TextureRect" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/PassiveMagic/VBox" unique_id=1021715319]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="PassiveMagicName" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/PassiveMagic/VBox" unique_id=155627846]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Q Magic"
+text = "PassiveMagic"
 horizontal_alignment = 1
 text_overrun_behavior = 3
 
-[node name="LightMagic" type="PanelContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer" unique_id=2104627013]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-theme_override_styles/panel = SubResource("CardE")
+[node name="Frame" type="Panel" parent="PlayerMargin/AbilityContainer/PassiveMagic"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 24.0
+offset_right = 106.0
+offset_bottom = 100.0
+theme_override_styles/panel = SubResource("AbilityPlate")
 
-[node name="VBox" type="VBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/LightMagic" unique_id=1784299350]
-layout_mode = 2
-
-[node name="Top" type="HBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/LightMagic/VBox" unique_id=1437059835]
-layout_mode = 2
-
-[node name="LightMagicCost" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/LightMagic/VBox/Top" unique_id=546902118]
+[node name="PassiveMagicIcon" type="TextureRect" parent="PlayerMargin/AbilityContainer/PassiveMagic"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 14
-text = "10"
-horizontal_alignment = 2
-
-[node name="LightMagicIcon" type="TextureRect" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/LightMagic/VBox" unique_id=879319415]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
+layout_mode = 0
+offset_left = 25.0
+offset_top = 31.0
+offset_right = 81.0
+offset_bottom = 87.0
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LightMagicName" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/LightMagic/VBox" unique_id=1547767486]
+[node name="PassiveMagicCost" type="Label" parent="PlayerMargin/AbilityContainer/PassiveMagic"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "E Magic"
+layout_mode = 0
+offset_left = 0.0
+offset_top = 106.0
+offset_right = 106.0
+offset_bottom = 124.0
+theme_override_font_sizes/font_size = 12
+text = "5 mana"
 horizontal_alignment = 1
-text_overrun_behavior = 3
 
-[node name="HeavyMagic" type="PanelContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer" unique_id=880628712]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-theme_override_styles/panel = SubResource("CardR")
-
-[node name="VBox" type="VBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/HeavyMagic" unique_id=413391118]
-layout_mode = 2
-
-[node name="Top" type="HBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/HeavyMagic/VBox" unique_id=1166222875]
-layout_mode = 2
-
-[node name="HeavyMagicCost" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/HeavyMagic/VBox/Top" unique_id=535405044]
+[node name="PassiveKey" type="Label" parent="PlayerMargin/AbilityContainer/PassiveMagic"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 14
-text = "20"
-horizontal_alignment = 2
-
-[node name="HeavyMagicIcon" type="TextureRect" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/HeavyMagic/VBox" unique_id=382324586]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
-size_flags_vertical = 8
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HeavyMagicName" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/HeavyMagic/VBox" unique_id=1086085212]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "R Magic"
-horizontal_alignment = 1
-text_overrun_behavior = 3
-
-[node name="MovementBuff" type="PanelContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer" unique_id=1736981841]
-custom_minimum_size = Vector2(70, 70)
-layout_mode = 2
-theme_override_styles/panel = SubResource("CardShift")
-
-[node name="VBox" type="VBoxContainer" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/MovementBuff" unique_id=1355870662]
-layout_mode = 2
-
-[node name="MovementAbilityIcon" type="TextureRect" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/MovementBuff/VBox" unique_id=382157686]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="MovementAbilityName" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/MovementBuff/VBox" unique_id=1952409205]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Ability"
-horizontal_alignment = 1
-text_overrun_behavior = 3
-
-[node name="MovementCooldownOverlay" type="ColorRect" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/MovementBuff" unique_id=627490935]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-color = Color(0.0470588, 0.0666667, 0.0901961, 0.82)
-
-[node name="MovementTimerLabel" type="Label" parent="PlayerMargin/PlayerPanel/VBox/AbilityContainer/MovementBuff" unique_id=543049185]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 30
-text = "5.0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PlayerHPBar" type="ProgressBar" parent="PlayerMargin/PlayerPanel/VBox" unique_id=931653652]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 15)
-layout_mode = 2
-theme_type_variation = &"HealthBar"
-value = 100.0
-show_percentage = false
-
-[node name="PlayerHPLabel" type="Label" parent="PlayerMargin/PlayerPanel/VBox/PlayerHPBar" unique_id=1950445734]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 17
-text = "HP  100 / 100"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PlayerManaBar" type="ProgressBar" parent="PlayerMargin/PlayerPanel/VBox" unique_id=1120717906]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 13)
-layout_mode = 2
-theme_type_variation = &"ManaBar"
-value = 100.0
-show_percentage = false
-
-[node name="PlayerManaLabel" type="Label" parent="PlayerMargin/PlayerPanel/VBox/PlayerManaBar" unique_id=806067318]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_left = 36.0
+offset_top = 134.0
+offset_right = 70.0
+offset_bottom = 158.0
 theme_override_font_sizes/font_size = 16
-text = "MANA  100 / 100"
+text = "Q"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_styles/normal = SubResource("KeyPlate")
+theme_override_colors/font_color = Color(0.05, 0.08, 0.13, 1)
+theme_override_constants/outline_size = 0
+
+[node name="PassiveState" type="Label" parent="PlayerMargin/AbilityContainer/PassiveMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -8.0
+offset_top = -21.0
+offset_right = 114.0
+offset_bottom = -3.0
+theme_override_font_sizes/font_size = 11
+text = ""
+horizontal_alignment = 1
+
+[node name="LightMagic" type="Control" parent="PlayerMargin/AbilityContainer"]
+custom_minimum_size = Vector2(106, 160)
+layout_mode = 2
+
+[node name="LightMagicName" type="Label" parent="PlayerMargin/AbilityContainer/LightMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 20.0
+theme_override_font_sizes/font_size = 14
+text = "LightMagic"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Frame" type="Panel" parent="PlayerMargin/AbilityContainer/LightMagic"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 24.0
+offset_right = 106.0
+offset_bottom = 100.0
+theme_override_styles/panel = SubResource("AbilityPlate")
+
+[node name="LightMagicIcon" type="TextureRect" parent="PlayerMargin/AbilityContainer/LightMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 25.0
+offset_top = 31.0
+offset_right = 81.0
+offset_bottom = 87.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LightMagicCost" type="Label" parent="PlayerMargin/AbilityContainer/LightMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 106.0
+offset_right = 106.0
+offset_bottom = 124.0
+theme_override_font_sizes/font_size = 12
+text = "5 mana"
+horizontal_alignment = 1
+
+[node name="LightKey" type="Label" parent="PlayerMargin/AbilityContainer/LightMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 36.0
+offset_top = 134.0
+offset_right = 70.0
+offset_bottom = 158.0
+theme_override_font_sizes/font_size = 16
+text = "E"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_styles/normal = SubResource("KeyPlate")
+theme_override_colors/font_color = Color(0.05, 0.08, 0.13, 1)
+theme_override_constants/outline_size = 0
+
+[node name="LightState" type="Label" parent="PlayerMargin/AbilityContainer/LightMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -8.0
+offset_top = -21.0
+offset_right = 114.0
+offset_bottom = -3.0
+theme_override_font_sizes/font_size = 11
+text = ""
+horizontal_alignment = 1
+
+[node name="HeavyMagic" type="Control" parent="PlayerMargin/AbilityContainer"]
+custom_minimum_size = Vector2(106, 160)
+layout_mode = 2
+
+[node name="HeavyMagicName" type="Label" parent="PlayerMargin/AbilityContainer/HeavyMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 20.0
+theme_override_font_sizes/font_size = 14
+text = "HeavyMagic"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Frame" type="Panel" parent="PlayerMargin/AbilityContainer/HeavyMagic"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 24.0
+offset_right = 106.0
+offset_bottom = 100.0
+theme_override_styles/panel = SubResource("AbilityPlate")
+
+[node name="HeavyMagicIcon" type="TextureRect" parent="PlayerMargin/AbilityContainer/HeavyMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 25.0
+offset_top = 31.0
+offset_right = 81.0
+offset_bottom = 87.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeavyMagicCost" type="Label" parent="PlayerMargin/AbilityContainer/HeavyMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 106.0
+offset_right = 106.0
+offset_bottom = 124.0
+theme_override_font_sizes/font_size = 12
+text = "5 mana"
+horizontal_alignment = 1
+
+[node name="HeavyKey" type="Label" parent="PlayerMargin/AbilityContainer/HeavyMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 36.0
+offset_top = 134.0
+offset_right = 70.0
+offset_bottom = 158.0
+theme_override_font_sizes/font_size = 16
+text = "R"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_styles/normal = SubResource("KeyPlate")
+theme_override_colors/font_color = Color(0.05, 0.08, 0.13, 1)
+theme_override_constants/outline_size = 0
+
+[node name="HeavyState" type="Label" parent="PlayerMargin/AbilityContainer/HeavyMagic"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -8.0
+offset_top = -21.0
+offset_right = 114.0
+offset_bottom = -3.0
+theme_override_font_sizes/font_size = 11
+text = ""
+horizontal_alignment = 1
+
+[node name="MovementBuff" type="Control" parent="PlayerMargin/AbilityContainer"]
+custom_minimum_size = Vector2(106, 160)
+layout_mode = 2
+
+[node name="MovementAbilityName" type="Label" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 20.0
+theme_override_font_sizes/font_size = 14
+text = "GHOST"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Frame" type="Panel" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 24.0
+offset_right = 106.0
+offset_bottom = 100.0
+theme_override_styles/panel = SubResource("AbilityPlate")
+
+[node name="MovementAbilityIcon" type="TextureRect" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 25.0
+offset_top = 31.0
+offset_right = 81.0
+offset_bottom = 87.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MovementKey" type="Label" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 134.0
+offset_right = 84.0
+offset_bottom = 158.0
+theme_override_font_sizes/font_size = 16
+text = "SHIFT"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_styles/normal = SubResource("KeyPlate")
+theme_override_colors/font_color = Color(0.05, 0.08, 0.13, 1)
+theme_override_constants/outline_size = 0
+
+[node name="MovementState" type="Label" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -8.0
+offset_top = 106.0
+offset_right = 114.0
+offset_bottom = 124.0
+theme_override_font_sizes/font_size = 11
+text = "READY"
+horizontal_alignment = 1
+
+[node name="MovementCooldownOverlay" type="ColorRect" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 24.0
+offset_right = 106.0
+offset_bottom = 100.0
+mouse_filter = 2
+color = Color(0.04, 0.06, 0.1, 0.25)
+
+[node name="MovementTimerLabel" type="Label" parent="PlayerMargin/AbilityContainer/MovementBuff"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 31.0
+offset_right = 106.0
+offset_bottom = 87.0
+theme_override_font_sizes/font_size = 36
+text = "3.2"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayerStatusLabel" type="Label" parent="PlayerMargin/PlayerPanel/VBox" unique_id=1647836682]
+[node name="MovementCooldownBar" type="ProgressBar" parent="PlayerMargin/AbilityContainer/MovementBuff"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-theme_type_variation = &"StatusLabel"
-theme_override_font_sizes/font_size = 14
-horizontal_alignment = 1
+layout_mode = 0
+offset_left = 1.0
+offset_top = 95.0
+offset_right = 105.0
+offset_bottom = 99.0
+max_value = 1.0
+value = 1.0
+show_percentage = false

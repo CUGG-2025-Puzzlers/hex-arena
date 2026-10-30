@@ -32,6 +32,8 @@ func _execute() -> void:
 	else:
 		player.global_position = target_pos
 		
+	Juice.world("depart", player_pos, player.player_id, direction)
+	Juice.world("arrive", player.global_position, player.player_id, direction)
 	_spawn_flash_effect()
 	
 func _spawn_flash_effect() -> void:

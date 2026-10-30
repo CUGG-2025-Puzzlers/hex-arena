@@ -224,7 +224,9 @@ func _handle_magic_entered(projectile: Magic) -> void:
 	if not projectile.can_be_cut_by_wire():
 		return
 
-	projectile.call_deferred("fizzle")
+	Juice.world("block", projectile.global_position, player_id)
+	Juice.success("INTERCEPTED", projectile.global_position, player_id)
+	projectile.call_deferred("fizzle", "interrupted")
 
 
 func _draw() -> void:

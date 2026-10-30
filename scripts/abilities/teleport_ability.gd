@@ -50,6 +50,7 @@ func _execute() -> void:
 
 
 func _complete_teleport() -> void:
+	var departure := player.global_position
 	var world_state = player.get_world_2d().direct_space_state
 
 	# avoid teleport into walls
@@ -68,10 +69,14 @@ func _complete_teleport() -> void:
 	else:
 		player.global_position = target_position
 
+	var direction := (player.global_position - departure).normalized()
+	Juice.world("depart", departure, player.player_id, direction)
+	Juice.world("arrive", player.global_position, player.player_id, direction)
 	_cleanup_channel()
 	_start_cooldown()
 	
 func _cancel_channel() -> void:
+	Juice.world("interrupted", player.global_position, player.player_id)
 	_cleanup_channel()
 	# refund partial cooldown when calceled
 	is_on_cooldown = true

@@ -274,6 +274,10 @@ func _launch_approved(cell: Vector2i, points: PackedVector2Array, player_id: int
 		if magic_instance is Magic and magic_instance.player_id == player_id and magic_instance.self_cell == cell and not magic_instance.rolling:
 			Telemetry.record_magic_fired(player_id, magic_instance.get_telemetry_name())
 			magic_instance.start_rolling(points)
+			if magic_instance.rolling:
+				Juice.world("launch", magic_instance.global_position, player_id, points[points.size() - 1] - points[0])
+				if is_instance_valid(magic_instance.rolling_pathfollow):
+					Juice.trail(magic_instance)
 
 
 static func get_hex_points_around(pos: Vector2i):

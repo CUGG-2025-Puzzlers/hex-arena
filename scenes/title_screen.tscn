@@ -1,38 +1,37 @@
 [gd_scene format=3 uid="uid://bxue7p844nv7d"]
 
-[ext_resource type="Script" uid="uid://ce3s23apcqhow" path="res://scripts/title_screen.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://bscr3k6xsv6oy" path="res://assets/textures/hex_icon.png" id="2_logo"]
+[ext_resource type="Script" path="res://scripts/title_screen.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/themes/pregame.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/ui/backgrounds/arena_courtyard.png" id="3"]
+[ext_resource type="Shader" path="res://shaders/pregame_shade.gdshader" id="4"]
 
-[sub_resource type="Shader" id="Shader_fog"]
-code = "shader_type canvas_item;
+[ext_resource type="Texture2D" path="res://assets/ui/icons/mode_quick.svg" id="mode_0"]
 
-void fragment() {
-	vec2 p = UV - vec2(0.5);
-	p.x *= 0.72;
-	float distance_from_center = length(p);
-	float center_fog = 1.0 - smoothstep(0.10, 0.62, distance_from_center);
-	float edge_vignette = smoothstep(0.35, 0.82, distance_from_center);
-	vec3 fog_color = vec3(0.035, 0.15, 0.16);
-	vec3 edge_color = vec3(0.015, 0.025, 0.04);
-	vec3 color = mix(fog_color, edge_color, edge_vignette);
-	float alpha = center_fog * 0.55 + edge_vignette * 0.72;
-	COLOR = vec4(color, alpha);
-}
-"
+[ext_resource type="Texture2D" path="res://assets/ui/icons/mode_lobby.svg" id="mode_1"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_fog"]
-shader = SubResource("Shader_fog")
+[ext_resource type="Texture2D" path="res://assets/ui/icons/mode_bot.svg" id="mode_2"]
 
-[node name="TitleScreen" type="Control" unique_id=472140380]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/mode_tutorial.svg" id="mode_3"]
+
+[ext_resource type="Texture2D" path="res://assets/ui/icons/mode_lan.svg" id="mode_4"]
+
+[ext_resource type="Script" path="res://scripts/ui/mode_card.gd" id="mode_script"]
+
+[sub_resource type="ShaderMaterial" id="Shade"]
+shader = ExtResource("4")
+
+[node name="TitleScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_script")
+theme = ExtResource("2")
+script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="." unique_id=760985383]
+
+[node name="Backdrop" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,969 +39,1264 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.0470588, 0.0666667, 0.0901961, 1)
-
-[node name="Fog" type="ColorRect" parent="." unique_id=1099714575]
-material = SubResource("ShaderMaterial_fog")
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="TopBar" type="PanelContainer" parent="." unique_id=1853637425]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 88.0
-grow_horizontal = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="Margin" type="MarginContainer" parent="TopBar" unique_id=1649475835]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 10
-
-[node name="Row" type="HBoxContainer" parent="TopBar/Margin" unique_id=687613245]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Logo" type="TextureRect" parent="TopBar/Margin/Row" unique_id=1908703041]
-custom_minimum_size = Vector2(62, 62)
-layout_mode = 2
-texture = ExtResource("2_logo")
+texture = ExtResource("3")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 6
 
-[node name="Brand" type="VBoxContainer" parent="TopBar/Margin/Row" unique_id=1634054224]
-custom_minimum_size = Vector2(150, 0)
-layout_mode = 2
-theme_override_constants/separation = -4
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("Shade")
 
-[node name="GameTitle" type="Label" parent="TopBar/Margin/Row/Brand" unique_id=2069592212]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 28
+[node name="SmallBrand" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 76.0
+offset_top = 32.0
+offset_right = 536.0
+offset_bottom = 72.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
 text = "HEX ARENA"
 
-[node name="BuildLabel" type="Label" parent="TopBar/Margin/Row/Brand" unique_id=230665370]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 13
-text = "EARLY BUILD"
 
-[node name="Navigation" type="HBoxContainer" parent="TopBar/Margin/Row" unique_id=1905629530]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="HomeTabButton" type="Button" parent="TopBar/Margin/Row/Navigation" unique_id=518030193]
+[node name="MenuBrand" type="Label" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(104, 54)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "HOME"
+layout_mode = 0
+offset_left = 72.0
+offset_top = 110.0
+offset_right = 722.0
+offset_bottom = 225.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 98
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "HEX ARENA"
 
-[node name="PlayTabButton" type="Button" parent="TopBar/Margin/Row/Navigation" unique_id=1399472615]
+
+[node name="BuildCaption" type="Label" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(104, 54)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "PLAY"
+layout_mode = 0
+offset_left = 78.0
+offset_top = 222.0
+offset_right = 578.0
+offset_bottom = 250.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "GAMEPLAY OVERHAUL  /  EARLY BUILD"
 
-[node name="HeroesTabButton" type="Button" parent="TopBar/Margin/Row/Navigation" unique_id=227189961]
+
+[node name="PlayerNameLabel" type="Label" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(116, 54)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "HEROES"
-
-[node name="PatchTabButton" type="Button" parent="TopBar/Margin/Row/Navigation" unique_id=1071617627]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(154, 54)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "PATCH NOTES"
-
-[node name="TopSpacer" type="Control" parent="TopBar/Margin/Row" unique_id=818641241]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Profile" type="VBoxContainer" parent="TopBar/Margin/Row" unique_id=442331992]
-custom_minimum_size = Vector2(190, 0)
-layout_mode = 2
-alignment = 1
-
-[node name="PlayerNameLabel" type="Label" parent="TopBar/Margin/Row/Profile" unique_id=1819670245]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 20
+layout_mode = 0
+offset_left = 1450.0
+offset_top = 30.0
+offset_right = 1730.0
+offset_bottom = 62.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
 text = "Player"
 horizontal_alignment = 2
 
-[node name="PlayerProgressLabel" type="Label" parent="TopBar/Margin/Row/Profile" unique_id=1494486949]
+[node name="PlayerProgressLabel" type="Label" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 14
+layout_mode = 0
+offset_left = 1450.0
+offset_top = 64.0
+offset_right = 1730.0
+offset_bottom = 88.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
 text = "Level 1"
 horizontal_alignment = 2
 
-[node name="AccountButton" type="Button" parent="TopBar/Margin/Row" unique_id=273344259 groups=["menu_action"]]
+[node name="AccountButton" type="Button" parent="." groups=["menu_action"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(116, 54)
-layout_mode = 2
-theme_type_variation = &"TealButton"
-text = "ACCOUNT"
+layout_mode = 0
+offset_left = 1760.0
+offset_top = 32.0
+offset_right = 1860.0
+offset_bottom = 86.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 17
+text = "PROFILE"
 
-[node name="Content" type="Control" parent="." unique_id=1711427023]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 88.0
-grow_horizontal = 2
-grow_vertical = 2
 
-[node name="HomeView" type="Control" parent="Content" unique_id=1874057236]
+[node name="HomeTabButton" type="Button" parent="."]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="LeftPanel" type="PanelContainer" parent="Content/HomeView" unique_id=22144045]
-layout_mode = 1
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 36.0
-offset_right = 362.0
-offset_bottom = -36.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="Margin" type="MarginContainer" parent="Content/HomeView/LeftPanel" unique_id=1750651082]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="VBox" type="VBoxContainer" parent="Content/HomeView/LeftPanel/Margin" unique_id=135498921]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="WelcomeHeading" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=2048423791]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 22
-text = "WELCOME BACK"
-
-[node name="WelcomeText" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=1660773622]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Choose a hero, then enter the arena."
-autowrap_mode = 2
-
-[node name="LeftSeparator" type="HSeparator" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=645508021]
-layout_mode = 2
-
-[node name="SelectedHeroHeading" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=473168547]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 14
-text = "SELECTED HERO"
-
-[node name="LeftHeroNameLabel" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=449308535]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 30
-text = "HEKASET"
-
-[node name="LeftHeroRoleLabel" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=1561937733]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "ARCANE MAGE"
-
-[node name="HeroDescriptionLabel" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=747172751]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-theme_type_variation = &"MutedLabel"
-text = "Flexible spell control."
-autowrap_mode = 2
-
-[node name="LatestSeparator" type="HSeparator" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=1260138301]
-layout_mode = 2
-
-[node name="LatestHeading" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=282396379]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 18
-text = "LATEST BUILD"
-
-[node name="LatestText" type="Label" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=1162614366]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 14
-text = "New menu hub, clearer HUD, and Quick Match diagnostics."
-autowrap_mode = 2
-
-[node name="ViewPatchButton" type="Button" parent="Content/HomeView/LeftPanel/Margin/VBox" unique_id=341988185 groups=["menu_action"]]
-unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 75.0
+offset_top = 82.0
+offset_right = 195.0
+offset_bottom = 118.0
 theme_type_variation = &"NavButton"
-text = "VIEW PATCH NOTES"
+theme_override_font_sizes/font_size = 19
+text = "HOME"
 
-[node name="HeroStage" type="Control" parent="Content/HomeView" unique_id=1058657451]
+
+[node name="HomeNavigation" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 74.0
+offset_top = 330.0
+offset_right = 614.0
+offset_bottom = 640.0
+mouse_filter = 2
+
+[node name="PlayTabButton" type="Button" parent="HomeNavigation"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 460.0
+offset_bottom = 86.0
+theme_type_variation = &"HomeMenuAction"
+theme_override_font_sizes/font_size = 68
+text = "PLAY"
+alignment = 0
+
+[node name="HeroesTabButton" type="Button" parent="HomeNavigation"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 105.0
+offset_right = 460.0
+offset_bottom = 175.0
+theme_type_variation = &"HomeMenuAction"
+theme_override_font_sizes/font_size = 46
+text = "HEROES"
+alignment = 0
+
+[node name="PatchTabButton" type="Button" parent="HomeNavigation"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 190.0
+offset_right = 460.0
+offset_bottom = 254.0
+theme_type_variation = &"HomeMenuAction"
+theme_override_font_sizes/font_size = 30
+text = "PATCH NOTES"
+alignment = 0
+
+[node name="Content" type="Control" parent="."]
 layout_mode = 1
-anchor_left = 0.19
-anchor_top = 0.02
-anchor_right = 0.79
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HeroArt" type="TextureRect" parent="Content/HomeView/HeroStage" unique_id=2002869801]
+[node name="HomeView" type="Control" parent="Content"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 10.0
-offset_bottom = -82.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+
+
+[node name="PlayView" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="HeroesView" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="PatchView" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="CustomLobbyPanel" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="LocalPanel" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="JoinContainer" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="LobbiesContainer" type="Control" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+
+[node name="HeroArt" type="TextureRect" parent="Content/HomeView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 740.0
+offset_top = 70.0
+offset_right = 1860.0
+offset_bottom = 1080.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HeroCaption" type="PanelContainer" parent="Content/HomeView/HeroStage" unique_id=1823246305]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -102.0
-offset_top = -165.0
-offset_right = 102.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_type_variation = &"SelectedModePanelContainer"
-
-[node name="VBox" type="VBoxContainer" parent="Content/HomeView/HeroStage/HeroCaption" unique_id=445192516]
-layout_mode = 2
-alignment = 1
-
-[node name="ChangeHeroButton" type="Button" parent="Content/HomeView/HeroStage/HeroCaption/VBox" unique_id=540370676 groups=["menu_action"]]
+[node name="LeftHeroNameLabel" type="Label" parent="Content/HomeView"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-theme_type_variation = &"TealButton"
-text = "CHANGE HERO"
-
-[node name="HeroNameLabel" type="Label" parent="Content/HomeView/HeroStage/HeroCaption/VBox" unique_id=968807882]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 32
+layout_mode = 0
+offset_left = 78.0
+offset_top = 677.0
+offset_right = 558.0
+offset_bottom = 707.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
 text = "HEKASET"
-horizontal_alignment = 1
 
-[node name="HeroRoleLabel" type="Label" parent="Content/HomeView/HeroStage/HeroCaption/VBox" unique_id=1736416553]
+
+[node name="LeftHeroRoleLabel" type="Label" parent="Content/HomeView"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 15
+layout_mode = 0
+offset_left = 78.0
+offset_top = 712.0
+offset_right = 548.0
+offset_bottom = 736.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
 text = "ARCANE MAGE"
-horizontal_alignment = 1
 
-[node name="RightPanel" type="PanelContainer" parent="Content/HomeView" unique_id=680410268]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -400.0
-offset_top = -392.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_type_variation = &"ModePanelContainer"
 
-[node name="Margin" type="MarginContainer" parent="Content/HomeView/RightPanel" unique_id=1475121603]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="VBox" type="VBoxContainer" parent="Content/HomeView/RightPanel/Margin" unique_id=749552879]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="ModeHeading" type="Label" parent="Content/HomeView/RightPanel/Margin/VBox" unique_id=1005803122]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 14
-text = "SELECTED MODE"
-
-[node name="SelectedModeLabel" type="Label" parent="Content/HomeView/RightPanel/Margin/VBox" unique_id=980587959]
+[node name="HeroDescriptionLabel" type="Label" parent="Content/HomeView"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 30
-text = "QUICK MATCH"
+layout_mode = 0
+offset_left = 78.0
+offset_top = 746.0
+offset_right = 508.0
+offset_bottom = 811.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = ""
+autowrap_mode = 3
 
-[node name="SelectedModeDescription" type="Label" parent="Content/HomeView/RightPanel/Margin/VBox" unique_id=499737134]
+[node name="ChangeHeroButton" type="Button" parent="Content/HomeView" groups=["menu_action"]]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-theme_type_variation = &"MutedLabel"
-text = "Find an online opponent."
-autowrap_mode = 2
+layout_mode = 0
+offset_left = 74.0
+offset_top = 817.0
+offset_right = 324.0
+offset_bottom = 855.0
+theme_type_variation = &"NavButton"
+theme_override_font_sizes/font_size = 18
+text = "HERO DETAILS  →"
 
-[node name="MainPlayButton" type="Button" parent="Content/HomeView/RightPanel/Margin/VBox" unique_id=1336338620 groups=["menu_action"]]
+
+[node name="HeroNameLabel" type="Label" parent="Content/HomeView"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 92)
-layout_mode = 2
-theme_type_variation = &"PlayButton"
-text = "PLAY"
+layout_mode = 0
+offset_left = 1340.0
+offset_top = 860.0
+offset_right = 1850.0
+offset_bottom = 925.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "HEKASET"
+horizontal_alignment = 2
 
-[node name="ChooseModeButton" type="Button" parent="Content/HomeView/RightPanel/Margin/VBox" unique_id=267004697 groups=["menu_action"]]
+[node name="HeroRoleLabel" type="Label" parent="Content/HomeView"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-theme_type_variation = &"TealButton"
-text = "CHANGE MODE"
+layout_mode = 0
+offset_left = 1340.0
+offset_top = 928.0
+offset_right = 1850.0
+offset_bottom = 960.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "ARCANE MAGE"
+horizontal_alignment = 2
 
-[node name="PlayView" type="Control" parent="Content" unique_id=1989443330]
+[node name="ViewPatchButton" type="Button" parent="Content/HomeView" groups=["menu_action"]]
 unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_left = 1580.0
+offset_top = 988.0
+offset_right = 1850.0
+offset_bottom = 1024.0
+theme_type_variation = &"NavButton"
+theme_override_font_sizes/font_size = 17
+text = "BUILD NOTES  →"
 
-[node name="Panel" type="PanelContainer" parent="Content/PlayView" unique_id=1858740373]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -590.0
-offset_top = -390.0
-offset_right = 590.0
-offset_bottom = 390.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
 
-[node name="Margin" type="MarginContainer" parent="Content/PlayView/Panel" unique_id=864534657]
-layout_mode = 2
-theme_override_constants/margin_left = 28
-theme_override_constants/margin_top = 28
-theme_override_constants/margin_right = 28
-theme_override_constants/margin_bottom = 28
+[node name="HeroesHeading" type="Label" parent="Content/HeroesView"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 158.0
+offset_right = 876.0
+offset_bottom = 253.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 80
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "HEROES"
 
-[node name="VBox" type="VBoxContainer" parent="Content/PlayView/Panel/Margin" unique_id=1994775948]
+
+[node name="PreviewArt" type="TextureRect" parent="Content/HeroesView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 650.0
+offset_top = 75.0
+offset_right = 1840.0
+offset_bottom = 1025.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewNameLabel" type="Label" parent="Content/HeroesView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 76.0
+offset_top = 305.0
+offset_right = 726.0
+offset_bottom = 400.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 74
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "HEKASET"
+
+
+[node name="PreviewRoleLabel" type="Label" parent="Content/HeroesView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 81.0
+offset_top = 411.0
+offset_right = 631.0
+offset_bottom = 446.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "ARCANE MAGE"
+theme_override_colors/font_color = Color(1, 0.65, 0.25, 1)
+
+[node name="PreviewDescriptionLabel" type="Label" parent="Content/HeroesView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 81.0
+offset_top = 470.0
+offset_right = 566.0
+offset_bottom = 620.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = ""
+autowrap_mode = 3
+
+[node name="SelectHeroButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 81.0
+offset_top = 670.0
+offset_right = 411.0
+offset_bottom = 744.0
+theme_type_variation = &"PrimaryButton"
+theme_override_font_sizes/font_size = 28
+text = "SELECT HERO"
+
+
+[node name="HeroesBackButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 77.0
+offset_top = 768.0
+offset_right = 307.0
+offset_bottom = 816.0
+theme_type_variation = &"NavButton"
+theme_override_font_sizes/font_size = 23
+text = "←  BACK"
+
+
+[node name="HekasetHeroButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 640.0
+offset_top = 886.0
+offset_right = 850.0
+offset_bottom = 986.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 20
+text = "HEKASET"
+
+
+[node name="ZiloHeroButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 872.0
+offset_top = 886.0
+offset_right = 1082.0
+offset_bottom = 986.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 20
+text = "ZILO"
+
+
+[node name="AquaAHeroButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1104.0
+offset_top = 886.0
+offset_right = 1314.0
+offset_bottom = 986.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 20
+text = "AQUA A"
+
+
+[node name="AquaBHeroButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1336.0
+offset_top = 886.0
+offset_right = 1546.0
+offset_bottom = 986.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 20
+text = "AQUA B"
+
+
+[node name="AuroraHeroButton" type="Button" parent="Content/HeroesView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1568.0
+offset_top = 886.0
+offset_right = 1778.0
+offset_bottom = 986.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 20
+text = "AURORA"
+
+
+[node name="CustomLobbyPanelHeading" type="Label" parent="Content/CustomLobbyPanel"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 156.0
+offset_right = 1676.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 78
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "CUSTOM LOBBY"
+
+
+[node name="CustomLobbyPanelSubtitle" type="Label" parent="Content/CustomLobbyPanel"]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 267.0
+offset_right = 1581.0
+offset_bottom = 311.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Create a private room or browse online lobbies."
+
+
+[node name="Form" type="PanelContainer" parent="Content/CustomLobbyPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 350.0
+offset_right = 840.0
+offset_bottom = 780.0
+
+
+[node name="VBox" type="VBoxContainer" parent="Content/CustomLobbyPanel/Form"]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="Heading" type="Label" parent="Content/PlayView/Panel/Margin/VBox" unique_id=1371850332]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 34
-text = "CHOOSE A MODE"
-
-[node name="Intro" type="Label" parent="Content/PlayView/Panel/Margin/VBox" unique_id=1504655860]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Pick a mode. The Home play button will launch it."
-
-[node name="ModeGrid" type="GridContainer" parent="Content/PlayView/Panel/Margin/VBox" unique_id=1428952665]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/h_separation = 14
-theme_override_constants/v_separation = 14
-columns = 2
-
-[node name="QuickMatchModeButton" type="Button" parent="Content/PlayView/Panel/Margin/VBox/ModeGrid" unique_id=1177901207 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 112)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "QUICK MATCH
-Online duel"
-
-[node name="CustomLobbyModeButton" type="Button" parent="Content/PlayView/Panel/Margin/VBox/ModeGrid" unique_id=486882735 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 112)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "CUSTOM LOBBY
-Create or find a lobby"
-
-[node name="BotModeButton" type="Button" parent="Content/PlayView/Panel/Margin/VBox/ModeGrid" unique_id=85834127 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 112)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "PLAY VS BOT
-Choose both heroes"
-
-[node name="TutorialModeButton" type="Button" parent="Content/PlayView/Panel/Margin/VBox/ModeGrid" unique_id=82723411 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 112)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "TUTORIAL
-Learn movement and magic"
-
-[node name="LocalModeButton" type="Button" parent="Content/PlayView/Panel/Margin/VBox/ModeGrid" unique_id=2001425347 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 112)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "LOCAL PLAY
-Host or join by IP"
-
-[node name="PlayBackButton" type="Button" parent="Content/PlayView/Panel/Margin/VBox" unique_id=1732723172 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 50)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK TO HOME"
-
-[node name="HeroesView" type="Control" parent="Content" unique_id=1095387755]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="PanelContainer" parent="Content/HeroesView" unique_id=1555880451]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -640.0
-offset_top = -405.0
-offset_right = 640.0
-offset_bottom = 405.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="Margin" type="MarginContainer" parent="Content/HeroesView/Panel" unique_id=736162406]
-layout_mode = 2
-theme_override_constants/margin_left = 26
-theme_override_constants/margin_top = 26
-theme_override_constants/margin_right = 26
-theme_override_constants/margin_bottom = 26
-
-[node name="Row" type="HBoxContainer" parent="Content/HeroesView/Panel/Margin" unique_id=1798418675]
-layout_mode = 2
-theme_override_constants/separation = 24
-
-[node name="HeroList" type="VBoxContainer" parent="Content/HeroesView/Panel/Margin/Row" unique_id=2070786816]
-custom_minimum_size = Vector2(330, 0)
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Heading" type="Label" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=106212720]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 32
-text = "HEROES"
-
-[node name="HeroHint" type="Label" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=1229582925]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Choose who appears on Home and enters character select."
-autowrap_mode = 2
-
-[node name="HekasetHeroButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=2016563214 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 70)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "HEKASET"
-
-[node name="ZiloHeroButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=1340217976 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 70)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "ZILO"
-
-[node name="AquaAHeroButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=86390311 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 70)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "AQUA A"
-
-[node name="AquaBHeroButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=1087779916 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 70)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "AQUA B"
-
-[node name="AuroraHeroButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=1332458639 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 70)
-layout_mode = 2
-theme_type_variation = &"ModeButton"
-text = "AURORA"
-
-[node name="HeroesBackButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroList" unique_id=2035367521 groups=["menu_action"]]
+[node name="CreateLobbyButton" type="Button" parent="Content/CustomLobbyPanel/Form/VBox" groups=["menu_action"]]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK TO HOME"
-
-[node name="HeroPreview" type="Control" parent="Content/HeroesView/Panel/Margin/Row" unique_id=1458807250]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="PreviewArt" type="TextureRect" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview" unique_id=2045539061]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_bottom = -160.0
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="PreviewPanel" type="PanelContainer" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview" unique_id=1825236892]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -150.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_type_variation = &"SelectedModePanelContainer"
-
-[node name="VBox" type="VBoxContainer" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview/PreviewPanel" unique_id=1324358233]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="PreviewNameLabel" type="Label" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview/PreviewPanel/VBox" unique_id=2098309229]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 28
-text = "HEKASET"
-
-[node name="PreviewRoleLabel" type="Label" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview/PreviewPanel/VBox" unique_id=1631663975]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "ARCANE MAGE"
-
-[node name="PreviewDescriptionLabel" type="Label" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview/PreviewPanel/VBox" unique_id=1118205878]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Flexible spell control."
-autowrap_mode = 2
-
-[node name="SelectHeroButton" type="Button" parent="Content/HeroesView/Panel/Margin/Row/HeroPreview/PreviewPanel/VBox" unique_id=838022129 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-theme_type_variation = &"TealButton"
-text = "SELECT HERO"
-
-[node name="PatchView" type="Control" parent="Content" unique_id=1143248662]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="PanelContainer" parent="Content/PatchView" unique_id=2133516908]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -560.0
-offset_top = -360.0
-offset_right = 560.0
-offset_bottom = 360.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="Margin" type="MarginContainer" parent="Content/PatchView/Panel" unique_id=1137072878]
-layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 30
-
-[node name="VBox" type="VBoxContainer" parent="Content/PatchView/Panel/Margin" unique_id=1975120772]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Heading" type="Label" parent="Content/PatchView/Panel/Margin/VBox" unique_id=798713527]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 34
-text = "PATCH NOTES"
-
-[node name="PatchNotes" type="RichTextLabel" parent="Content/PatchView/Panel/Margin/VBox" unique_id=1249432478]
-layout_mode = 2
-size_flags_vertical = 3
-bbcode_enabled = true
-text = "[font_size=24][color=#8BE3DE]Current prototype build[/color][/font_size]
-
-[color=#F5F8FA]MENU[/color]
-• Added a focused Home hub.
-• Added working Play and Heroes tabs.
-• Added selected hero splash art and mode selection.
-
-[color=#F5F8FA]ONLINE[/color]
-• Added Quick Match diagnostics and clearer EOS errors.
-
-[color=#F5F8FA]COMBAT UI[/color]
-• Improved health, mana, status, and ability displays.
-
-[color=#9DAAB5]This page is kept in the menu scene for now. Move it to data only when patch notes need frequent updates.[/color]"
-fit_content = true
-
-[node name="PatchBackButton" type="Button" parent="Content/PatchView/Panel/Margin/VBox" unique_id=1922055301 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 50)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK TO HOME"
-
-[node name="CustomLobbyPanel" type="PanelContainer" parent="Content" unique_id=751800232]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -220.0
-offset_right = 280.0
-offset_bottom = 220.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="VBox" type="VBoxContainer" parent="Content/CustomLobbyPanel" unique_id=2024911593]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="Heading" type="Label" parent="Content/CustomLobbyPanel/VBox" unique_id=1913183141]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 30
-text = "CUSTOM LOBBY"
-horizontal_alignment = 1
-
-[node name="CreateLobbyButton" type="Button" parent="Content/CustomLobbyPanel/VBox" unique_id=405411619 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 66)
-layout_mode = 2
-theme_type_variation = &"TealButton"
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"PrimaryButton"
 text = "CREATE LOBBY"
 
-[node name="FindLobbiesButton" type="Button" parent="Content/CustomLobbyPanel/VBox" unique_id=1090023113 groups=["menu_action"]]
+[node name="FindLobbiesButton" type="Button" parent="Content/CustomLobbyPanel/Form/VBox" groups=["menu_action"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 66)
 layout_mode = 2
-theme_type_variation = &"TealButton"
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"Button"
 text = "FIND LOBBIES"
 
-[node name="CustomBackButton" type="Button" parent="Content/CustomLobbyPanel/VBox" unique_id=252674053 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 56)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK"
-
-[node name="LocalPanel" type="PanelContainer" parent="Content" unique_id=606598512]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -250.0
-offset_right = 280.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="VBox" type="VBoxContainer" parent="Content/LocalPanel" unique_id=1742276583]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="Heading" type="Label" parent="Content/LocalPanel/VBox" unique_id=2071389112]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 30
-text = "LOCAL PLAY"
-horizontal_alignment = 1
-
-[node name="HostGameButton" type="Button" parent="Content/LocalPanel/VBox" unique_id=1786568722 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 66)
-layout_mode = 2
-theme_type_variation = &"TealButton"
-text = "HOST LAN GAME"
-
-[node name="JoinGameButton" type="Button" parent="Content/LocalPanel/VBox" unique_id=1000797412 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 66)
-layout_mode = 2
-theme_type_variation = &"TealButton"
-text = "JOIN LAN GAME"
-
-[node name="LocalBackButton" type="Button" parent="Content/LocalPanel/VBox" unique_id=238865782 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 56)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK"
-
-[node name="JoinContainer" type="PanelContainer" parent="Content" unique_id=813832026]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -310.0
-offset_top = -275.0
-offset_right = 310.0
-offset_bottom = 275.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="VBox" type="VBoxContainer" parent="Content/JoinContainer" unique_id=1653014466]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Title" type="Label" parent="Content/JoinContainer/VBox" unique_id=349742329]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 28
-text = "JOIN LAN GAME"
-horizontal_alignment = 1
-
-[node name="IPErrorLabel" type="Label" parent="Content/JoinContainer/VBox" unique_id=1838470838]
+[node name="CustomBackButton" type="Button" parent="Content/CustomLobbyPanel/Form/VBox" groups=["menu_action"]]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"RedLabel"
-text = "Enter a valid IPv4 address."
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"Button"
+text = "←  BACK"
 
-[node name="IPLineEdit" type="LineEdit" parent="Content/JoinContainer/VBox" unique_id=1763247643]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 54)
+[node name="LocalPanelHeading" type="Label" parent="Content/LocalPanel"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 156.0
+offset_right = 1676.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 78
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "LOCAL / LAN"
+
+
+[node name="LocalPanelSubtitle" type="Label" parent="Content/LocalPanel"]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 267.0
+offset_right = 1581.0
+offset_bottom = 311.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Direct games with friends. No online account required for LAN."
+
+
+[node name="Form" type="PanelContainer" parent="Content/LocalPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 350.0
+offset_right = 840.0
+offset_bottom = 780.0
+
+
+[node name="VBox" type="VBoxContainer" parent="Content/LocalPanel/Form"]
 layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="HostGameButton" type="Button" parent="Content/LocalPanel/Form/VBox" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"PrimaryButton"
+text = "HOST GAME"
+
+[node name="JoinGameButton" type="Button" parent="Content/LocalPanel/Form/VBox" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"Button"
+text = "JOIN GAME"
+
+[node name="LocalBackButton" type="Button" parent="Content/LocalPanel/Form/VBox" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"Button"
+text = "←  BACK"
+
+[node name="JoinContainerHeading" type="Label" parent="Content/JoinContainer"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 156.0
+offset_right = 1676.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 78
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "JOIN A GAME"
+
+
+[node name="JoinContainerSubtitle" type="Label" parent="Content/JoinContainer"]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 267.0
+offset_right = 1581.0
+offset_bottom = 311.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Enter the host address and port."
+
+
+[node name="Form" type="PanelContainer" parent="Content/JoinContainer"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 350.0
+offset_right = 840.0
+offset_bottom = 780.0
+
+
+[node name="VBox" type="VBoxContainer" parent="Content/JoinContainer/Form"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="IPLineEdit" type="LineEdit" parent="Content/JoinContainer/Form/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 58)
 placeholder_text = "Host IP address"
 
-[node name="PortErrorLabel" type="Label" parent="Content/JoinContainer/VBox" unique_id=1354300957]
+[node name="IPErrorLabel" type="Label" parent="Content/JoinContainer/Form/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+autowrap_mode = 3
+theme_type_variation = &"RedLabel"
+text = "Enter a valid IP address."
+
+[node name="PortLineEdit" type="LineEdit" parent="Content/JoinContainer/Form/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 58)
+placeholder_text = "Port (default 6769)"
+
+[node name="PortErrorLabel" type="Label" parent="Content/JoinContainer/Form/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
 theme_type_variation = &"RedLabel"
 text = "Enter a port from 1 to 65535."
 
-[node name="PortLineEdit" type="LineEdit" parent="Content/JoinContainer/VBox" unique_id=1770564523]
+[node name="ConnectButton" type="Button" parent="Content/JoinContainer/Form/VBox" groups=["menu_action"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 54)
 layout_mode = 2
-placeholder_text = "Port (default 6769)"
-
-[node name="ConnectButton" type="Button" parent="Content/JoinContainer/VBox" unique_id=875306158 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 62)
-layout_mode = 2
-theme_type_variation = &"TealButton"
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"PrimaryButton"
 text = "CONNECT"
 
-[node name="JoinBackButton" type="Button" parent="Content/JoinContainer/VBox" unique_id=1479452434 groups=["menu_action"]]
+[node name="JoinBackButton" type="Button" parent="Content/JoinContainer/Form/VBox" groups=["menu_action"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(520, 54)
 layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK"
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"Button"
+text = "←  BACK"
 
-[node name="LobbiesContainer" type="PanelContainer" parent="Content" unique_id=1951701548]
+[node name="LobbiesHeading" type="Label" parent="Content/LobbiesContainer"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 156.0
+offset_right = 1676.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 78
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "FIND A LOBBY"
+
+
+[node name="Results" type="PanelContainer" parent="Content/LobbiesContainer"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 310.0
+offset_right = 1840.0
+offset_bottom = 890.0
+
+
+[node name="VBox" type="VBoxContainer" parent="Content/LobbiesContainer/Results"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="LobbySearch" type="LineEdit" parent="Content/LobbiesContainer/Results/VBox"]
 unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -570.0
-offset_top = -360.0
-offset_right = 570.0
-offset_bottom = 360.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"ModePanelContainer"
-
-[node name="VBox" type="VBoxContainer" parent="Content/LobbiesContainer" unique_id=1994862838]
 layout_mode = 2
-theme_override_constants/separation = 12
+custom_minimum_size = Vector2(0, 58)
+placeholder_text = "Search lobbies by name"
 
-[node name="Title" type="Label" parent="Content/LobbiesContainer/VBox" unique_id=1476293599]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 28
-text = "AVAILABLE LOBBIES"
-
-[node name="LobbySearch" type="LineEdit" parent="Content/LobbiesContainer/VBox" unique_id=443361334]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-placeholder_text = "Filter by host name"
-
-[node name="Scroll" type="ScrollContainer" parent="Content/LobbiesContainer/VBox" unique_id=127213115]
-custom_minimum_size = Vector2(0, 500)
+[node name="Scroll" type="ScrollContainer" parent="Content/LobbiesContainer/Results/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LobbiesGrid" type="GridContainer" parent="Content/LobbiesContainer/VBox/Scroll" unique_id=228148850]
+[node name="LobbiesGrid" type="GridContainer" parent="Content/LobbiesContainer/Results/VBox/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 18
-theme_override_constants/v_separation = 12
 columns = 4
+theme_override_constants/h_separation = 45
+theme_override_constants/v_separation = 18
 
-[node name="HostHeader" type="Label" parent="Content/LobbiesContainer/VBox/Scroll/LobbiesGrid" unique_id=582274599]
+[node name="Header0" type="Label" parent="Content/LobbiesContainer/Results/VBox/Scroll/LobbiesGrid"]
 layout_mode = 2
-theme_type_variation = &"MutedLabel"
+metadata/header = true
 text = "HOST"
-metadata/header = true
 
-[node name="ModeHeader" type="Label" parent="Content/LobbiesContainer/VBox/Scroll/LobbiesGrid" unique_id=1624111611]
+[node name="Header1" type="Label" parent="Content/LobbiesContainer/Results/VBox/Scroll/LobbiesGrid"]
 layout_mode = 2
-theme_type_variation = &"MutedLabel"
+metadata/header = true
 text = "MODE"
-metadata/header = true
 
-[node name="SlotsHeader" type="Label" parent="Content/LobbiesContainer/VBox/Scroll/LobbiesGrid" unique_id=658868785]
+[node name="Header2" type="Label" parent="Content/LobbiesContainer/Results/VBox/Scroll/LobbiesGrid"]
 layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "SLOTS"
 metadata/header = true
+text = "PLAYERS"
 
-[node name="ActionHeader" type="Label" parent="Content/LobbiesContainer/VBox/Scroll/LobbiesGrid" unique_id=1554244679]
+[node name="Header3" type="Label" parent="Content/LobbiesContainer/Results/VBox/Scroll/LobbiesGrid"]
 layout_mode = 2
-theme_type_variation = &"MutedLabel"
 metadata/header = true
+text = "JOIN"
 
-[node name="Buttons" type="HBoxContainer" parent="Content/LobbiesContainer/VBox" unique_id=1955626338]
-layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 2
-
-[node name="RefreshButton" type="Button" parent="Content/LobbiesContainer/VBox/Buttons" unique_id=1034609821 groups=["menu_action"]]
+[node name="RefreshButton" type="Button" parent="Content/LobbiesContainer" groups=["menu_action"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(190, 50)
-layout_mode = 2
-theme_type_variation = &"TealButton"
+layout_mode = 0
+offset_left = 80.0
+offset_top = 930.0
+offset_right = 320.0
+offset_bottom = 992.0
+theme_type_variation = &"PrimaryButton"
+theme_override_font_sizes/font_size = 23
 text = "REFRESH"
 
-[node name="LobbiesBackButton" type="Button" parent="Content/LobbiesContainer/VBox/Buttons" unique_id=1774150413 groups=["menu_action"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(190, 50)
-layout_mode = 2
-theme_type_variation = &"NavButton"
-text = "BACK"
 
-[node name="NameErrorLabel" type="Label" parent="." unique_id=160457145]
+[node name="LobbiesBackButton" type="Button" parent="Content/LobbiesContainer" groups=["menu_action"]]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 96.0
-offset_bottom = 128.0
-grow_horizontal = 2
-theme_type_variation = &"RedLabel"
-text = "Set a valid player name in Account first."
-horizontal_alignment = 1
+layout_mode = 0
+offset_left = 350.0
+offset_top = 930.0
+offset_right = 550.0
+offset_bottom = 992.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 23
+text = "←  BACK"
+
+
+[node name="PatchHeading" type="Label" parent="Content/PatchView"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 156.0
+offset_right = 1676.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 78
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "PATCH NOTES"
+
+
+[node name="NotesPanel" type="PanelContainer" parent="Content/PatchView"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 310.0
+offset_right = 1260.0
+offset_bottom = 920.0
+
+
+[node name="VBox" type="VBoxContainer" parent="Content/PatchView/NotesPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Notes" type="RichTextLabel" parent="Content/PatchView/NotesPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[font_size=34]GAMEPLAY OVERHAUL[/font_size]\n\nCOMBAT READABILITY\nSegmented health, mana, ability feedback, and clearer cooldowns.\n\nPLAY YOUR WAY\nOriginal duel, limited-vision duel, or LAN 2v2 Control with respawns.\n\nBEFORE THE MATCH\nBrowse heroes, choose a mode, and prepare with friends.\n\nThis is an early playtest build. Match rules and character kits remain under development."
+
+[node name="PatchBackButton" type="Button" parent="Content/PatchView/NotesPanel/VBox" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 66)
+theme_type_variation = &"Button"
+text = "←  BACK"
+
+[node name="NameErrorLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 78.0
+offset_top = 1025.0
+offset_right = 1258.0
+offset_bottom = 1055.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Set a valid player name in Profile first."
+theme_override_colors/font_color = Color(1, 0.65, 0.45, 1)
+
+[node name="StatusLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 740.0
+offset_top = 1025.0
+offset_right = 1570.0
+offset_bottom = 1055.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = ""
+
 
 [node name="CancelQueueButton" type="Button" parent="."]
 unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 12
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -95.0
-offset_top = -96.0
-offset_right = 95.0
-offset_bottom = -52.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_type_variation = &"TealButton"
+layout_mode = 0
+offset_left = 1580.0
+offset_top = 1015.0
+offset_right = 1850.0
+offset_bottom = 1061.0
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 18
 text = "CANCEL SEARCH"
 
-[node name="StatusLabel" type="Label" parent="." unique_id=1226645375]
+
+[node name="PlayHeading" type="Label" parent="Content/PlayView"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 156.0
+offset_right = 1076.0
+offset_bottom = 256.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 84
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+text = "PLAY"
+
+
+[node name="PlaySubtitle" type="Label" parent="Content/PlayView"]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 267.0
+offset_right = 1381.0
+offset_bottom = 303.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+text = "SELECT A MODE"
+
+
+[node name="QuickMatchModeButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -48.0
-offset_bottom = -14.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_type_variation = &"StatusLabel"
-theme_override_font_sizes/font_size = 18
+layout_mode = 0
+offset_left = 80.0
+offset_top = 350.0
+offset_right = 420.0
+offset_bottom = 850.0
+theme_type_variation = &"ModeCard"
+script = ExtResource("mode_script")
+toggle_mode = true
+
+
+[node name="Symbol" type="TextureRect" parent="Content/PlayView/QuickMatchModeButton"]
+layout_mode = 0
+offset_left = 106.0
+offset_top = 112.0
+offset_right = 234.0
+offset_bottom = 240.0
+mouse_filter = 2
+texture = ExtResource("mode_0")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tag" type="Label" parent="Content/PlayView/QuickMatchModeButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 290.0
+offset_right = 320.0
+offset_bottom = 314.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.26, 0.35, 0.48, 1)
+text = "ONLINE DUEL"
 horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Content/PlayView/QuickMatchModeButton"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 329.0
+offset_right = 322.0
+offset_bottom = 367.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "QUICK MATCH"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Content/PlayView/QuickMatchModeButton"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 389.0
+offset_right = 316.0
+offset_bottom = 467.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "Find an opponent of your skill\nthrough online matchmaking."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BotModeButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 446.0
+offset_top = 350.0
+offset_right = 786.0
+offset_bottom = 850.0
+theme_type_variation = &"ModeCard"
+script = ExtResource("mode_script")
+toggle_mode = true
+
+
+[node name="Symbol" type="TextureRect" parent="Content/PlayView/BotModeButton"]
+layout_mode = 0
+offset_left = 106.0
+offset_top = 112.0
+offset_right = 234.0
+offset_bottom = 240.0
+mouse_filter = 2
+texture = ExtResource("mode_2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tag" type="Label" parent="Content/PlayView/BotModeButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 290.0
+offset_right = 320.0
+offset_bottom = 314.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.26, 0.35, 0.48, 1)
+text = "PRACTICE"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Content/PlayView/BotModeButton"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 329.0
+offset_right = 322.0
+offset_bottom = 367.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "VS. BOT"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Content/PlayView/BotModeButton"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 389.0
+offset_right = 316.0
+offset_bottom = 467.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "Choose both heroes and\ntrain against the bot."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TutorialModeButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 812.0
+offset_top = 350.0
+offset_right = 1152.0
+offset_bottom = 850.0
+theme_type_variation = &"ModeCard"
+script = ExtResource("mode_script")
+toggle_mode = true
+
+
+[node name="Symbol" type="TextureRect" parent="Content/PlayView/TutorialModeButton"]
+layout_mode = 0
+offset_left = 106.0
+offset_top = 112.0
+offset_right = 234.0
+offset_bottom = 240.0
+mouse_filter = 2
+texture = ExtResource("mode_3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tag" type="Label" parent="Content/PlayView/TutorialModeButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 290.0
+offset_right = 320.0
+offset_bottom = 314.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.26, 0.35, 0.48, 1)
+text = "LEARN THE BASICS"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Content/PlayView/TutorialModeButton"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 329.0
+offset_right = 322.0
+offset_bottom = 367.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "TUTORIAL"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Content/PlayView/TutorialModeButton"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 389.0
+offset_right = 316.0
+offset_bottom = 467.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "Learn movement, placement,\nand magic transformations."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="CustomLobbyModeButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1180.0
+offset_top = 350.0
+offset_right = 1840.0
+offset_bottom = 585.0
+theme_type_variation = &"ModeCard"
+script = ExtResource("mode_script")
+toggle_mode = true
+
+
+[node name="Symbol" type="TextureRect" parent="Content/PlayView/CustomLobbyModeButton"]
+layout_mode = 0
+offset_left = 35.0
+offset_top = 65.0
+offset_right = 125.0
+offset_bottom = 155.0
+mouse_filter = 2
+texture = ExtResource("mode_1")
+modulate = Color(0.2, 0.4, 0.65, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tag" type="Label" parent="Content/PlayView/CustomLobbyModeButton"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 41.0
+offset_right = 618.0
+offset_bottom = 65.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "PLAY TOGETHER"
+
+
+[node name="Title" type="Label" parent="Content/PlayView/CustomLobbyModeButton"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 84.0
+offset_right = 618.0
+offset_bottom = 124.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "CUSTOM LOBBY"
+
+
+[node name="Description" type="Label" parent="Content/PlayView/CustomLobbyModeButton"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 140.0
+offset_right = 618.0
+offset_bottom = 205.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "Create a room or find a hosted lobby."
+autowrap_mode = 3
+
+[node name="LocalModeButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1180.0
+offset_top = 615.0
+offset_right = 1840.0
+offset_bottom = 850.0
+theme_type_variation = &"ModeCard"
+script = ExtResource("mode_script")
+toggle_mode = true
+
+
+[node name="Symbol" type="TextureRect" parent="Content/PlayView/LocalModeButton"]
+layout_mode = 0
+offset_left = 35.0
+offset_top = 65.0
+offset_right = 125.0
+offset_bottom = 155.0
+mouse_filter = 2
+texture = ExtResource("mode_4")
+modulate = Color(0.2, 0.4, 0.65, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tag" type="Label" parent="Content/PlayView/LocalModeButton"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 41.0
+offset_right = 618.0
+offset_bottom = 65.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "DIRECT CONNECT"
+
+
+[node name="Title" type="Label" parent="Content/PlayView/LocalModeButton"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 84.0
+offset_right = 618.0
+offset_bottom = 124.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "LOCAL / LAN"
+
+
+[node name="Description" type="Label" parent="Content/PlayView/LocalModeButton"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 140.0
+offset_right = 618.0
+offset_bottom = 205.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.08, 0.14, 0.24, 1)
+text = "Host or join a LAN game, including 2v2 Control."
+autowrap_mode = 3
+
+[node name="SelectedModeLabel" type="Label" parent="Content/PlayView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 82.0
+offset_top = 913.0
+offset_right = 1082.0
+offset_bottom = 949.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+text = "QUICK MATCH"
+
+
+[node name="SelectedModeDescription" type="Label" parent="Content/PlayView"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 82.0
+offset_top = 958.0
+offset_right = 1202.0
+offset_bottom = 1008.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+text = "Find an online opponent."
+autowrap_mode = 3
+
+[node name="MainPlayButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1400.0
+offset_top = 931.0
+offset_right = 1840.0
+offset_bottom = 1007.0
+theme_type_variation = &"PrimaryButton"
+theme_override_font_sizes/font_size = 28
+text = "FIND MATCH"
+
+[node name="PlayBackButton" type="Button" parent="Content/PlayView" groups=["menu_action"]]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 78.0
+offset_top = 1010.0
+offset_right = 288.0
+offset_bottom = 1054.0
+theme_type_variation = &"NavButton"
+theme_override_font_sizes/font_size = 21
+text = "←  BACK"

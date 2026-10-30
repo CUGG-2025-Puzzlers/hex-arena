@@ -11,6 +11,7 @@ var travelled: float = 0.0
 var lifetime_elapsed: float = 0.0
 var animation_time: float = 0.0
 var hit_consumed: bool = false
+var _feedback_tracking_visible_target: bool = false
 
 
 func _process(delta: float) -> void:
@@ -58,6 +59,10 @@ func start_rolling(path: PackedVector2Array) -> void:
 func _advance_mote(delta: float) -> void:
 	lifetime_elapsed += delta
 	var target := _find_homing_target()
+	var tracking := target != null and target.visible and Juice.visible_at(target.global_position, target.player_id)
+	if _feedback_tracking_visible_target and target == null:
+		Juice.world("lost_target", global_position, player_id)
+	_feedback_tracking_visible_target = tracking
 
 	if target != null:
 		var target_position := _get_player_hurtbox_position(target)
@@ -73,7 +78,7 @@ func _advance_mote(delta: float) -> void:
 	rotation = rolling_dir.angle()
 
 	if travelled >= max_range:
-		fizzle()
+		fizzle("expired")
 
 
 func _on_area_entered(area: Area2D) -> void:
@@ -106,7 +111,7 @@ func _try_consume_player_area(area: Area2D) -> bool:
 
 	hit_consumed = true
 	_resolve_hit(target)
-	call_deferred("fizzle")
+	call_deferred("fizzle", "completed")
 	return true
 
 

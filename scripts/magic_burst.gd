@@ -30,7 +30,7 @@ func start_rolling(_wiggly_path: PackedVector2Array) -> void:
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_blast_tween.tween_callback(_resolve_hits)
 	_blast_tween.tween_interval(visible_after_hit_time)
-	_blast_tween.tween_callback(fizzle)
+	_blast_tween.tween_callback(fizzle.bind("completed"))
 
 func _set_blast_progress(value: float) -> void:
 	_blast_progress = value
@@ -89,6 +89,7 @@ func _resolve_magic_breaks(blast_radius: float) -> void:
 
 		# Zilo's E is explicit counter-magic: anything hostile caught in the
 		# blast is removed regardless of its remaining magic health.
+		target.feedback_destroyed()
 		target.fizzle()
 		destroyed += 1
 

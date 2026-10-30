@@ -45,7 +45,7 @@ func start_rolling(wiggly_path: PackedVector2Array) -> void:
 	_movement_tween.set_ease(Tween.EASE_IN_OUT)
 	_movement_tween.tween_property(self, "global_position", target_position, travel_time)
 	_movement_tween.tween_interval(linger_time)
-	_movement_tween.tween_callback(fizzle)
+	_movement_tween.tween_callback(fizzle.bind("expired"))
 
 func try_consume_hit() -> bool:
 	if not is_active or _hit_consumed:

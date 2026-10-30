@@ -34,15 +34,22 @@ func _process(delta: float) -> void:
 			is_on_cooldown = false
 			cooldown_remaining = 0.0
 			cooldown_finished.emit()
+			if is_instance_valid(player) and _is_local() and player.is_alive and not is_active and not player.is_gameplay_input_blocked():
+				Juice.cue("ready")
 
 func try_activate() -> bool:
 	if is_on_cooldown or is_active or player.is_gameplay_input_blocked():
+		if _is_local() and not player.get_node("InputSynchronizer").ui_input_blocked:
+			Juice.cue("denied")
 		return false
 	if not can_activate():
+		if _is_local():
+			Juice.cue("denied")
 		return false
 	_execute()
 	Telemetry.record_ability_cast(player.player_id, ability_name)
 	ability_activated.emit()
+	Juice.world("ability", player.global_position, player.player_id)
 	_start_cooldown()
 	return true
 	

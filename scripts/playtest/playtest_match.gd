@@ -15,6 +15,12 @@ var scores: Array[float] = control.percentages
 var round_wins: Array[int] = [0, 0]
 var round_number: int = 1
 var round_time: float = 0.0
+var _feedback_owner: int = -2
+var _feedback_overtime: bool = false
+var _feedback_contested: bool = false
+var _feedback_phase: String = ""
+var _feedback_clock: float = 0.0
+var _overtime_beat: float = 0.0
 var round_pause: float = 0.0
 var occupants: Array = []
 var respawns: Dictionary = {}
@@ -28,6 +34,10 @@ var _leave_button: Button
 var _capture_bar: ProgressBar
 var _overtime_bar: ProgressBar
 var _hint: Label
+var _score_row: HBoxContainer
+var _blue_score: Label
+var _red_score: Label
+var _point_badge: Label
 var _fog: Node2D
 var _last_sight: bool = false
 var _last_occupants: Array = []
@@ -65,34 +75,54 @@ func _build_hud() -> void:
 	layer.layer = 20
 	add_child(layer)
 	var panel := PanelContainer.new()
-	panel.position = Vector2(520, 12)
-	panel.custom_minimum_size = Vector2(880, 90)
+	panel.custom_minimum_size = Vector2(680, 90)
+	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(panel)
+	panel.anchor_left = 0.5
+	panel.anchor_right = 0.5
+	panel.offset_left = -340.0
+	panel.offset_right = 340.0
+	panel.offset_top = 18.0
 	var box := VBoxContainer.new()
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(box)
+	_score_row = HBoxContainer.new()
+	_score_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_score_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_score_row.add_theme_constant_override("separation", 24)
+	box.add_child(_score_row)
+	_blue_score = _score_label(TEAM_COLORS[0])
+	_point_badge = _score_label(Color.WHITE)
+	_point_badge.text = "A"
+	_red_score = _score_label(TEAM_COLORS[1])
 	_status = Label.new()
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_status.add_theme_font_size_override("font_size", 25)
+	_status.add_theme_font_size_override("font_size", 16)
 	box.add_child(_status)
 	_hint = Label.new()
+	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hint.custom_minimum_size.x = 860.0
+	_hint.custom_minimum_size.x = 660.0
 	_hint.add_theme_font_size_override("font_size", 18)
 	box.add_child(_hint)
 	_capture_bar = ProgressBar.new()
+	_capture_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_capture_bar.max_value = 1.0
 	_capture_bar.show_percentage = false
 	_capture_bar.custom_minimum_size.y = 8.0
 	box.add_child(_capture_bar)
 	_overtime_bar = ProgressBar.new()
+	_overtime_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_overtime_bar.max_value = 5.0
 	_overtime_bar.show_percentage = false
 	_overtime_bar.custom_minimum_size.y = 8.0
 	_overtime_bar.modulate = Color("ffb347")
 	box.add_child(_overtime_bar)
 	var buttons := HBoxContainer.new()
+	buttons.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.add_child(buttons)
 	_rematch_button = Button.new()
@@ -107,6 +137,18 @@ func _build_hud() -> void:
 	_leave_button.hide()
 	_leave_button.pressed.connect(_leave_match)
 	buttons.add_child(_leave_button)
+
+func _score_label(color: Color) -> Label:
+	var label := Label.new()
+	label.custom_minimum_size.x = 90.0
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 32)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", Color(0.02, 0.03, 0.05, 0.9))
+	label.add_theme_constant_override("outline_size", 5)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_score_row.add_child(label)
+	return label
 
 func get_players() -> Array:
 	return get_parent().get_node("Players").get_children()
@@ -134,6 +176,15 @@ func _sync_phase(value: String) -> void:
 				sync.replication_config = sync.get_meta("playtest_config")
 
 func _process(delta: float) -> void:
+	_feedback_clock += delta
+	_overtime_beat = maxf(0.0, _overtime_beat - delta)
+	if phase == "active" and control.overtime and control.overtime_remaining > 0.0:
+		if _overtime_beat <= 0.0:
+			_overtime_beat = lerpf(0.85, 0.35, 1.0 - clampf(control.overtime_remaining / maxf(control.overtime_duration(), 0.1), 0.0, 1.0))
+			Juice.queue_sound("overtime_tick", Vector2.ZERO, Juice.local_id(), true)
+	else:
+		_overtime_beat = 0.0
+	queue_redraw()
 	if phase == "ended":
 		return
 	if phase == "waiting" and not _reported_spawn_ready and get_players().size() == Overhaul.rules.player_count():
@@ -218,6 +269,7 @@ func _end_round(wins: Array, point: Dictionary) -> void:
 	round_wins.assign(wins)
 	control.load_snapshot(point)
 	phase = "intermission"
+	Juice.cue("objective", "ROUND COMPLETE")
 	round_pause = Overhaul.rules.round_break
 	for player in get_players():
 		player._ability.process_mode = Node.PROCESS_MODE_DISABLED
@@ -334,6 +386,7 @@ func _restore_player(id: int, point: Vector2) -> void:
 	player._input.direction = Vector2.ZERO
 	player._input.use_ability = false
 	player._ability.reset_for_respawn()
+	Juice.world("heal", point, id)
 	player._ability.process_mode = Node.PROCESS_MODE_INHERIT
 	player.stats_update.set_health(player.stats_update.max_health)
 	player.stats_update.set_mana(player.stats_update.max_mana)
@@ -356,6 +409,7 @@ func _finish(team: int, reason: String, points: Array, wins: Array) -> void:
 	phase = "ended"
 	Overhaul.result_team = team
 	Overhaul.result_text = "Draw" if team < 0 else "Team %s wins" % ("Blue" if team == 0 else "Red")
+	Juice.cue("objective", "DRAW" if team < 0 else ("VICTORY" if team == Overhaul.team_for(multiplayer.get_unique_id()) else "DEFEAT"))
 	if reason == "disconnect":
 		Overhaul.result_text = "Match ended: player disconnected"
 	Telemetry.end_match({"winner_team": team, "scores": points, "round_wins": round_wins, "match_end_reason": reason,
@@ -437,7 +491,26 @@ func _update_camera() -> void:
 			break
 	camera.global_position = point
 
+func _update_feedback_transitions() -> void:
+	if phase == "active":
+		if _feedback_phase in ["intermission", "waiting"]:
+			Juice.cue("objective", "ROUND START")
+		if Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE:
+			if _feedback_owner != -2 and control.owner >= 0 and control.owner != _feedback_owner:
+				Juice.cue("objective", "POINT CAPTURED" if control.owner == Overhaul.team_for(multiplayer.get_unique_id()) else "POINT LOST")
+			if control.overtime and not _feedback_overtime:
+				Juice.cue("objective", "OVERTIME")
+			var contested := occupants.has(0) and occupants.has(1)
+			if contested and not _feedback_contested:
+				Juice.cue("objective", "POINT CONTESTED")
+			_feedback_contested = contested
+	_feedback_owner = control.owner
+	_feedback_overtime = control.overtime
+	_feedback_phase = phase
+
 func _update_hud() -> void:
+	_update_feedback_transitions()
+	_score_row.visible = Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE
 	var team := Overhaul.team_for(multiplayer.get_unique_id())
 	var local := get_player(multiplayer.get_unique_id())
 	var mode := "2v2 CONTROL" if Overhaul.rules.preset == PlaytestRules.Preset.TEAM_OBJECTIVE else "VISION DUEL"
@@ -463,7 +536,10 @@ func _update_hud() -> void:
 			state = "NEXT ROUND IN %ds" % ceili(round_pause)
 		var blue_percent := mini(int(scores[0]), 99) if control.overtime and control.winner < 0 and control.owner == 0 else int(scores[0])
 		var red_percent := mini(int(scores[1]), 99) if control.overtime and control.winner < 0 and control.owner == 1 else int(scores[1])
-		_hint.text = "ROUNDS %d—%d · BLUE %d%% — %d%% RED · %s" % [round_wins[0], round_wins[1], blue_percent, red_percent, state]
+		_blue_score.text = "%d%%  %s" % [blue_percent, "●".repeat(round_wins[0])]
+		_red_score.text = "%s  %d%%" % ["●".repeat(round_wins[1]), red_percent]
+		_point_badge.modulate = TEAM_COLORS[control.owner] if control.owner >= 0 else Color.WHITE
+		_hint.text = state
 	else:
 		_hint.text = "Eliminate the opponent • Walls conceal players and prepared magic"
 	if phase == "waiting":
@@ -480,6 +556,15 @@ func _draw() -> void:
 			var points := PackedVector2Array(HexCells.get_hex_points_around(cell))
 			draw_colored_polygon(points, Color(point_color, 0.12))
 			draw_polyline(points, point_color, 2, true)
+		if phase == "active" and round_time >= Overhaul.rules.objective_delay and Juice.intensity > 0.0:
+			var color: Color = TEAM_COLORS[control.capture_team] if control.capture_team >= 0 else point_color
+			color.a = Juice.intensity * 0.6
+			var radius := HexCells.hex_width * 2.3
+			if control.capture_team >= 0:
+				draw_arc(Vector2.ZERO, radius, -PI / 2, -PI / 2 + maxf(0.01, control.capture_progress) * TAU, 64, color, 3.0, true)
+			if control.overtime:
+				var pulse := 0.5 if Juice.reduced_flashes else 0.35 + 0.15 * sin(_feedback_clock * 4.0)
+				draw_arc(Vector2.ZERO, radius + 7, 0, TAU, 64, Color(1.0, 0.7, 0.3, pulse * Juice.intensity), 2.0, true)
 		for team in range(2):
 			var center := Overhaul.spawn_position(team, 0) * Vector2(1, 0)
 			draw_circle(center, 180, Color(TEAM_COLORS[team], 0.12))
@@ -517,6 +602,7 @@ func _report_spawn_ready() -> void:
 
 
 func _show_result() -> void:
+	_score_row.hide()
 	_capture_bar.hide()
 	_overtime_bar.hide()
 	var peer := multiplayer.multiplayer_peer

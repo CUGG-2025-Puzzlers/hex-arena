@@ -313,6 +313,9 @@ func _apply_root(
 	rooted_until_msec = maxi(old_until, now + int(duration * 1000.0))
 	var added_duration := float(maxi(0, rooted_until_msec - maxi(old_until, now))) / 1000.0
 	Telemetry.record_cc(source_player_id, player_id, added_duration, source_ability)
+	if added_duration > 0.0:
+		Juice.world("root", global_position, player_id)
+		Juice.success("ROOTED", global_position, source_player_id)
 	velocity = Vector2.ZERO
 
 	# DashAbility moves the player from its own _physics_process(), so it must
@@ -329,13 +332,14 @@ func _apply_damage(
 ) -> void:
 	# Explicit attacks such as Tideblade, Pressure Lance, Burst, and Razor Wire
 	# call this directly, so the Reform invulnerability check belongs here too.
-	if is_invulnerable() or amount <= 0.0 or (source_player_id > 0 and Overhaul.friendly(source_player_id, player_id)):
+	if not is_alive or stats_update.current_health <= 0.0 or is_invulnerable() or amount <= 0.0 or (source_player_id > 0 and Overhaul.friendly(source_player_id, player_id)):
 		return
 	if Overhaul.active():
 		last_damage_time = Overhaul.get_match().elapsed
 
 	var actual_damage := minf(amount, stats_update.current_health)
 	Telemetry.record_damage(source_player_id, player_id, actual_damage, source_ability)
+	Juice.damage(self, actual_damage, source_player_id, actual_damage >= stats_update.current_health)
 	stats_update.take_damage(amount)
 
 
@@ -356,6 +360,7 @@ func _apply_heal(
 		return
 	var before := stats_update.current_health
 	stats_update.heal(amount)
+	Juice.heal(self, stats_update.current_health - before)
 	Telemetry.record_heal(
 		source_player_id,
 		stats_update.current_health - before,
@@ -384,6 +389,9 @@ func _apply_silence(
 	silenced_until_msec = maxi(old_until, now + int(duration * 1000.0))
 	var added_duration := float(maxi(0, silenced_until_msec - maxi(old_until, now))) / 1000.0
 	Telemetry.record_cc(source_player_id, player_id, added_duration, source_ability)
+	if added_duration > 0.0:
+		Juice.world("silence", global_position, player_id)
+		Juice.success("SILENCED", global_position, source_player_id)
 
 
 @rpc("authority", "call_local", "reliable")

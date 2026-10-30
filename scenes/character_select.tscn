@@ -1,250 +1,375 @@
 [gd_scene format=3 uid="uid://dbdtjmxxusy04"]
 
-[ext_resource type="Script" uid="uid://c0gojosq378ye" path="res://scripts/character_select.gd" id="1_x8mhf"]
-[ext_resource type="PackedScene" uid="uid://b3a0qvr67qhuw" path="res://scenes/selectable_character.tscn" id="2_jgus3"]
-[ext_resource type="Texture2D" uid="uid://if7xxb44kfxs" path="res://assets/textures/zilo_splash.png" id="3_bow2h"]
-[ext_resource type="Texture2D" uid="uid://duwhuih2m5qmu" path="res://assets/textures/hekaset_splash.png" id="3_fa52j"]
-[ext_resource type="Texture2D" uid="uid://cps56w3hlht21" path="res://assets/textures/61457.png" id="4_uxcyu"]
-[ext_resource type="Texture2D" uid="uid://d0qgf3a125u1x" path="res://assets/textures/zilo_icon.png" id="5_5wdeo"]
-[ext_resource type="Texture2D" uid="uid://beey07mewbjie" path="res://assets/textures/hekaset_icon.png" id="6_w1hxv"]
-[ext_resource type="Texture2D" uid="uid://q44v2exean2e" path="res://assets/textures/water_orb/water_orb_razor_splash.png" id="7_water_splash"]
-[ext_resource type="Texture2D" uid="uid://c26ka76hhx40o" path="res://assets/textures/water_orb/water_orb_razor_icon.png" id="8_water_icon"]
-[ext_resource type="Texture2D" uid="uid://d3p14r1unwk4r" path="res://assets/textures/water_orb/water_orb_flow_splash.png" id="9_flow_splash"]
-[ext_resource type="Texture2D" uid="uid://cwu5sko7ky25k" path="res://assets/textures/water_orb/water_orb_flow_icon.png" id="10_flow_icon"]
-[ext_resource type="Texture2D" uid="uid://cg58jgbvo8jpp" path="res://assets/textures/aurora/aurora_splash.png" id="11_aurora_splash"]
-[ext_resource type="Texture2D" uid="uid://drkmae6f862c0" path="res://assets/textures/aurora/aurora_icon.png" id="12_aurora_icon"]
+[ext_resource type="Script" path="res://scripts/character_select.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/themes/pregame.tres" id="2"]
+[ext_resource type="Texture2D" path="res://assets/ui/backgrounds/arena_courtyard.png" id="3"]
+[ext_resource type="Shader" path="res://shaders/pregame_shade.gdshader" id="4"]
 
-[node name="CharacterSelect" type="Node2D" unique_id=1709553184]
-script = ExtResource("1_x8mhf")
-texture_list = Array[Texture2D]([null, ExtResource("3_bow2h"), ExtResource("3_fa52j"), ExtResource("3_fa52j"), ExtResource("7_water_splash"), ExtResource("9_flow_splash"), ExtResource("11_aurora_splash")])
+[ext_resource type="PackedScene" path="res://scenes/selectable_character.tscn" id="5"]
+[ext_resource type="Texture2D" path="res://assets/textures/zilo_splash.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/textures/hekaset_splash.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/textures/water_orb/water_orb_razor_splash.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/textures/water_orb/water_orb_flow_splash.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/textures/aurora/aurora_splash.png" id="10"]
+[ext_resource type="Texture2D" path="res://assets/textures/zilo_icon.png" id="11"]
+[ext_resource type="Texture2D" path="res://assets/textures/hekaset_icon.png" id="12"]
+[ext_resource type="Texture2D" path="res://assets/textures/water_orb/water_orb_razor_icon.png" id="13"]
+[ext_resource type="Texture2D" path="res://assets/textures/water_orb/water_orb_flow_icon.png" id="14"]
+[ext_resource type="Texture2D" path="res://assets/textures/aurora/aurora_icon.png" id="15"]
+[ext_resource type="Texture2D" path="res://assets/textures/61457.png" id="16"]
 
-[node name="LocalPlayerInfo" type="Control" parent="." unique_id=1961302266]
-custom_minimum_size = Vector2(950, 1080)
+[sub_resource type="ShaderMaterial" id="Shade"]
+shader = ExtResource("4")
+
+[node name="CharacterSelect" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2")
+script = ExtResource("1")
+texture_list = Array[Texture2D]([null, ExtResource("6"), ExtResource("7"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10")])
 
-[node name="NamePanel" type="Panel" parent="LocalPlayerInfo" unique_id=503751340]
+
+[node name="Backdrop" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("Shade")
+
+[node name="SelectHeading" type="Label" parent="."]
 layout_mode = 0
-offset_right = 950.0
-offset_bottom = 100.0
-theme_type_variation = &"ModePanel"
+offset_left = 76.0
+offset_top = 40.0
+offset_right = 1076.0
+offset_bottom = 140.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 62
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "ASSEMBLE YOUR TEAM"
 
-[node name="LocalPlayerName" type="Label" parent="LocalPlayerInfo/NamePanel" unique_id=1331055825]
+
+[node name="SelectSubtitle" type="Label" parent="."]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 143.0
+offset_right = 981.0
+offset_bottom = 175.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "CHOOSE A HERO. MAKE YOUR NEXT MOVE."
+
+
+[node name="LocalCharacterArt" type="TextureRect" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 20.0
-offset_top = 10.0
-offset_right = 930.0
-offset_bottom = 90.0
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 50
-text = "Waiting for player..."
-
-[node name="LocalCharacterArt" type="TextureRect" parent="LocalPlayerInfo" unique_id=23506429]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(950, 950)
-layout_mode = 0
-offset_top = 130.0
-offset_right = 950.0
-offset_bottom = 1080.0
+offset_left = 570.0
+offset_top = 70.0
+offset_right = 1560.0
+offset_bottom = 840.0
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LocalCharacterName" type="Label" parent="LocalPlayerInfo" unique_id=115677487]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(950, 100)
-layout_mode = 0
-offset_top = 100.0
-offset_right = 950.0
-offset_bottom = 123.0
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 40
-text = "Character Name"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="RemotePlayerInfo" type="Control" parent="." unique_id=1393824492]
-custom_minimum_size = Vector2(950, 1080)
-layout_mode = 3
-anchors_preset = 0
-offset_left = 970.0
-offset_right = 1010.0
-offset_bottom = 40.0
-
-[node name="NamePanel" type="Panel" parent="RemotePlayerInfo" unique_id=600625399]
-layout_mode = 0
-offset_right = 950.0
-offset_bottom = 100.0
-theme_type_variation = &"ModePanel"
-
-[node name="RemotePlayerName" type="Label" parent="RemotePlayerInfo/NamePanel" unique_id=1112659897]
+[node name="LocalPlayerName" type="Label" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 20.0
-offset_top = 10.0
-offset_right = 930.0
-offset_bottom = 90.0
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 50
-text = "Waiting for player..."
+offset_left = 80.0
+offset_top = 252.0
+offset_right = 580.0
+offset_bottom = 288.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Player"
 
-[node name="RemoteCharacterArt" type="TextureRect" parent="RemotePlayerInfo" unique_id=891245071]
+
+[node name="LocalCharacterName" type="Label" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(950, 950)
 layout_mode = 0
-offset_top = 130.0
-offset_right = 950.0
-offset_bottom = 1080.0
+offset_left = 76.0
+offset_top = 300.0
+offset_right = 646.0
+offset_bottom = 400.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 66
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "CHOOSE A HERO"
+
+
+[node name="SelectedHeroRole" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 82.0
+offset_top = 410.0
+offset_right = 582.0
+offset_bottom = 445.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = ""
+theme_override_colors/font_color = Color(1, 0.65, 0.26, 1)
+
+[node name="SelectedHeroDescription" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 82.0
+offset_top = 470.0
+offset_right = 532.0
+offset_bottom = 620.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Select a portrait below to preview your hero."
+autowrap_mode = 3
+
+[node name="RemotePanel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 1535.0
+offset_top = 240.0
+offset_right = 1835.0
+offset_bottom = 590.0
+
+
+[node name="RemoteBox" type="VBoxContainer" parent="RemotePanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RemoteHeader" type="Label" parent="RemotePanel/RemoteBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "OTHER SLOT"
+
+
+[node name="RemotePlayerName" type="Label" parent="RemotePanel/RemoteBox"]
+unique_name_in_owner = true
+unique_name_in_owner = true
+layout_mode = 2
+text = "Waiting for player…"
+theme_override_font_sizes/font_size = 23
+autowrap_mode = 3
+
+[node name="RemoteCharacterArt" type="TextureRect" parent="RemotePanel/RemoteBox"]
+unique_name_in_owner = true
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(220, 210)
 expand_mode = 1
 stretch_mode = 5
-flip_h = true
 
-[node name="RemoteCharacterName" type="Label" parent="RemotePlayerInfo" unique_id=1567604212]
+[node name="RemoteCharacterName" type="Label" parent="RemotePanel/RemoteBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(950, 100)
-layout_mode = 0
-offset_top = 100.0
-offset_right = 950.0
-offset_bottom = 123.0
-theme_type_variation = &"MutedLabel"
-theme_override_font_sizes/font_size = 40
-text = "Character Name"
-horizontal_alignment = 1
-vertical_alignment = 1
+unique_name_in_owner = true
+layout_mode = 2
+text = "Choose a hero"
+theme_override_font_sizes/font_size = 23
 
-[node name="CharacterContainer" type="CenterContainer" parent="." unique_id=1696245211]
-offset_top = 730.0
+[node name="SelectionTargetContainer" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 675.0
+offset_right = 600.0
+offset_bottom = 740.0
+theme_override_constants/separation = 16
+
+[node name="ChoosePlayerButton" type="Button" parent="SelectionTargetContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(230, 60)
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 21
+text = "YOUR HERO"
+
+
+[node name="ChooseBotButton" type="Button" parent="SelectionTargetContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(230, 60)
+theme_type_variation = &"Button"
+theme_override_font_sizes/font_size = 21
+text = "BOT HERO"
+
+
+[node name="RosterPlate" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 820.0
 offset_right = 1920.0
 offset_bottom = 1080.0
+mouse_filter = 2
+color = Color(0.04, 0.09, 0.16, 0.87)
 
-[node name="CharacterList" type="HBoxContainer" parent="CharacterContainer" unique_id=2080266635]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-theme_override_constants/separation = 20
-
-[node name="SelectableCharacter" parent="CharacterContainer/CharacterList" unique_id=20013062 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-icon = ExtResource("5_5wdeo")
-character = 1
-
-[node name="SelectableCharacter2" parent="CharacterContainer/CharacterList" unique_id=840476462 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-icon = ExtResource("6_w1hxv")
-character = 3
-
-[node name="SelectableCharacter3" parent="CharacterContainer/CharacterList" unique_id=1268722044 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-icon = ExtResource("4_uxcyu")
-character = 2
-locked = true
-
-[node name="WaterOrbA" parent="CharacterContainer/CharacterList" unique_id=816066300 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-icon = ExtResource("8_water_icon")
-character = 4
-
-[node name="WaterOrbB" parent="CharacterContainer/CharacterList" unique_id=847911 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-icon = ExtResource("10_flow_icon")
-character = 5
-
-[node name="Aurora" parent="CharacterContainer/CharacterList" unique_id=1573898395 instance=ExtResource("2_jgus3")]
-layout_mode = 2
-icon = ExtResource("12_aurora_icon")
-character = 6
-
-[node name="SelectionTargetContainer" type="HBoxContainer" parent="." unique_id=1586798201]
+[node name="HeroRoster" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 660.0
-offset_top = 686.0
-offset_right = 1267.0
-offset_bottom = 740.0
-grow_horizontal = 2
+layout_mode = 0
+offset_left = 400.0
+offset_top = 846.0
+offset_right = 1520.0
+offset_bottom = 1014.0
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="ChoosePlayerButton" type="Button" parent="SelectionTargetContainer" unique_id=204482782]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 48)
+[node name="Zilo" parent="HeroRoster" instance=ExtResource("5")]
 layout_mode = 2
-theme_type_variation = &"TealButton"
-theme_override_font_sizes/font_size = 24
-text = "Choose Your Character"
+icon = ExtResource("11")
+character = 1
+locked = false
 
-[node name="ChooseBotButton" type="Button" parent="SelectionTargetContainer" unique_id=1219023909]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 48)
+[node name="Hekaset" parent="HeroRoster" instance=ExtResource("5")]
 layout_mode = 2
-theme_type_variation = &"TealButton"
-theme_override_font_sizes/font_size = 24
-text = "Choose Bot Character"
+icon = ExtResource("12")
+character = 3
+locked = false
 
-[node name="StartButton" type="Button" parent="." unique_id=2091587044]
-unique_name_in_owner = true
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 860.0
-offset_top = 425.0
-offset_right = 1060.0
-offset_bottom = 525.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"PlayButton"
-theme_override_font_sizes/font_size = 50
-text = " Start "
+[node name="Vesta" parent="HeroRoster" instance=ExtResource("5")]
+layout_mode = 2
+icon = ExtResource("16")
+character = 2
+locked = true
 
-[node name="BackButton" type="Button" parent="." unique_id=457765511]
+[node name="WaterOrbA" parent="HeroRoster" instance=ExtResource("5")]
+layout_mode = 2
+icon = ExtResource("13")
+character = 4
+locked = false
+
+[node name="WaterOrbB" parent="HeroRoster" instance=ExtResource("5")]
+layout_mode = 2
+icon = ExtResource("14")
+character = 5
+locked = false
+
+[node name="Aurora" parent="HeroRoster" instance=ExtResource("5")]
+layout_mode = 2
+icon = ExtResource("15")
+character = 6
+locked = false
+
+[node name="ReadyStatus" type="Label" parent="."]
 unique_name_in_owner = true
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 1756.0
-offset_top = 988.0
-offset_right = 1892.0
-offset_bottom = 1045.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_left = 420.0
+offset_top = 1030.0
+offset_right = 1500.0
+offset_bottom = 1062.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.03, 0.06, 0.12, 0.5)
+theme_override_constants/shadow_offset_y = 2
+text = "Choose a hero to prepare for the match."
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1570.0
+offset_top = 912.0
+offset_right = 1840.0
+offset_bottom = 988.0
+theme_type_variation = &"PrimaryButton"
+theme_override_font_sizes/font_size = 27
+text = "START MATCH"
+
+
+[node name="BackButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 941.0
+offset_right = 300.0
+offset_bottom = 1005.0
 theme_type_variation = &"NavButton"
-theme_override_font_sizes/font_size = 35
-text = "Back
-"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1107944300]
-offset_left = 17.0
-offset_top = 848.0
-offset_right = 317.0
-offset_bottom = 1065.0
-theme_override_constants/separation = 15
-alignment = 2
-
-[node name="PortForwardingLabel" type="Label" parent="VBoxContainer" unique_id=1022525613]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"RedLabel"
 theme_override_font_sizes/font_size = 25
-text = " Manual Port Forwarding 
- Required For Online Play "
+text = "←  BACK"
 
-[node name="CopyExternalIPButton" type="Button" parent="VBoxContainer" unique_id=1286893130]
+
+[node name="ConnectionInfo" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 1535.0
+offset_top = 610.0
+offset_right = 1835.0
+offset_bottom = 770.0
+theme_override_constants/separation = 10
+
+[node name="PortForwardingLabel" type="Label" parent="ConnectionInfo"]
+unique_name_in_owner = true
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TealButton"
-theme_override_font_sizes/font_size = 35
-text = "Copy External IP"
+text = "Internet hosting needs port forwarding."
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.83, 0.6, 1)
 
-[node name="CopyInternalIPButton" type="Button" parent="VBoxContainer" unique_id=337733082]
+[node name="CopyExternalIPButton" type="Button" parent="ConnectionInfo"]
+unique_name_in_owner = true
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TealButton"
-theme_override_font_sizes/font_size = 35
-text = "Copy LAN IP"
+text = "COPY INTERNET IP"
+theme_override_font_sizes/font_size = 16
+
+[node name="CopyInternalIPButton" type="Button" parent="ConnectionInfo"]
+unique_name_in_owner = true
+unique_name_in_owner = true
+layout_mode = 2
+text = "COPY LAN IP"
+theme_override_font_sizes/font_size = 16
+
+[node name="LobbyRules" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1515.0
+offset_top = 50.0
+offset_right = 1855.0
+offset_bottom = 210.0
+
+
+[node name="LobbyRulesBox" type="VBoxContainer" parent="LobbyRules"]
+unique_name_in_owner = true
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LobbyRoster" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+offset_left = 80.0
+offset_top = 625.0
+offset_right = 580.0
+offset_bottom = 795.0
+
+[node name="TeamRosterBox" type="VBoxContainer" parent="LobbyRoster"]
+unique_name_in_owner = true
+layout_mode = 2

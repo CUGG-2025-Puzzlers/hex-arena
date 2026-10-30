@@ -24,6 +24,8 @@ var player_id : int = -1
 var telemetry_name: String = ""
 var _last_wall_position: Vector2
 var _wall_tracking_ready: bool = false
+var feedback_placement: String = "place"
+var _feedback_broken: bool = false
 
 const ENEMY_MAGIC_TINT := Color(0.819, 0.205, 0.204, 1.0)
 
@@ -113,6 +115,7 @@ func place_instance_for_player(cell: Vector2i, _player_owner: Player = null, _st
 	if not GameManager.readability_style_changed.is_connected(_apply_readability_style):
 		GameManager.readability_style_changed.connect(_apply_readability_style)
 	_apply_readability_style(GameManager.readability_style)
+	Juice.world(feedback_placement, global_position, player_id)
 
 
 func _apply_readability_style(style: String) -> void:
@@ -211,6 +214,7 @@ func change_state_for_player(new_magic_state: MagicType, _player_owner: Player):
 	monitorable = false
 	
 	var new_magic : Magic = own_transforms[new_magic_state].scene.instantiate()
+	new_magic.feedback_placement = "transform"
 	
 	new_magic.place_instance_for_player(self_cell, _player_owner, own_transforms[new_magic_state])
 	
@@ -229,7 +233,7 @@ func _advance_rolling(delta: float):
 				rolling_pathfollow.progress_ratio = 0
 
 		if not screen.has_point(global_position):
-			fizzle()
+			fizzle("expired")
 
 
 
@@ -240,7 +244,8 @@ func _process(delta: float) -> void:
 		custom_function.call(delta)
 	if rolling and Overhaul.active() and not is_queued_for_deletion():
 		if not PlaytestVisionMask.has_line_of_sight(previous, global_position, Overhaul.get_match().walls):
-			fizzle()
+			Juice.world("wall", previous, player_id, -rolling_dir)
+			fizzle("interrupted")
 	_last_wall_position = global_position
 	_wall_tracking_ready = true
 
@@ -293,18 +298,34 @@ func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group('magic') and \
 	(not Overhaul.friendly(area.player_id, player_id) \
 	or collides_w_own or area.collides_w_own):
+		if damage > 0.0 and area.damage > 0.0 and not self is MagicShield and not is_queued_for_deletion():
+			Juice.world("spell", global_position, player_id, (global_position - area.global_position).normalized())
 		take_damage(area.damage)
 
 # Decreases this magic object's health
 # Destroys it if no health remains
 func take_damage(damage_to_take: float):
+	var before := own_health
+	if damage_to_take > 0.0 and own_health > 0.0 and not is_queued_for_deletion() and self is MagicShield:
+		Juice.world("block", global_position, player_id)
+		Juice.success("BLOCKED", global_position, player_id)
 	own_health -= damage_to_take
 	
 	if own_health <= 0:
+		if damage_to_take > 0.0 and before > 0.0:
+			feedback_destroyed()
 		fizzle()
 
+func feedback_destroyed() -> void:
+	if _feedback_broken or is_queued_for_deletion():
+		return
+	_feedback_broken = true
+	Juice.world("break", global_position, player_id)
+
 # Destroys this object and its associated path
-func fizzle():
+func fizzle(reason: String = "ended"):
+	if not _feedback_broken and not is_queued_for_deletion() and is_inside_tree() and reason in ["expired", "completed", "interrupted", "lost_target"]:
+		Juice.world(reason, global_position, player_id)
 	_release_grid_cell()
 	if is_queued_for_deletion() or not is_inside_tree():
 		return

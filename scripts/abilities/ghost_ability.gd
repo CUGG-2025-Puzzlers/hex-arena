@@ -27,6 +27,7 @@ func _process(delta: float) -> void:
 		# ^ solved infinitely increasing speed
 		
 		if elapsed >= duration:
+			Juice.world("completed", player.global_position, player.player_id)
 			_deactivate()
 
 func _execute() -> void:

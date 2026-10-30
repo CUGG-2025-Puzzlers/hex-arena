@@ -1,7 +1,8 @@
 extends Node
 
 const WAITING_FOR_PLAYER := "Waiting for player..."
-const SELECT_CHARACTER := "Select Character"
+const SELECT_CHARACTER := "CHOOSE A HERO"
+const HERO_CATALOG = preload("res://scripts/ui/hero_catalog.gd")
 
 @onready var _local_player_name: Label = %LocalPlayerName
 @onready var _local_character_art: TextureRect = %LocalCharacterArt
@@ -54,7 +55,10 @@ func _ready() -> void:
 
 	if not _bot_mode:
 		_build_playtest_controls()
+	%LobbyRules.visible = not _bot_mode
+	%LobbyRoster.visible = not _bot_mode
 	_check_players_ready()
+	_refresh_card_selection()
 	_update_back_button_text()
 	Telemetry.track("character_select_viewed", {
 		"mode": "bot" if _bot_mode else "online",
@@ -120,12 +124,14 @@ func _select_player_slot() -> void:
 	_selection_target_id = 1
 	_choose_player_button.disabled = true
 	_choose_bot_button.disabled = false
+	_refresh_card_selection()
 
 
 func _select_bot_slot() -> void:
 	_selection_target_id = MultiplayerManager.BOT_PLAYER_ID
 	_choose_player_button.disabled = false
 	_choose_bot_button.disabled = true
+	_refresh_card_selection()
 
 
 func _on_player_connected(_id, info) -> void:
@@ -161,6 +167,7 @@ func _on_character_selected(
 		else player_id == multiplayer.get_unique_id()
 	)
 	_set_character_info(character, is_local_slot)
+	_refresh_card_selection()
 	_check_players_ready()
 
 
@@ -216,8 +223,10 @@ func _set_character_info(
 		character_texture = texture_list[character_index]
 
 	if is_local_client:
-		_local_character_name.text = character_name
+		_local_character_name.text = character_name.to_upper()
 		_local_character_art.texture = character_texture
+		%SelectedHeroRole.text = str(HERO_CATALOG.ROLES.get(character, ""))
+		%SelectedHeroDescription.text = str(HERO_CATALOG.DESCRIPTIONS.get(character, "Select a portrait below to preview your hero."))
 	else:
 		_remote_character_name.text = character_name
 		_remote_character_art.texture = character_texture
@@ -241,30 +250,28 @@ func _players_are_ready() -> bool:
 	return true
 
 func _check_players_ready() -> void:
-	_start_button.visible = (_bot_mode or multiplayer.is_server()) and _players_are_ready()
+	var ready := _players_are_ready()
+	_start_button.visible = (_bot_mode or multiplayer.is_server()) and ready
+	%ReadyStatus.text = "READY TO PLAY" if ready else "Waiting for every player to select a hero…"
 
 func _build_playtest_controls() -> void:
-	var layer := CanvasLayer.new()
-	add_child(layer)
-	var panel := PanelContainer.new()
-	panel.position = Vector2(650, 35)
-	panel.custom_minimum_size = Vector2(620, 150)
-	layer.add_child(panel)
-	var box := VBoxContainer.new()
-	panel.add_child(box)
+	var box: VBoxContainer = %LobbyRulesBox
 	_preset_select = OptionButton.new()
-	for title in ["A — Original duel", "B — Vision duel / new map", "C — 2v2 control / respawns"]:
+	for title in ["A · ORIGINAL DUEL", "B · VISION DUEL", "C · 2v2 CONTROL"]:
 		_preset_select.add_item(title)
 	_preset_select.set_item_disabled(2, MultiplayerManager._active_transport.begins_with("eos"))
 	_preset_select.disabled = not multiplayer.is_server()
 	box.add_child(_preset_select)
 	_vision_check = CheckButton.new()
-	_vision_check.text = "Limited vision (uncheck for same-map comparison)"
+	_vision_check.text = "LIMITED VISION"
+	_vision_check.tooltip_text = "Uncheck to compare full sight on the same arena."
+	_vision_check.add_theme_font_size_override("font_size", 18)
 	_vision_check.disabled = not multiplayer.is_server()
 	box.add_child(_vision_check)
 	_team_roster = Label.new()
-	_team_roster.add_theme_font_size_override("font_size", 19)
-	box.add_child(_team_roster)
+	_team_roster.add_theme_font_size_override("font_size", 16)
+	_team_roster.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	%TeamRosterBox.add_child(_team_roster)
 	_preset_select.item_selected.connect(func(value: int): Overhaul.set_preset(value, _vision_check.button_pressed))
 	_vision_check.toggled.connect(func(value: bool): Overhaul.set_preset(_preset_select.selected, value))
 	Overhaul.settings_changed.connect(_refresh_playtest_controls)
@@ -291,3 +298,11 @@ func _refresh_playtest_controls() -> void:
 		lines.append("%s · %s — %s" % ["Blue" if i % 2 == 0 else "Red", info.name, Util.get_character_display_name(info.character)])
 	_team_roster.text = "2v2 uses LAN / direct connect\n" + "\n".join(lines) + "\n%d / %d players · host starts when everyone selects" % [ids.size(), Overhaul.rules.player_count()]
 	_check_players_ready()
+
+
+func _refresh_card_selection() -> void:
+	var target := _selection_target_id if _bot_mode else multiplayer.get_unique_id()
+	var chosen: int = MultiplayerManager.players.get(target, {}).get("character", Util.Character.None)
+	for card in %HeroRoster.get_children():
+		if card.has_method("set_selected"):
+			card.set_selected(card.character == chosen)

@@ -23,6 +23,7 @@ const DISPLAY_STATS := [
 func _ready() -> void:
 	MultiplayerManager.reset_character_selections()
 	winner_label.text = "%s wins!" % SceneManager.winner_name
+	Juice.cue.call_deferred("objective", winner_label.text)
 	play_again_button.pressed.connect(_on_play_again_pressed)
 	main_menu_button.pressed.connect(_on_main_menu_pressed)
 	_populate_match_stats()

@@ -24,7 +24,7 @@ func start_lifetime_timer(time: float):
 	timer.one_shot = true
 	timer.autostart = true
 	
-	timer.timeout.connect(fizzle)
+	timer.timeout.connect(fizzle.bind("expired"))
 	
 	timer.wait_time = time
 	add_child(timer)
